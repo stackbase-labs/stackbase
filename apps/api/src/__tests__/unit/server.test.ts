@@ -44,6 +44,29 @@ describe('API Server', () => {
     });
   });
 
+  describe('GET /metrics', () => {
+    it('should return 200 with Prometheus metrics in text format', async () => {
+      const response = await supertest(app).get('/metrics').expect(200);
+
+      expect(response.headers['content-type']).toContain('text/plain');
+      expect(response.text).toContain('build_elevate_');
+      expect(response.text).toContain('build_elevate_http_requests_total');
+      expect(response.text).toContain('build_elevate_http_request_duration_seconds');
+      expect(response.text).toContain('build_elevate_http_requests_in_flight');
+    });
+
+    it('should track requests in http_requests_total metric', async () => {
+      // Send a request to an endpoint
+      await supertest(app).get('/health').expect(200);
+
+      // Scrape metrics and verify route was recorded
+      const metricsResponse = await supertest(app).get('/metrics').expect(200);
+      expect(metricsResponse.text).toMatch(
+        /build_elevate_http_requests_total\{.*route="\/health".*\}\s+[1-9]\d*/,
+      );
+    });
+  });
+
   describe('404 handling', () => {
     it.each(['/non-existent-route', '/api/non-existent'])(
       'should return 404 for %s',

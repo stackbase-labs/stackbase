@@ -353,6 +353,22 @@ Services include:
 
 See [Docker Documentation](https://build-elevate.vercel.app/docs/configuration/docker) for more details.
 
+### Local Observability
+
+Run Prometheus and Grafana locally to visualize the API metrics exposed at `http://localhost:4000/metrics`:
+
+```bash
+pnpm --filter api dev
+pnpm docker:observability
+```
+
+Then open:
+
+- **Prometheus**: <http://localhost:9090>
+- **Grafana**: <http://localhost:3002> (`admin` / `admin`)
+
+The provisioned Grafana dashboard is named **Build Elevate API Overview** and includes request rate, status codes, p95 latency, per-route latency, and in-flight request panels. Generate a little traffic with `curl http://localhost:4000/health` or an API route if the dashboard is empty at first.
+
 ## ⛵ Kubernetes
 
 Production-ready manifests for deploying both the Next.js frontend and Express API to any Kubernetes cluster (EKS, GKE, AKS, k3s, minikube) live in the [`k8s/`](k8s/) directory — Deployments, Services, nginx Ingress, HorizontalPodAutoscalers (2 → 10 pods), and a post-deploy health-check script.

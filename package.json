@@ -42,6 +42,7 @@
     "clean": "turbo clean",
     "dev": "turbo dev",
     "docker:dev": "docker-compose up --build",
+    "docker:observability": "docker-compose -f docker-compose.observability.yml up",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
     "lint": "turbo lint",
     "lint:fix": "turbo run lint:fix",

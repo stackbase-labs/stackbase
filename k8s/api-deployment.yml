@@ -16,6 +16,10 @@ spec:
     metadata:
       labels:
         app: build-elevate-api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4000"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: build-elevate-api

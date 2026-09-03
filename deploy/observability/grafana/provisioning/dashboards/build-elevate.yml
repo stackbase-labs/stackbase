@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Build Elevate
+    orgId: 1
+    folder: Build Elevate
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

@@ -5,14 +5,16 @@ import express, { type Express, type Request, json, urlencoded } from 'express';
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 import corsOptions from './config/corsOptions';
+import { register } from './metrics';
 import credentials from './middleware/credentials';
 import { errorHandler } from './middleware/error';
+import { metricsMiddleware } from './middleware/metrics';
 import routes from './routes';
 
 const isProd = process.env.NODE_ENV === 'production';
 
-// Liveness/readiness probes are hit constantly (K8s) and add only noise.
-const HEALTH_ROUTES = new Set(['/', '/health', '/healthz', '/readyz']);
+// Liveness/readiness probes and metrics scraping are hit constantly (K8s/Prometheus) and add only noise.
+const IGNORED_LOG_ROUTES = new Set(['/', '/health', '/healthz', '/readyz', '/metrics']);
 
 export const createServer = (): Express => {
   const app = express();
@@ -37,7 +39,7 @@ export const createServer = (): Express => {
     pinoHttp({
       logger,
       autoLogging: {
-        ignore: (req) => HEALTH_ROUTES.has(req.url ?? ''),
+        ignore: (req) => IGNORED_LOG_ROUTES.has(req.url ?? ''),
       },
       customSuccessMessage: (req, res, responseTime) =>
         `${req.method} ${req.url} ${res.statusCode} (${Math.round(responseTime)}ms)`,
@@ -51,6 +53,9 @@ export const createServer = (): Express => {
       },
     }),
   );
+
+  // Prometheus HTTP RED metrics collection
+  app.use(metricsMiddleware);
 
   // Body parsing
   app.use(json());
@@ -77,6 +82,12 @@ export const createServer = (): Express => {
 
   app.get('/healthz', (req, res) => {
     res.status(200).send('ok');
+  });
+
+  // Prometheus metrics scraping endpoint
+  app.get('/metrics', async (_req, res) => {
+    res.setHeader('Content-Type', register.contentType);
+    res.send(await register.metrics());
   });
 
   // Health check route

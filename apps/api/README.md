@@ -39,16 +39,20 @@ The server will be running at `http://localhost:4000` (or the port you specified
 
 ### 4. API Endpoints
 
-- `GET /api/health`: Check the health of the API server.
+- `GET /health`: Basic health check with uptime and timestamp.
+- `GET /healthz`: Kubernetes liveness probe.
+- `GET /readyz`: Kubernetes readiness probe.
+- `GET /metrics`: Prometheus metrics scraping endpoint.
 
-## Middleware
+## Middleware & Monitoring
 
-- **Helmet**: For setting various HTTP headers for security.
-- **Morgan**: For logging HTTP requests.
-- **Body Parsers**: To parse JSON and URL-encoded request bodies.
-- **Credentials**: Whitelists origins and sets `Access-Control-Allow-Credentials` for allowed requests.
-- **CORS**: Configured to allow requests from specified origins.
-- **Error Handling**: Centralized error handling middleware.
+- **Prometheus Metrics**: High-resolution HTTP RED metrics (`http_requests_total`, `http_request_duration_seconds`, `http_requests_in_flight`) and Node.js process metrics via `prom-client`.
+- **Pino & Pino-HTTP**: Fast, structured JSON logging with sensitive data redaction.
+- **Helmet**: Security HTTP headers.
+- **Body Parsers**: Express JSON and URL-encoded request body parsing.
+- **Credentials & CORS**: Whitelists origins and handles credentials safely.
+- **Rate Limiting**: Distributed Upstash Redis rate limiting on `/api` routes.
+- **Error Handling**: Centralized error handling and correlated logging.
 
 ## License
 

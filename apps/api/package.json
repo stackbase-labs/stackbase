@@ -24,7 +24,8 @@
     "dotenv": "catalog:core",
     "express": "catalog:server",
     "helmet": "catalog:server",
-    "pino-http": "catalog:server"
+    "pino-http": "catalog:server",
+    "prom-client": "catalog:server"
   },
   "devDependencies": {
     "@types/cors": "catalog:server",

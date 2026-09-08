@@ -1,6 +1,6 @@
 {
   "title": "Configuration",
   "icon": "Settings",
-  "pages": ["environment-variables", "docker", "formatting"],
+  "pages": ["environment-variables", "docker", "observability", "formatting"],
   "defaultOpen": true
 }

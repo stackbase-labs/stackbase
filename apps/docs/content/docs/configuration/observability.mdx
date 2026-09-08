@@ -1,0 +1,205 @@
+---
+title: Observability
+description: Run Prometheus and Grafana locally to scrape, store, and visualize API metrics exposed by build-elevate
+---
+
+# Prometheus & Grafana
+
+build-elevate includes a local observability stack for the Express API. Prometheus scrapes the API's `/metrics` endpoint, and Grafana starts with a provisioned Prometheus data source plus an API overview dashboard.
+
+## What You Get
+
+- **Prometheus** on `http://localhost:9090`
+- **Grafana** on `http://localhost:3002`
+- **API metrics endpoint** on `http://localhost:4000/metrics`
+- **Provisioned dashboard** named **Build Elevate API Overview**
+- **RED metrics** for request rate, errors, and duration
+- **Node.js runtime metrics** from `prom-client`
+
+The observability files live in:
+
+| File                                                        | Purpose                                       |
+| ----------------------------------------------------------- | --------------------------------------------- |
+| `docker-compose.observability.yml`                          | Runs Prometheus and Grafana locally           |
+| `deploy/observability/prometheus.yml`                       | Configures Prometheus scraping                |
+| `deploy/observability/grafana/provisioning/datasources`     | Provisions the Prometheus Grafana data source |
+| `deploy/observability/grafana/provisioning/dashboards`      | Provisions Grafana dashboard loading          |
+| `deploy/observability/grafana/dashboards/api-overview.json` | API overview dashboard definition             |
+| `apps/api/src/metrics/index.ts`                             | Defines Prometheus metrics                    |
+| `apps/api/src/middleware/metrics.ts`                        | Records HTTP request metrics                  |
+
+## Start The Stack
+
+Start the API first so Prometheus has something to scrape:
+
+```bash
+pnpm --filter api dev
+```
+
+In another terminal, start Prometheus and Grafana:
+
+```bash
+pnpm docker:observability
+```
+
+Then open:
+
+- **Prometheus**: [http://localhost:9090](http://localhost:9090)
+- **Grafana**: [http://localhost:3002](http://localhost:3002)
+
+Grafana uses these local credentials:
+
+```text
+Username: admin
+Password: admin
+```
+
+<Callout type="warning">
+  The local Grafana credentials are for development only. Change them before
+  using this setup in any shared or production environment.
+</Callout>
+
+## Generate Traffic
+
+The dashboard needs API traffic before most panels show useful data. Hit a few endpoints:
+
+```bash
+curl http://localhost:4000/health
+curl http://localhost:4000/
+curl http://localhost:4000/api/users/session
+```
+
+You can also leave the app running and interact with the web UI. Prometheus scrapes every 15 seconds by default, so panels may take a short moment to populate.
+
+## Metrics Exposed By The API
+
+The API exposes metrics at `/metrics` using Prometheus text format:
+
+```bash
+curl http://localhost:4000/metrics
+```
+
+Application HTTP metrics include:
+
+| Metric                                        | Type      | Labels                           | Description                      |
+| --------------------------------------------- | --------- | -------------------------------- | -------------------------------- |
+| `build_elevate_http_requests_total`           | Counter   | `method`, `route`, `status_code` | Total HTTP requests processed    |
+| `build_elevate_http_request_duration_seconds` | Histogram | `method`, `route`, `status_code` | HTTP request duration in seconds |
+| `build_elevate_http_requests_in_flight`       | Gauge     | `method`                         | Requests currently being handled |
+
+The API also exposes default Node.js process metrics with the `build_elevate_` prefix, including CPU, memory, event loop, garbage collection, and active handle metrics.
+
+Health checks and scraper routes are intentionally excluded from RED metrics where they would add noise:
+
+- `/metrics`
+- `/healthz`
+- `/readyz`
+
+## Prometheus Configuration
+
+Prometheus is configured in `deploy/observability/prometheus.yml`:
+
+```yaml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: build-elevate-api
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - host.docker.internal:4000
+        labels:
+          service: api
+          environment: local
+```
+
+`host.docker.internal:4000` lets the Prometheus container scrape the API running on your host machine.
+
+<Callout type="info">
+  On Linux, the compose file adds `host.docker.internal:host-gateway` so the
+  same Prometheus target works across Docker Desktop and native Docker setups.
+</Callout>
+
+## Grafana Dashboard
+
+Grafana automatically provisions:
+
+- A Prometheus data source named **Prometheus**
+- A dashboard folder named **Build Elevate**
+- The **Build Elevate API Overview** dashboard
+
+The dashboard includes panels for:
+
+- request rate
+- total requests by status code
+- p95 latency
+- average latency
+- per-route latency
+- in-flight requests
+- Node.js memory and CPU signals
+
+If you edit dashboard JSON locally, restart Grafana to reload provisioned dashboards:
+
+```bash
+docker-compose -f docker-compose.observability.yml restart grafana
+```
+
+## Production Notes
+
+The included compose stack is intended for local development. For production, deploy Prometheus and Grafana through your infrastructure platform and scrape the API service through your cluster or private network.
+
+For Kubernetes deployments, the API pods include Prometheus scrape annotations:
+
+```yaml
+prometheus.io/scrape: "true"
+prometheus.io/port: "4000"
+prometheus.io/path: "/metrics"
+```
+
+Use those annotations with a Prometheus setup that supports Kubernetes service discovery, or translate them into the equivalent `ServiceMonitor` or `PodMonitor` resources if you use the Prometheus Operator.
+
+## Troubleshooting
+
+### Prometheus Target Is Down
+
+Check that the API is running:
+
+```bash
+curl http://localhost:4000/health
+curl http://localhost:4000/metrics
+```
+
+Then open Prometheus targets at [http://localhost:9090/targets](http://localhost:9090/targets). The `build-elevate-api` target should show as **UP**.
+
+### Grafana Dashboard Is Empty
+
+Generate API traffic, wait for the next Prometheus scrape, then refresh Grafana:
+
+```bash
+curl http://localhost:4000/health
+curl http://localhost:4000/api/users/session
+```
+
+Empty panels usually mean either the API has not received matching traffic yet or Prometheus has not scraped the latest samples.
+
+### Port Already In Use
+
+The local stack uses:
+
+- `9090` for Prometheus
+- `3002` for Grafana
+- `4000` for the API
+
+If one of those ports is already taken, change the port mapping in `docker-compose.observability.yml` and restart the stack.
+
+### Reset Local Observability Data
+
+Stop the observability stack and remove its volumes:
+
+```bash
+docker-compose -f docker-compose.observability.yml down -v
+```
+
+This clears local Prometheus time-series data and Grafana's local database.

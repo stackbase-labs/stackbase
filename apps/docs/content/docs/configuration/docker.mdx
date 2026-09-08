@@ -96,6 +96,17 @@ This will start:
 - **API** - http://localhost:4000
 - **PostgreSQL** - localhost:5432
 
+## Local Observability
+
+Prometheus and Grafana can be started with the included observability compose file:
+
+```bash
+pnpm --filter api dev
+pnpm docker:observability
+```
+
+See the [Observability](/docs/configuration/observability) guide for the full setup, dashboard, and troubleshooting notes.
+
 ## Production Configuration
 
 Production deployments use `docker-compose.prod.yml` with optimized settings:

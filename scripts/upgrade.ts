@@ -120,6 +120,8 @@ const getTemplateExcludedPrefixes = (template: string): string[] => {
         "k8s/api-service.yml",
         "k8s/api-ingress.yml",
         "k8s/api-hpa.yml",
+        "docker-compose.observability.yml",
+        "deploy/observability",
       ];
     case "api":
       return [
@@ -154,6 +156,8 @@ const isExcludedByTemplate = (filePath: string, template: string): boolean => {
 const FEATURE_PATHS: Record<keyof ManifestFeatures, string[]> = {
   docker: [
     "docker-compose.prod.yml",
+    "docker-compose.observability.yml",
+    "deploy/observability",
     "apps/api/Dockerfile.prod",
     "apps/web/Dockerfile.prod",
     ".dockerignore",

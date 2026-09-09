@@ -102,6 +102,7 @@ const deleteInternalContent = async () => {
 const removeDockerFiles = async () => {
   const dockerFiles = [
     "docker-compose.prod.yml",
+    "docker-compose.observability.yml",
     "apps/api/Dockerfile.prod",
     "apps/web/Dockerfile.prod",
     ".dockerignore",
@@ -120,7 +121,10 @@ const removeDockerFiles = async () => {
     }
   });
 
-  await Promise.all(deletePromises);
+  await Promise.all([
+    ...deletePromises,
+    rm("deploy/observability", { recursive: true, force: true }),
+  ]);
 
   if (errors.length > 0) {
     log.warn(`Some Docker files could not be deleted:\n${errors.join("\n")}`);
@@ -214,6 +218,8 @@ const updateDockerComposeForTemplate = async (template: string) => {
       await rm("apps/web/Dockerfile.prod", { force: true });
     } else if (template === "web") {
       await rm("apps/api/Dockerfile.prod", { force: true });
+      await rm("docker-compose.observability.yml", { force: true });
+      await rm("deploy/observability", { recursive: true, force: true });
     }
   } catch (error) {
     log.warn(

@@ -1,6 +1,6 @@
 {
   "name": "build-elevate",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Production-grade full-stack starter with Next.js, Express, and Better Auth - Get from idea to production faster",
   "type": "module",
   "author": "Vijay Singh",

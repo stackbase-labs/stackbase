@@ -1,0 +1,16 @@
+---
+version: "1.7.0"
+date: "2026-09-09"
+tag: "latest"
+title: "API Observability with Prometheus & Grafana"
+summary: "Adds first-class API observability with Prometheus-compatible metrics, local Prometheus/Grafana infrastructure, and documentation for inspecting request and runtime behavior during development."
+---
+
+### Added
+
+- Prometheus-compatible `/metrics` endpoint exposing HTTP request counts, request duration histograms, in-flight request gauges, and Node.js runtime metrics
+- RED metrics middleware that records request rate, errors, and duration while excluding scraper and probe traffic from application metrics
+- Local Prometheus and Grafana compose stack with a provisioned Prometheus data source and API overview dashboard
+- Scaffold script updates that keep observability assets, Docker scripts, project-name replacement, and generated README output aligned with selected template options
+- Prometheus scrape annotations on API pods for clusters with Prometheus-compatible service discovery
+- Observability guide covering local startup, Prometheus targets, Grafana dashboard provisioning, metric names, Kubernetes notes, and troubleshooting

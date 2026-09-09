@@ -68,6 +68,7 @@ const buildAvailableScriptsSection = ({
   scriptPrefix,
   includeDocker,
   includeKubernetes,
+  template,
 }: ReadmeContext): string => `\
 ## Available Scripts
 
@@ -84,6 +85,7 @@ const buildAvailableScriptsSection = ({
 ${
   includeDocker
     ? `- \`${scriptPrefix} docker:dev\` - Run with Docker (development)
+${template !== "web" ? `- \`${scriptPrefix} docker:observability\` - Run Prometheus and Grafana locally\n` : ""}\
 - \`${scriptPrefix} docker:prod\` - Run with Docker (production)`
     : ""
 }
@@ -243,6 +245,17 @@ Production:
 \`\`\`bash
 ${scriptPrefix} docker:prod
 \`\`\`
+
+${
+  template !== "web"
+    ? `Observability:
+
+\`\`\`bash
+${scriptPrefix} docker:observability
+\`\`\`
+`
+    : ""
+}
 
 ${services.join("\n")}
 

@@ -97,7 +97,10 @@ export const applyPackageJsonCleanup = (
     delete pkg.scripts.prepublish;
     if (!includeDocker) {
       delete pkg.scripts["docker:dev"];
+      delete pkg.scripts["docker:observability"];
       delete pkg.scripts["docker:prod"];
+    } else if (template === "web") {
+      delete pkg.scripts["docker:observability"];
     }
     if (!includeKubernetes) {
       delete pkg.scripts["k8s:deploy"];

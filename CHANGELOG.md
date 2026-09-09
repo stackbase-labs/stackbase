@@ -5,6 +5,18 @@ All changes, fixes and updates to build-elevate.
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 `Latest` is derived from position and is not stored here.
 
+## [1.7.0] - 2026-09-09 [Minor] - API Observability with Prometheus & Grafana
+
+Adds first-class API observability with Prometheus-compatible metrics, local Prometheus/Grafana infrastructure, and documentation for inspecting request and runtime behavior during development.
+
+### Added
+
+- **API:** Prometheus-compatible `/metrics` endpoint exposing HTTP request counts, request duration histograms, in-flight request gauges, and Node.js runtime metrics
+- **API:** RED metrics middleware that records request rate, errors, and duration while excluding scraper and probe traffic from application metrics
+- **Observability:** Local Prometheus and Grafana compose stack with a provisioned Prometheus data source and API overview dashboard
+- **Kubernetes:** Prometheus scrape annotations on API pods for clusters with Prometheus-compatible service discovery
+- **Docs:** Observability guide covering local startup, Prometheus targets, Grafana dashboard provisioning, metric names, Kubernetes notes, and troubleshooting
+
 ## [1.6.0] - 2026-08-29 [Minor] - Cloud File Storage, Interactive DX & Storage Scaffolding
 
 Adds vendor-agnostic S3-compatible cloud storage (`@workspace/storage`) with presigned URLs, contracts, API endpoints, and FileUploader UI dropzone, alongside an interactive DX lifecycle and TypeFlow architecture trace in docs, with full CLI scaffolding integration.

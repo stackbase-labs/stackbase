@@ -2,21 +2,23 @@ import { type ExecSyncOptions, exec as execRaw } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
-import { REPO } from "./branding.js";
+import { TEMPLATE_REPO } from "./branding.js";
 
-export const url = REPO;
+export const url = TEMPLATE_REPO;
 
 export const execSyncOpts: ExecSyncOptions = { stdio: "ignore" };
 export const execOpts = { stdio: "ignore" as const };
 
-export const internalContentDirs = ["scripts", "apps/docs", "assets"];
+export const internalContentDirs = [
+  "packages/stackbase",
+  "apps/docs",
+  "assets",
+];
 
 export const internalContentFiles = [
   "CONTRIBUTING.md",
   "SECURITY.md",
   "SCREENSHOTS.md",
-  "tsup.config.ts",
-  "tsconfig.scripts.json",
   ".npmignore",
   "CHANGELOG.md",
   ".markdownlint.yaml",
@@ -160,13 +162,6 @@ export const applyProjectName = (
   result = result.replaceAll("stackbase", toKebabCase(projectName));
   result = result.replaceAll("Stackbase", toTitleCase(projectName));
   result = result.replaceAll("STACKBASE", toConstantCase(projectName));
-  result = result.replaceAll("build-elevate", toKebabCase(projectName));
-  result = result.replaceAll("buildElevate", toCamelCase(projectName));
-  result = result.replaceAll("BuildElevate", toPascalCase(projectName));
-  result = result.replaceAll("build_elevate", toSnakeCase(projectName));
-  result = result.replaceAll("BUILD_ELEVATE", toConstantCase(projectName));
-  result = result.replaceAll("BUILD ELEVATE", toCapitalCase(projectName));
-  result = result.replaceAll("Build Elevate", toTitleCase(projectName));
   return result;
 };
 
@@ -223,7 +218,7 @@ export const replaceProjectNameInAll = async (newProjectName: string) => {
   for (const file of files) {
     try {
       await replaceProjectName(file, newProjectName);
-    } catch (error) {
+    } catch {
       // Skip files that don't exist (based on template)
     }
   }
@@ -246,7 +241,7 @@ export const updateAuthSecretInEnvFile = async (
       `BETTER_AUTH_SECRET="${secret}"`,
     );
     await writeFile(filePath, updated);
-  } catch (error) {
+  } catch {
     // Skip if file doesn't exist
   }
 };

@@ -1,9 +1,7 @@
 export const PRODUCT_NAME = "Stackbase";
 export const CLI_NAME = "stackbase";
-export const LEGACY_CLI_NAME = "build-elevate";
 export const REPO = "stackbase-labs/stackbase";
-export const LEGACY_REPO = "vijaysingh2219/build-elevate";
+export const TEMPLATE_PATH = "templates/base";
+export const TEMPLATE_REPO = `${REPO}/${TEMPLATE_PATH}`;
 export const DOCS_URL = "https://stackbase-labs.vercel.app";
-export const LEGACY_DOCS_URL = "https://build-elevate.vercel.app";
 export const MANIFEST_FILE = ".stackbase.json";
-export const LEGACY_MANIFEST_FILE = ".build-elevate.json";

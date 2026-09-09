@@ -8,12 +8,11 @@ import {
   writeManifest,
   manifestExists,
   resolveFeatures,
-  LEGACY_MANIFEST_FILE,
   MANIFEST_FILE,
   MANIFEST_VERSION,
   type ManifestFeatures,
 } from "./manifest.js";
-import { CLI_NAME, REPO, PRODUCT_NAME } from "./branding.js";
+import { CLI_NAME, REPO, PRODUCT_NAME, TEMPLATE_PATH } from "./branding.js";
 import {
   applyTurboLintEnv,
   applyPackageJsonCleanup,
@@ -31,6 +30,7 @@ import { applyProjectName, internalContentFiles } from "./utils.js";
 
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 const API_BASE = `https://api.github.com/repos/${REPO}`;
+const TEMPLATE_PREFIX = `${TEMPLATE_PATH}/`;
 
 // Files/dirs we never write during upgrade — mirrors the skip logic in manifest.ts
 
@@ -44,13 +44,13 @@ const SKIP_SEGMENTS = new Set([
   "build",
   ".cache",
   "coverage",
-  "scripts",
   "assets",
 ]);
 
 // Full path prefixes — skip anything that starts with these
 const SKIP_PREFIXES = [
   "apps/docs", // internal docs app — deleted during init
+  "packages/stackbase", // internal CLI package — deleted during init
 ];
 
 const SKIP_EXACT = new Set([
@@ -59,7 +59,6 @@ const SKIP_EXACT = new Set([
   // the shared list so this set and the delete step can't fall out of sync.
   ...internalContentFiles,
   MANIFEST_FILE,
-  LEGACY_MANIFEST_FILE,
   "README.md",
   "LICENSE",
   "pnpm-lock.yaml",
@@ -203,9 +202,12 @@ const getFileAtCommit = async (
   commit: string,
   filePath: string,
 ): Promise<string | null> => {
-  const res = await fetch(`${RAW_BASE}/${commit}/${filePath}`);
-  if (!res.ok) return null;
-  return res.text();
+  const res = await fetch(
+    `${RAW_BASE}/${commit}/${TEMPLATE_PREFIX}${filePath}`,
+  );
+  if (res.ok) return res.text();
+
+  return null;
 };
 
 /**
@@ -303,16 +305,14 @@ export const upgrade = async (
     // 1. Check manifest exists
     if (!(await manifestExists())) {
       log.error(
-        `No ${MANIFEST_FILE} or ${LEGACY_MANIFEST_FILE} found.\n\nThis project was either not scaffolded with ${PRODUCT_NAME}, or was created before upgrade support was added.\n\nTo manually upgrade, compare your files against the latest template at:\nhttps://github.com/${REPO}`,
+        `No ${MANIFEST_FILE} found.\n\nThis project was either not scaffolded with ${PRODUCT_NAME}, or was created before Stackbase upgrade support was added.\n\nTo manually upgrade, compare your files against the latest template at:\nhttps://github.com/${REPO}/${TEMPLATE_PATH}`,
       );
       process.exit(1);
     }
 
     const manifest = await readManifest();
     if (!manifest) {
-      log.error(
-        `Failed to read ${MANIFEST_FILE} or ${LEGACY_MANIFEST_FILE}. It may be corrupted.`,
-      );
+      log.error(`Failed to read ${MANIFEST_FILE}. It may be corrupted.`);
       process.exit(1);
     }
 
@@ -352,9 +352,14 @@ export const upgrade = async (
     const treeData = (await treeRes.json()) as {
       tree: Array<{ path: string; type: string }>;
     };
-    const latestTreeFiles = treeData.tree
+    const latestTreePaths = treeData.tree
       .filter((entry) => entry.type === "blob")
       .map((entry) => entry.path);
+    const templateTreeFiles = latestTreePaths
+      .filter((path) => path.startsWith(TEMPLATE_PREFIX))
+      .map((path) => path.slice(TEMPLATE_PREFIX.length));
+    const latestTreeFiles =
+      templateTreeFiles.length > 0 ? templateTreeFiles : latestTreePaths;
 
     // Union: existing manifest files + new files from latest commit
     const allFiles = new Set<string>([...manifestFileSet, ...latestTreeFiles]);

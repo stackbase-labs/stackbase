@@ -1,0 +1,71 @@
+{
+  "name": "stackbase",
+  "version": "1.7.0",
+  "description": "Stackbase CLI for scaffolding production-ready full-stack Turborepo applications with Next.js, Express, Better Auth, and Prisma",
+  "type": "module",
+  "homepage": "https://stackbase-labs.vercel.app/docs/cli",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Vijay Singh",
+    "url": "https://github.com/vijaysingh2219"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stackbase-labs/stackbase.git",
+    "directory": "packages/stackbase"
+  },
+  "bugs": {
+    "url": "https://github.com/stackbase-labs/stackbase/issues"
+  },
+  "files": [
+    "dist/index.js"
+  ],
+  "keywords": [
+    "stackbase",
+    "starter",
+    "boilerplate",
+    "scaffold",
+    "cli",
+    "fullstack",
+    "monorepo",
+    "turborepo",
+    "nextjs",
+    "express",
+    "typescript",
+    "prisma",
+    "better-auth",
+    "shadcn-ui",
+    "saas",
+    "template"
+  ],
+  "bin": {
+    "stackbase": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "prepublish": "pnpm build"
+  },
+  "dependencies": {
+    "@clack/prompts": "catalog:cli",
+    "commander": "catalog:cli",
+    "degit": "catalog:cli",
+    "yaml": "catalog:cli"
+  },
+  "devDependencies": {
+    "@types/degit": "catalog:cli",
+    "@types/node": "catalog:dev",
+    "@workspace/eslint-config": "workspace:*",
+    "eslint": "catalog:eslint",
+    "tsup": "catalog:cli",
+    "typescript": "catalog:dev"
+  }
+}

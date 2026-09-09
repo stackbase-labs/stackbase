@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["scripts/index.ts"],
+  entry: ["src/index.ts"],
   outDir: "dist",
   sourcemap: false,
   minify: true,

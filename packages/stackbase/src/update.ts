@@ -1,10 +1,28 @@
 import { readFile, rm, writeFile } from "node:fs/promises";
 import { envsByTemplate, getDescription } from "./utils.js";
 
+type JsonObject = Record<string, unknown>;
+type TurboJson = {
+  tasks?: {
+    lint?: {
+      env?: string[];
+    };
+  };
+};
+
+type PackageJson = JsonObject & {
+  scripts?: Record<string, string>;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  exports?: Record<string, unknown>;
+  description?: string;
+  version?: string;
+};
+
 export const updateTurboLintEnv = async (template: string) => {
   const turboPath = "turbo.json";
   const content = await readFile(turboPath, "utf8");
-  const turbo = JSON.parse(content);
+  const turbo = JSON.parse(content) as TurboJson;
   if (!turbo.tasks?.lint) return;
   turbo.tasks.lint.env = envsByTemplate[template];
   await writeFile(turboPath, JSON.stringify(turbo, null, 2) + "\n");
@@ -15,14 +33,14 @@ export const removeAuthClientArtifactsForApi = async (template: string) => {
   if (template === "api") {
     try {
       await rm("packages/auth/src/client.ts", { force: true });
-    } catch (error) {
+    } catch {
       // Ignore if file doesn't exist
     }
     const indexPath = "packages/auth/src/index.ts";
     try {
       const indexContent = await readFile(indexPath, "utf8");
       await writeFile(indexPath, applyAuthIndexCleanup(indexContent));
-    } catch (error) {
+    } catch {
       // Ignore if file doesn't exist
     }
 
@@ -30,7 +48,7 @@ export const removeAuthClientArtifactsForApi = async (template: string) => {
     try {
       const pkgContent = await readFile(pkgPath, "utf8");
       await writeFile(pkgPath, applyAuthPackageJsonCleanup(pkgContent));
-    } catch (error) {
+    } catch {
       // Ignore if file doesn't exist
     }
 
@@ -38,7 +56,7 @@ export const removeAuthClientArtifactsForApi = async (template: string) => {
     try {
       const keysContent = await readFile(keysPath, "utf8");
       await writeFile(keysPath, applyAuthKeysCleanup(keysContent));
-    } catch (error) {
+    } catch {
       // Ignore if file doesn't exist
     }
   }
@@ -56,9 +74,9 @@ export const applyTurboLintEnv = (
   content: string,
   template: string,
 ): string => {
-  let turbo: any;
+  let turbo: TurboJson;
   try {
-    turbo = JSON.parse(content);
+    turbo = JSON.parse(content) as TurboJson;
   } catch {
     return content;
   }
@@ -77,9 +95,9 @@ export const applyPackageJsonCleanup = (
   includeDocker: boolean = true,
   includeKubernetes: boolean = true,
 ): string => {
-  let pkg: any;
+  let pkg: PackageJson;
   try {
-    pkg = JSON.parse(content);
+    pkg = JSON.parse(content) as PackageJson;
   } catch {
     return content;
   }
@@ -132,12 +150,12 @@ export const applyPnpmCatalogCleanup = (
   let updated = content;
 
   // Always remove the cli catalog
-  updated = updated.replace(/\n  cli:[\s\S]*?(?=\n  \w+:|$)/s, "");
+  updated = updated.replace(/\n {2}cli:[\s\S]*?(?=\n {2}\w+:|$)/s, "");
 
   if (template === "api") {
-    updated = updated.replace(/\n  web:[\s\S]*?(?=\n  \w+:|$)/s, "");
+    updated = updated.replace(/\n {2}web:[\s\S]*?(?=\n {2}\w+:|$)/s, "");
   } else if (template === "web") {
-    updated = updated.replace(/\n  server:[\s\S]*?(?=\n  \w+:|$)/s, "");
+    updated = updated.replace(/\n {2}server:[\s\S]*?(?=\n {2}\w+:|$)/s, "");
   }
 
   return updated;
@@ -160,9 +178,9 @@ export const applyAuthIndexCleanup = (content: string): string => {
  * Mirrors the packages/auth/package.json mutation in removeAuthClientArtifactsForApi().
  */
 export const applyAuthPackageJsonCleanup = (content: string): string => {
-  let pkg: any;
+  let pkg: PackageJson;
   try {
-    pkg = JSON.parse(content);
+    pkg = JSON.parse(content) as PackageJson;
   } catch {
     return content;
   }
@@ -196,15 +214,12 @@ export const applyDockerComposeCleanup = (
 
   if (template === "web") {
     // Remove API service and its Dockerfile
-    updated = updated.replace(/\n  api:[\s\S]*?(?=\n  \w+:|$)/, "");
+    updated = updated.replace(/\n {2}api:[\s\S]*?(?=\n {2}\w+:|$)/, "");
     // Remove API dependency from web service
-    updated = updated.replace(
-      /\n      api:\n        condition: service_started/,
-      "",
-    );
+    updated = updated.replace(/\n {6}api:\n {8}condition: service_started/, "");
   } else if (template === "api") {
     // Remove web service and its Dockerfile
-    updated = updated.replace(/\n  web:[\s\S]*?(?=\n  \w+:|$)/, "");
+    updated = updated.replace(/\n {2}web:[\s\S]*?(?=\n {2}\w+:|$)/, "");
   }
 
   return updated;
@@ -244,7 +259,7 @@ export const applyDomainName = (
     `        - ${domainName}`,
   );
   updated = updated.replace(
-    /^(\s*)#\s*secretName:\s*([a-z0-9-]+-tls)/m,
+    /^( {6})#\s*secretName:\s*([a-z0-9-]+-tls)/m,
     "$1secretName: $2",
   );
 

@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile, access, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { LEGACY_MANIFEST_FILE, MANIFEST_FILE } from "./branding.js";
+import { MANIFEST_FILE } from "./branding.js";
 import { toKebabCase } from "./utils.js";
 
-export { LEGACY_MANIFEST_FILE, MANIFEST_FILE };
+export { MANIFEST_FILE };
 
 // Increase this number whenever we change the shape of the manifest, so the
 // upgrade and diff commands can tell which version of the file they're reading.
@@ -25,8 +25,6 @@ export interface StackbaseManifest {
   features: ManifestFeatures; // the optional features the user chose to include when the project was created
   files: Record<string, string>; // filePath -> sha256 hash (first 12 chars)
 }
-
-export type LegacyBuildElevateManifest = StackbaseManifest;
 
 /**
  * Works out which optional features a project includes.
@@ -76,12 +74,7 @@ export const manifestExists = async (): Promise<boolean> => {
     await access(MANIFEST_FILE);
     return true;
   } catch {
-    try {
-      await access(LEGACY_MANIFEST_FILE);
-      return true;
-    } catch {
-      return false;
-    }
+    return false;
   }
 };
 
@@ -97,10 +90,7 @@ const readManifestFile = async (
 };
 
 export const readManifest = async (): Promise<StackbaseManifest | null> => {
-  return (
-    (await readManifestFile(MANIFEST_FILE)) ??
-    (await readManifestFile(LEGACY_MANIFEST_FILE))
-  );
+  return readManifestFile(MANIFEST_FILE);
 };
 
 export const writeManifest = async (
@@ -124,7 +114,7 @@ const SKIP_DIRS = new Set([
   "coverage",
   ".react-email",
   "packages/db/generated",
-  "scripts", // internal CLI — deleted by deleteInternalContent() anyway
+  "packages/stackbase", // internal CLI — deleted by deleteInternalContent() anyway
   "assets", // internal — also deleted
   "apps/docs", // internal — also deleted
 ]);
@@ -141,15 +131,12 @@ const SKIP_FILES = new Set([
   "package-lock.json",
   "yarn.lock",
   // tsconfig build info — environment-specific
-  "tsconfig.scripts.json",
   "tsconfig.tsbuildinfo",
   // the manifest itself
   ".stackbase.json",
-  ".build-elevate.json",
   // internal files deleted during init
   "SCREENSHOTS.md",
   ".npmignore",
-  "tsup.config.ts",
 ]);
 
 const SKIP_EXTENSIONS = new Set([

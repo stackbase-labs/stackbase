@@ -43,6 +43,16 @@ import {
   K8S_DOCKERHUB_FILES,
 } from "./update.js";
 
+type PackageJson = {
+  packageManager?: string;
+  workspaces?: string[];
+  scripts?: Record<string, string>;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+};
+
 const branch = process.env.STACKBASE_BRANCH ?? "main";
 
 const getLatestCommit = async (): Promise<string> => {
@@ -375,7 +385,7 @@ const replaceCatalogVersions = async () => {
 
   for (const filePath of normalizedFiles) {
     const content = await readFile(filePath, "utf8");
-    let packageJson: any;
+    let packageJson: PackageJson;
     try {
       packageJson = JSON.parse(content);
     } catch (error) {
@@ -461,7 +471,7 @@ const replaceWorkspaceProtocols = async (packageManager: string) => {
 
   for (const filePath of normalizedFiles) {
     const content = await readFile(filePath, "utf8");
-    let packageJson: any;
+    let packageJson: PackageJson;
     try {
       packageJson = JSON.parse(content);
     } catch (error) {
@@ -657,10 +667,10 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
     { source: join("apps", "api"), target: ".env.local" },
     { source: join("apps", "web"), target: ".env.local" },
     { source: join("packages", "auth"), target: ".env.local" },
-    { source: join("packages", "db"), target: ".env" },
-    { source: join("packages", "rate-limit"), target: ".env" },
-    { source: join("packages", "email"), target: ".env" },
-    { source: join("packages", "storage"), target: ".env" },
+    { source: join("packages", "db"), target: ".env.local" },
+    { source: join("packages", "rate-limit"), target: ".env.local" },
+    { source: join("packages", "email"), target: ".env.local" },
+    { source: join("packages", "storage"), target: ".env.local" },
   ];
 
   // Generate a single auth secret to share across all env files

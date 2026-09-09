@@ -20,7 +20,7 @@ const buildHeroSection = ({
 
 ${templateDescriptions[template]}
 
-Built with [Stackbase](https://github.com/stackbase-labs/stackbase) - A production-grade full-stack starter.
+Built with [BuildElevate](https://github.com/vijaysingh2219/build-elevate).
 `;
 
 const buildGettingStartedSection = ({
@@ -45,7 +45,7 @@ ${packageManager} install
 
 #### 2. Configure environment variables
 
-- Copy \`.env.example\` files to \`.env.local\` or \`.env\` in respective packages
+- Copy \`.env.example\` files to \`.env.local\` in the respective packages
 - Update database connection strings and API keys
 
 #### 3. Generate Prisma client and run migrations

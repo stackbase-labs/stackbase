@@ -1,7 +1,8 @@
 {
   "name": "stackbase",
   "version": "1.7.0",
-  "description": "Stackbase CLI for scaffolding production-ready full-stack Turborepo applications with Next.js, Express, Better Auth, and Prisma",
+  "description": "Stackbase is a production-ready full-stack starter with Next.js, Express, Better Auth, and Prisma.",
+  "private": true,
   "type": "module",
   "author": "Vijay Singh",
   "license": "MIT",
@@ -13,32 +14,9 @@
   "bugs": {
     "url": "https://github.com/stackbase-labs/stackbase/issues"
   },
-  "keywords": [
-    "starter",
-    "boilerplate",
-    "nextjs",
-    "express",
-    "monorepo",
-    "turborepo",
-    "typescript",
-    "prisma",
-    "better-auth",
-    "shadcn-ui",
-    "fullstack",
-    "template",
-    "scaffold",
-    "cli"
-  ],
-  "bin": {
-    "stackbase": "./dist/index.js"
-  },
-  "files": [
-    "dist/index.js"
-  ],
   "scripts": {
     "build": "turbo build",
-    "build:cli": "tsup",
-    "prepublish": "pnpm build:cli",
+    "build:cli": "pnpm --filter stackbase build",
     "clean": "turbo clean",
     "dev": "turbo dev",
     "docker:dev": "docker-compose up --build",
@@ -56,15 +34,8 @@
     "k8s:deploy": "sh deploy.sh",
     "k8s:verify": "sh k8s/verify.sh"
   },
-  "dependencies": {
-    "@clack/prompts": "catalog:cli",
-    "commander": "catalog:cli",
-    "degit": "catalog:cli",
-    "yaml": "catalog:cli"
-  },
   "devDependencies": {
     "@types/node": "catalog:dev",
-    "@types/degit": "catalog:cli",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:eslint",
     "husky": "catalog:dev",
@@ -73,7 +44,6 @@
     "prettier-plugin-organize-imports": "catalog:prettier",
     "prettier-plugin-packagejson": "catalog:prettier",
     "prettier-plugin-tailwindcss": "catalog:prettier",
-    "tsup": "catalog:cli",
     "turbo": "catalog:core",
     "typescript": "catalog:dev"
   },

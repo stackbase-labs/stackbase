@@ -271,23 +271,7 @@ catalogs:
 importers:
 
   .:
-    dependencies:
-      '@clack/prompts':
-        specifier: catalog:cli
-        version: 0.7.0
-      commander:
-        specifier: catalog:cli
-        version: 12.1.0
-      degit:
-        specifier: catalog:cli
-        version: 2.8.4
-      yaml:
-        specifier: catalog:cli
-        version: 2.8.2
     devDependencies:
-      '@types/degit':
-        specifier: catalog:cli
-        version: 2.8.6
       '@types/node':
         specifier: catalog:dev
         version: 25.8.0
@@ -315,9 +299,6 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: catalog:prettier
         version: 0.7.2(prettier-plugin-organize-imports@4.3.0(prettier@3.8.1)(typescript@5.9.3))(prettier@3.8.1)
-      tsup:
-        specifier: catalog:cli
-        version: 8.5.1(jiti@2.6.1)(postcss@8.5.14)(tsx@4.22.1)(typescript@5.9.3)(yaml@2.8.2)
       turbo:
         specifier: catalog:core
         version: 2.9.14
@@ -666,6 +647,40 @@ importers:
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
+
+  packages/stackbase:
+    dependencies:
+      '@clack/prompts':
+        specifier: catalog:cli
+        version: 0.7.0
+      commander:
+        specifier: catalog:cli
+        version: 12.1.0
+      degit:
+        specifier: catalog:cli
+        version: 2.8.4
+      yaml:
+        specifier: catalog:cli
+        version: 2.8.2
+    devDependencies:
+      '@types/degit':
+        specifier: catalog:cli
+        version: 2.8.6
+      '@types/node':
+        specifier: catalog:dev
+        version: 25.8.0
+      '@workspace/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      eslint:
+        specifier: catalog:eslint
+        version: 9.39.2(jiti@2.6.1)
+      tsup:
+        specifier: catalog:cli
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.14)(tsx@4.22.1)(typescript@5.9.3)(yaml@2.8.2)
       typescript:
         specifier: catalog:dev
         version: 5.9.3
@@ -10962,7 +10977,7 @@ snapshots:
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react-hooks: 7.0.1(eslint@9.39.2(jiti@2.6.1))
@@ -10999,7 +11014,7 @@ snapshots:
       tinyglobby: 0.2.17
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -11013,7 +11028,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9

@@ -1,22 +1,23 @@
 import { intro, log } from "@clack/prompts";
-import {
-  LEGACY_MANIFEST_FILE,
-  MANIFEST_FILE,
-  readManifest,
-  manifestExists,
-} from "./manifest.js";
+import { MANIFEST_FILE, readManifest, manifestExists } from "./manifest.js";
 import { getLatestCommit } from "./upgrade.js";
-import { CLI_NAME, PRODUCT_NAME, REPO } from "./branding.js";
+import { CLI_NAME, PRODUCT_NAME, REPO, TEMPLATE_PATH } from "./branding.js";
 
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
+
+const getTemplateFilePath = (filePath: string): string =>
+  `${TEMPLATE_PATH}/${filePath}`;
 
 const getFileAtCommit = async (
   commit: string,
   filePath: string,
 ): Promise<string | null> => {
-  const res = await fetch(`${RAW_BASE}/${commit}/${filePath}`);
-  if (!res.ok) return null;
-  return res.text();
+  const res = await fetch(
+    `${RAW_BASE}/${commit}/${getTemplateFilePath(filePath)}`,
+  );
+  if (res.ok) return res.text();
+
+  return null;
 };
 
 const coloredDiff = (
@@ -173,14 +174,14 @@ export const diff = async (filePath: string) => {
     // 1. Check manifest
     if (!(await manifestExists())) {
       log.error(
-        `No ${MANIFEST_FILE} or ${LEGACY_MANIFEST_FILE} found. This project was not scaffolded with ${PRODUCT_NAME}.`,
+        `No ${MANIFEST_FILE} found. This project was not scaffolded with ${PRODUCT_NAME}.`,
       );
       process.exit(1);
     }
 
     const manifest = await readManifest();
     if (!manifest) {
-      log.error(`Failed to read ${MANIFEST_FILE} or ${LEGACY_MANIFEST_FILE}.`);
+      log.error(`Failed to read ${MANIFEST_FILE}.`);
       process.exit(1);
     }
 

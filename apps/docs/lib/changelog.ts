@@ -7,7 +7,8 @@ export type ReleaseTag =
   | "security";
 
 /** Canonical site origin, used for changelog metadata and the RSS feed. */
-export const SITE_URL = "https://build-elevate.vercel.app";
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://stackbase-labs.vercel.app";
 
 /** Stable anchor id for a release version (e.g. "1.3.0" → "v1-3-0"). */
 export function versionAnchor(version: string): string {

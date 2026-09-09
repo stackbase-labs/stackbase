@@ -69,8 +69,8 @@ export const createServer = (): Express => {
 
   app.get('/', (req, res) => {
     res.json({
-      message: 'Welcome to the Build Elevate API!',
-      service: 'build-elevate-api',
+      message: 'Welcome to the Stackbase API!',
+      service: 'stackbase-api',
       pod: process.env.POD_NAME || 'unknown',
       time: new Date().toISOString(),
     });

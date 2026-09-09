@@ -114,7 +114,7 @@ export const auth = betterAuth({
   },
   plugins: [
     twoFactor({
-      issuer: 'BuildElevate',
+      issuer: 'Stackbase',
     }),
   ],
 });

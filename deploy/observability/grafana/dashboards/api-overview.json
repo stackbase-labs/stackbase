@@ -80,7 +80,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(build_elevate_http_requests_total[5m]))",
+          "expr": "sum(rate(stackbase_http_requests_total[5m]))",
           "legendFormat": "requests/sec",
           "refId": "A"
         }
@@ -150,7 +150,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(build_elevate_http_requests_total{status_code=~\"5..\"}[5m])) / clamp_min(sum(rate(build_elevate_http_requests_total[5m])), 0.001)",
+          "expr": "sum(rate(stackbase_http_requests_total{status_code=~\"5..\"}[5m])) / clamp_min(sum(rate(stackbase_http_requests_total[5m])), 0.001)",
           "legendFormat": "5xx ratio",
           "refId": "A"
         }
@@ -212,7 +212,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(build_elevate_http_request_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(stackbase_http_request_duration_seconds_bucket[5m])))",
           "legendFormat": "p95",
           "refId": "A"
         }
@@ -274,7 +274,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(build_elevate_http_requests_in_flight)",
+          "expr": "sum(stackbase_http_requests_in_flight)",
           "legendFormat": "in flight",
           "refId": "A"
         }
@@ -365,7 +365,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum by (method, route, status_code) (rate(build_elevate_http_requests_total[5m]))",
+          "expr": "sum by (method, route, status_code) (rate(stackbase_http_requests_total[5m]))",
           "legendFormat": "{{method}} {{route}} {{status_code}}",
           "refId": "A"
         }
@@ -456,7 +456,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.50, sum by (le, route, method) (rate(build_elevate_http_request_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, route, method) (rate(stackbase_http_request_duration_seconds_bucket[5m])))",
           "legendFormat": "p50 {{method}} {{route}}",
           "refId": "A"
         },
@@ -465,7 +465,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum by (le, route, method) (rate(build_elevate_http_request_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le, route, method) (rate(stackbase_http_request_duration_seconds_bucket[5m])))",
           "legendFormat": "p95 {{method}} {{route}}",
           "refId": "B"
         }
@@ -556,7 +556,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum by (status_code) (rate(build_elevate_http_requests_total[5m]))",
+          "expr": "sum by (status_code) (rate(stackbase_http_requests_total[5m]))",
           "legendFormat": "{{status_code}}",
           "refId": "A"
         }
@@ -647,7 +647,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum by (method) (build_elevate_http_requests_in_flight)",
+          "expr": "sum by (method) (stackbase_http_requests_in_flight)",
           "legendFormat": "{{method}}",
           "refId": "A"
         }
@@ -659,7 +659,7 @@
   "refresh": "10s",
   "schemaVersion": 39,
   "tags": [
-    "build-elevate",
+    "stackbase",
     "api",
     "prometheus"
   ],
@@ -672,8 +672,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Build Elevate API Overview",
-  "uid": "build-elevate-api-overview",
+  "title": "Stackbase API Overview",
+  "uid": "stackbase-api-overview",
   "version": 1,
   "weekStart": ""
 }

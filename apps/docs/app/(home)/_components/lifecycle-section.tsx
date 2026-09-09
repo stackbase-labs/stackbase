@@ -9,7 +9,7 @@ const WORKFLOW_STEPS = [
   {
     step: "01",
     title: "Scaffolding",
-    cmd: "pnpm dlx build-elevate init my-saas",
+    cmd: "pnpm dlx stackbase init my-saas",
     desc: "Interactive CLI prompts you for database, auth providers, and monorepo packages.",
     icon: Terminal,
     output: [
@@ -84,15 +84,15 @@ const WORKFLOW_STEPS = [
     output: [
       { text: "✔ Network app_network Created", type: "info" },
       {
-        text: "✔ Container build-elevate-postgres Healthy (PostgreSQL 16)",
+        text: "✔ Container stackbase-postgres Healthy (PostgreSQL 16)",
         type: "success",
       },
       {
-        text: "✔ Container build-elevate-api Started (:4000)",
+        text: "✔ Container stackbase-api Started (:4000)",
         type: "success",
       },
       {
-        text: "✔ Container build-elevate-web Started (:3000)",
+        text: "✔ Container stackbase-web Started (:3000)",
         type: "success",
       },
       {

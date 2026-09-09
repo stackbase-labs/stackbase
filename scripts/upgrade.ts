@@ -8,9 +8,12 @@ import {
   writeManifest,
   manifestExists,
   resolveFeatures,
+  LEGACY_MANIFEST_FILE,
+  MANIFEST_FILE,
   MANIFEST_VERSION,
   type ManifestFeatures,
 } from "./manifest.js";
+import { CLI_NAME, REPO, PRODUCT_NAME } from "./branding.js";
 import {
   applyTurboLintEnv,
   applyPackageJsonCleanup,
@@ -26,7 +29,6 @@ import {
 } from "./update.js";
 import { applyProjectName, internalContentFiles } from "./utils.js";
 
-const REPO = "vijaysingh2219/build-elevate";
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 const API_BASE = `https://api.github.com/repos/${REPO}`;
 
@@ -56,7 +58,8 @@ const SKIP_EXACT = new Set([
   // created (for example CONTRIBUTING.md, SECURITY.md, CHANGELOG.md). We reuse
   // the shared list so this set and the delete step can't fall out of sync.
   ...internalContentFiles,
-  ".build-elevate.json",
+  MANIFEST_FILE,
+  LEGACY_MANIFEST_FILE,
   "README.md",
   "LICENSE",
   "pnpm-lock.yaml",
@@ -295,19 +298,21 @@ export const upgrade = async (
   options: { yes?: boolean; dry?: boolean; force?: boolean } = {},
 ) => {
   try {
-    intro("build-elevate upgrade");
+    intro(`${CLI_NAME} upgrade`);
 
     // 1. Check manifest exists
     if (!(await manifestExists())) {
       log.error(
-        `No .build-elevate.json found.\n\nThis project was either not scaffolded with build-elevate, or was created before upgrade support was added.\n\nTo manually upgrade, compare your files against the latest template at:\nhttps://github.com/${REPO}`,
+        `No ${MANIFEST_FILE} or ${LEGACY_MANIFEST_FILE} found.\n\nThis project was either not scaffolded with ${PRODUCT_NAME}, or was created before upgrade support was added.\n\nTo manually upgrade, compare your files against the latest template at:\nhttps://github.com/${REPO}`,
       );
       process.exit(1);
     }
 
     const manifest = await readManifest();
     if (!manifest) {
-      log.error("Failed to read .build-elevate.json. It may be corrupted.");
+      log.error(
+        `Failed to read ${MANIFEST_FILE} or ${LEGACY_MANIFEST_FILE}. It may be corrupted.`,
+      );
       process.exit(1);
     }
 
@@ -483,7 +488,7 @@ export const upgrade = async (
       log.warn(
         `${conflicts.length} file(s) were modified by you and could not be upgraded automatically:\n\n` +
           conflicts.map((c) => `  ⚠ ${c.file}`).join("\n") +
-          `\n\nRun \`build-elevate diff <file>\` to see exactly what changed in the template.`,
+          `\n\nRun \`${CLI_NAME} diff <file>\` to see exactly what changed in the template.`,
       );
     }
 
@@ -495,7 +500,7 @@ export const upgrade = async (
       manifest.features = features;
       // Only advance the commit pointer if all conflicts are resolved.
       // If conflicts remain, keep manifest.commit at the base so
-      // `build-elevate diff <file>` can still show what needs to be applied.
+      // `${CLI_NAME} diff <file>` can still show what needs to be applied.
       if (conflicts.length === 0) {
         manifest.commit = latestCommit;
       }

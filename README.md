@@ -1,22 +1,23 @@
 <!-- markdownlint-disable MD033 -->
-<h1 align="center">build-elevate</h1>
+<h1 align="center">Stackbase</h1>
 
 <div align="center">
 
 [![Quick Start](https://img.shields.io/badge/Quick_Start-blue?style=for-the-badge)](./README.md#-quick-start)
-[![CI](https://img.shields.io/github/actions/workflow/status/vijaysingh2219/build-elevate/ci.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/vijaysingh2219/build-elevate/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/build-elevate?style=for-the-badge&color=CB3837&logo=npm)](https://www.npmjs.com/package/build-elevate)
-[![npm downloads](https://img.shields.io/npm/dy/build-elevate?style=for-the-badge&color=20c997)](https://www.npmjs.com/package/build-elevate)
+[![CI](https://img.shields.io/github/actions/workflow/status/stackbase-labs/stackbase/ci.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/stackbase-labs/stackbase/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/stackbase?style=for-the-badge&color=CB3837&logo=npm)](https://www.npmjs.com/package/stackbase)
+[![npm downloads](https://img.shields.io/npm/dy/stackbase?style=for-the-badge&color=20c997)](https://www.npmjs.com/package/stackbase)
+[![build-elevate downloads](https://img.shields.io/npm/dy/build-elevate?style=for-the-badge&color=6b7280&label=build-elevate%20downloads)](https://www.npmjs.com/package/build-elevate)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Docs](https://img.shields.io/badge/Documentation-Live-6366f1?style=for-the-badge&logo=vercel)](https://build-elevate.vercel.app)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-333?style=for-the-badge&logo=github)](https://github.com/vijaysingh2219/build-elevate)
+[![Docs](https://img.shields.io/badge/Documentation-Live-6366f1?style=for-the-badge&logo=vercel)](https://stackbase-labs.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-333?style=for-the-badge&logo=github)](https://github.com/stackbase-labs/stackbase)
 
 <!-- markdownlint-disable MD036 -->
 
 **Launch your SaaS product faster. Everything you need is built in.**
 
 <p align="center">
-  <img src="assets/og-image.png" alt="Build Elevate" />
+  <img src="assets/og-image.png" alt="Stackbase" />
 </p>
 
 <!-- markdownlint-enable MD036 -->
@@ -28,11 +29,11 @@
 ---
 
 > [!TIP]
-> **Perfect for SaaS teams, startups, and developers tired of reinventing the same setup.** Skip weeks of boilerplate, onboard new developers in hours, and ship features on day one. build-elevate has you covered.
+> **Perfect for SaaS teams, startups, and developers tired of reinventing the same setup.** Skip weeks of boilerplate, onboard new developers in hours, and ship features on day one. Stackbase has you covered.
 
 **You're launching tomorrow. Your backend isn't designed. Your auth isn't configured. Your database isn't connected. And you have 3 other things to do.**
 
-build-elevate is a production-ready monorepo starter that bundles everything you need — authentication, database, email templates, UI components, rate limiting, and deployment configs — into a single, cohesive foundation.
+Stackbase is a production-ready monorepo starter that bundles everything you need — authentication, database, email templates, UI components, rate limiting, and deployment configs — into a single, cohesive foundation.
 
 Built with **Turborepo**, **Next.js 16**, **Express**, **Better Auth**, **Prisma**, and **shadcn/ui**, it's designed for teams that want to focus on their product, not boilerplate. **Launch in days. Deploy with confidence.**
 
@@ -145,7 +146,7 @@ npm install -g pnpm@latest
 The fastest way to get started:
 
 ```bash
-pnpm dlx build-elevate@latest init my-project
+pnpm dlx stackbase@latest init my-project
 ```
 
 This interactive CLI will:
@@ -177,7 +178,7 @@ That's it. No more setup. Start building features.
 ## 📂 Project Structure
 
 ```txt
-build-elevate/
+stackbase/
 ├── apps/
 │   ├── web/              # Next.js frontend application
 │   ├── api/              # Express REST API server
@@ -322,7 +323,7 @@ cp apps/api/.env.example apps/api/.env.local
 cp packages/db/.env.example packages/db/.env
 ```
 
-See [Environment Variables Documentation](https://build-elevate.vercel.app/docs/configuration/environment-variables) for a complete reference.
+See [Environment Variables Documentation](https://stackbase-labs.vercel.app/docs/configuration/environment-variables) for a complete reference.
 
 ## 🐳 Docker
 
@@ -334,7 +335,7 @@ Using Docker Compose for PostgreSQL:
 docker-compose up -d
 ```
 
-This starts a PostgreSQL database at `postgresql://postgres:password@localhost:5432/build-elevate-app`.
+This starts a PostgreSQL database at `postgresql://postgres:password@localhost:5432/stackbase-app`.
 
 ### Production Deployment
 
@@ -351,7 +352,7 @@ Services include:
 - **PostgreSQL** on port 5432
 - Health checks and restart policies configured
 
-See [Docker Documentation](https://build-elevate.vercel.app/docs/configuration/docker) for more details.
+See [Docker Documentation](https://stackbase-labs.vercel.app/docs/configuration/docker) for more details.
 
 ### Local Observability
 
@@ -367,7 +368,7 @@ Then open:
 - **Prometheus**: <http://localhost:9090>
 - **Grafana**: <http://localhost:3002> (`admin` / `admin`)
 
-The provisioned Grafana dashboard is named **Build Elevate API Overview** and includes request rate, status codes, p95 latency, per-route latency, and in-flight request panels. Generate a little traffic with `curl http://localhost:4000/health` or an API route if the dashboard is empty at first.
+The provisioned Grafana dashboard is named **Stackbase API Overview** and includes request rate, status codes, p95 latency, per-route latency, and in-flight request panels. Generate a little traffic with `curl http://localhost:4000/health` or an API route if the dashboard is empty at first.
 
 ## ⛵ Kubernetes
 
@@ -380,11 +381,11 @@ pnpm k8s:deploy   # build & push images, create secrets, apply manifests, wait f
 pnpm k8s:verify   # check pods, endpoints, in-cluster HTTP, ingress, and HPA metrics
 ```
 
-See the [Kubernetes Deployment Guide](https://build-elevate.vercel.app/docs/deployment/kubernetes) for cluster requirements, TLS/cert-manager setup, traffic flow, and troubleshooting.
+See the [Kubernetes Deployment Guide](https://stackbase-labs.vercel.app/docs/deployment/kubernetes) for cluster requirements, TLS/cert-manager setup, traffic flow, and troubleshooting.
 
 ## 📖 Documentation
 
-Visit [https://build-elevate.vercel.app/docs](https://build-elevate.vercel.app/docs) to view the documentation.
+Visit [https://stackbase-labs.vercel.app/docs](https://stackbase-labs.vercel.app/docs) to view the documentation.
 
 ## 🚢 Deployment
 
@@ -392,9 +393,9 @@ Visit [https://build-elevate.vercel.app/docs](https://build-elevate.vercel.app/d
 
 Deploy the Next.js frontend to Vercel with one click:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/vijaysingh2219/build-elevate)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/stackbase-labs/stackbase)
 
-See [Vercel Deployment Guide](https://build-elevate.vercel.app/docs/deployment/vercel) for detailed instructions.
+See [Vercel Deployment Guide](https://stackbase-labs.vercel.app/docs/deployment/vercel) for detailed instructions.
 
 ### Other Platforms
 
@@ -423,13 +424,13 @@ If you discover a security vulnerability, please **do not** open a public issue.
 
 ## 💬 Support
 
-- 📖 **Documentation** — [build-elevate.vercel.app/docs](https://build-elevate.vercel.app/docs)
-- 🐛 **Bugs & feature requests** — [open an issue](https://github.com/vijaysingh2219/build-elevate/issues)
-- 💡 **Questions & ideas** — [start a discussion](https://github.com/vijaysingh2219/build-elevate/discussions)
+- 📖 **Documentation** — [stackbase-labs.vercel.app/docs](https://stackbase-labs.vercel.app/docs)
+- 🐛 **Bugs & feature requests** — [open an issue](https://github.com/stackbase-labs/stackbase/issues)
+- 💡 **Questions & ideas** — [start a discussion](https://github.com/stackbase-labs/stackbase/discussions)
 - 📸 **Screenshots** — see [SCREENSHOTS.md](./SCREENSHOTS.md)
 - 📝 **Release notes** — see [CHANGELOG.md](./CHANGELOG.md)
 
-If build-elevate saves you time, consider giving it a ⭐ — it helps others discover the project.
+If Stackbase saves you time, consider giving it a ⭐ — it helps others discover the project.
 
 ---
 
@@ -439,7 +440,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 ## 🙏 Acknowledgments
 
-build-elevate is built on top of amazing open-source projects:
+Stackbase is built on top of amazing open-source projects:
 
 - [Turborepo](https://turbo.build/repo) - Monorepo build system
 - [Next.js](https://nextjs.org) - React framework

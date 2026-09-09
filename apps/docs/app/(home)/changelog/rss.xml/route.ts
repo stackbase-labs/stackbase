@@ -1,8 +1,8 @@
 import { SITE_URL, versionAnchor } from "@/lib/changelog";
 import { getSortedChangelogPages, type ChangelogPage } from "@/lib/source";
 
-const FEED_TITLE = "build-elevate Changelog";
-const FEED_DESC = "All changes, fixes and updates to build-elevate.";
+const FEED_TITLE = "Stackbase Changelog";
+const FEED_DESC = "All changes, fixes and updates to Stackbase.";
 const CHANGELOG_URL = `${SITE_URL}/changelog`;
 const FEED_URL = `${CHANGELOG_URL}/rss.xml`;
 

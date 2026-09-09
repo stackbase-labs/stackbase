@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: build-elevate-api-ingress
-  namespace: build-elevate
+  name: stackbase-api-ingress
+  namespace: stackbase
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     # Strips /api/v1/ prefix: /api/v1/users → /api/users on the API service
@@ -16,7 +16,7 @@ spec:
   # tls:
   #   - hosts:
   #       - yourdomain.com
-  #     secretName: build-elevate-tls
+  #     secretName: stackbase-tls
   rules:
     - http:
         paths:
@@ -24,6 +24,6 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: build-elevate-api-service
+                name: stackbase-api-service
                 port:
                   number: 4000

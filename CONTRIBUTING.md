@@ -1,4 +1,4 @@
-# Contributing to build-elevate
+# Contributing to Stackbase
 
 Thanks for taking the time to contribute! This guide explains how to get set up and the workflow we follow.
 
@@ -62,7 +62,7 @@ Common types: `feat`, `fix`, `docs`, `refactor`, `chore`, `test`.
 
 ## Reporting Bugs & Requesting Features
 
-Use [GitHub Issues](https://github.com/vijaysingh2219/build-elevate/issues). For open-ended questions or ideas, start a [Discussion](https://github.com/vijaysingh2219/build-elevate/discussions).
+Use [GitHub Issues](https://github.com/stackbase-labs/stackbase/issues). For open-ended questions or ideas, start a [Discussion](https://github.com/stackbase-labs/stackbase/discussions).
 
 ## Security
 

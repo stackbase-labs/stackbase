@@ -1,4 +1,4 @@
-export const SITE_NAME = 'Build Elevate';
+export const SITE_NAME = 'Stackbase';
 export const SITE_DESCRIPTION = 'A starter template for building applications with Turborepo.';
 export const DEFAULT_BASE_URL = 'https://your-domain.com';
 export const DEFAULT_OG_IMAGE = '/og-image.png';

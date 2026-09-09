@@ -1,7 +1,7 @@
 services:
   prometheus:
     image: prom/prometheus:latest
-    container_name: build-elevate-prometheus
+    container_name: stackbase-prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
@@ -10,14 +10,14 @@ services:
       - 9090:9090
     volumes:
       - ./deploy/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - build-elevate-prometheus-data:/prometheus
+      - stackbase-prometheus-data:/prometheus
     extra_hosts:
       - host.docker.internal:host-gateway
     restart: unless-stopped
 
   grafana:
     image: grafana/grafana-oss:latest
-    container_name: build-elevate-grafana
+    container_name: stackbase-grafana
     ports:
       - 3002:3000
     environment:
@@ -27,11 +27,11 @@ services:
     volumes:
       - ./deploy/observability/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./deploy/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
-      - build-elevate-grafana-data:/var/lib/grafana
+      - stackbase-grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
     restart: unless-stopped
 
 volumes:
-  build-elevate-prometheus-data:
-  build-elevate-grafana-data:
+  stackbase-prometheus-data:
+  stackbase-grafana-data:

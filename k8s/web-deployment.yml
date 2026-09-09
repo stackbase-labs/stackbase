@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: build-elevate-web-deployment
-  namespace: build-elevate
+  name: stackbase-web-deployment
+  namespace: stackbase
   labels:
-    app: build-elevate-web
+    app: stackbase-web
 spec:
   # replicas is intentionally omitted: the HorizontalPodAutoscaler
   # (k8s/web-hpa.yml) owns this value. Setting it here would reset the
   # pod count on every `kubectl apply`, fighting the autoscaler.
   selector:
     matchLabels:
-      app: build-elevate-web
+      app: stackbase-web
   template:
     metadata:
       labels:
-        app: build-elevate-web
+        app: stackbase-web
     spec:
       containers:
-        - name: build-elevate-web
-          image: vijaysingh2219/build-elevate-web:latest
+        - name: stackbase-web
+          image: your-dockerhub-username/stackbase-web:latest
           ports:
             - containerPort: 3000
           envFrom:
             - secretRef:
-                name: build-elevate-web-env
+                name: stackbase-web-env
             - configMapRef:
-                name: build-elevate-config
+                name: stackbase-config
           env:
             - name: HOSTNAME
               value: "0.0.0.0"

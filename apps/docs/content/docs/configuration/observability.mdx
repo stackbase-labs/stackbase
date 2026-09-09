@@ -1,18 +1,18 @@
 ---
 title: Observability
-description: Run Prometheus and Grafana locally to scrape, store, and visualize API metrics exposed by build-elevate
+description: Run Prometheus and Grafana locally to scrape, store, and visualize API metrics exposed by Stackbase
 ---
 
 # Prometheus & Grafana
 
-build-elevate includes a local observability stack for the Express API. Prometheus scrapes the API's `/metrics` endpoint, and Grafana starts with a provisioned Prometheus data source plus an API overview dashboard.
+Stackbase includes a local observability stack for the Express API. Prometheus scrapes the API's `/metrics` endpoint, and Grafana starts with a provisioned Prometheus data source plus an API overview dashboard.
 
 ## What You Get
 
 - **Prometheus** on `http://localhost:9090`
 - **Grafana** on `http://localhost:3002`
 - **API metrics endpoint** on `http://localhost:4000/metrics`
-- **Provisioned dashboard** named **Build Elevate API Overview**
+- **Provisioned dashboard** named **Stackbase API Overview**
 - **RED metrics** for request rate, errors, and duration
 - **Node.js runtime metrics** from `prom-client`
 
@@ -81,13 +81,13 @@ curl http://localhost:4000/metrics
 
 Application HTTP metrics include:
 
-| Metric                                        | Type      | Labels                           | Description                      |
-| --------------------------------------------- | --------- | -------------------------------- | -------------------------------- |
-| `build_elevate_http_requests_total`           | Counter   | `method`, `route`, `status_code` | Total HTTP requests processed    |
-| `build_elevate_http_request_duration_seconds` | Histogram | `method`, `route`, `status_code` | HTTP request duration in seconds |
-| `build_elevate_http_requests_in_flight`       | Gauge     | `method`                         | Requests currently being handled |
+| Metric                                    | Type      | Labels                           | Description                      |
+| ----------------------------------------- | --------- | -------------------------------- | -------------------------------- |
+| `stackbase_http_requests_total`           | Counter   | `method`, `route`, `status_code` | Total HTTP requests processed    |
+| `stackbase_http_request_duration_seconds` | Histogram | `method`, `route`, `status_code` | HTTP request duration in seconds |
+| `stackbase_http_requests_in_flight`       | Gauge     | `method`                         | Requests currently being handled |
 
-The API also exposes default Node.js process metrics with the `build_elevate_` prefix, including CPU, memory, event loop, garbage collection, and active handle metrics.
+The API also exposes default Node.js process metrics with the `stackbase_` prefix, including CPU, memory, event loop, garbage collection, and active handle metrics.
 
 Health checks and scraper routes are intentionally excluded from RED metrics where they would add noise:
 
@@ -105,7 +105,7 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: build-elevate-api
+  - job_name: stackbase-api
     metrics_path: /metrics
     static_configs:
       - targets:
@@ -127,8 +127,8 @@ scrape_configs:
 Grafana automatically provisions:
 
 - A Prometheus data source named **Prometheus**
-- A dashboard folder named **Build Elevate**
-- The **Build Elevate API Overview** dashboard
+- A dashboard folder named **Stackbase**
+- The **Stackbase API Overview** dashboard
 
 The dashboard includes panels for:
 
@@ -171,7 +171,7 @@ curl http://localhost:4000/health
 curl http://localhost:4000/metrics
 ```
 
-Then open Prometheus targets at [http://localhost:9090/targets](http://localhost:9090/targets). The `build-elevate-api` target should show as **UP**.
+Then open Prometheus targets at [http://localhost:9090/targets](http://localhost:9090/targets). The `stackbase-api` target should show as **UP**.
 
 ### Grafana Dashboard Is Empty
 

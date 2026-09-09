@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: build-elevate-config
-  namespace: build-elevate
+  name: stackbase-config
+  namespace: stackbase
 data:
   NODE_ENV: "production"
   # Used by Next.js next.config.mjs to proxy /api/v1/* → API service at /api/*
-  API_INTERNAL_URL: "http://build-elevate-api-service.build-elevate.svc.cluster.local:4000"
+  API_INTERNAL_URL: "http://stackbase-api-service.stackbase.svc.cluster.local:4000"

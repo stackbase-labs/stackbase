@@ -6,11 +6,11 @@ import { SiGithub } from "react-icons/si";
 import Link from "next/link";
 import { Entry } from "./_components/changelog-entry";
 
-const GITHUB_URL = "https://github.com/vijaysingh2219/build-elevate";
+const GITHUB_URL = "https://github.com/stackbase-labs/stackbase";
 
 export const metadata: Metadata = {
   title: "Changelog",
-  description: "All changes, fixes and updates to build-elevate.",
+  description: "All changes, fixes and updates to Stackbase.",
   alternates: {
     canonical: `${SITE_URL}/changelog`,
     types: {
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Changelog — build-elevate",
-    description: "All changes, fixes and updates to build-elevate.",
+    title: "Changelog — Stackbase",
+    description: "All changes, fixes and updates to Stackbase.",
     url: `${SITE_URL}/changelog`,
     type: "website",
   },
@@ -47,7 +47,7 @@ export default function ChangelogPage() {
             Changelog
           </h1>
           <p className="text-base text-fd-muted-foreground leading-relaxed max-w-sm">
-            All changes, fixes and updates to build-elevate.
+            All changes, fixes and updates to Stackbase.
           </p>
 
           <div className="flex gap-2 mt-4">

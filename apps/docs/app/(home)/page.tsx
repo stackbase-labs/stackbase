@@ -30,8 +30,8 @@ import { TechLogos } from "./_components/tech-logos";
 import { LifecycleSection } from "./_components/lifecycle-section";
 import { TypeFlowSection } from "./_components/typeflow-section";
 
-const GITHUB_URL = "https://github.com/vijaysingh2219/build-elevate";
-const INSTALL_COMMAND = "pnpm dlx build-elevate@latest init my-saas";
+const GITHUB_URL = "https://github.com/stackbase-labs/stackbase";
+const INSTALL_COMMAND = "pnpm dlx stackbase@latest init my-saas";
 
 export default function HomePage() {
   return (
@@ -99,11 +99,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why build-elevate */}
+      {/* Why Stackbase */}
       <section className="py-24">
         <div className="mx-auto max-w-5xl px-4">
           <Reveal>
-            <Eyebrow>Why build-elevate</Eyebrow>
+            <Eyebrow>Why Stackbase</Eyebrow>
             <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
               Skip the boilerplate, keep the best practices
             </h2>
@@ -183,7 +183,7 @@ export default function HomePage() {
           <GridGlow />
           <Reveal>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Ready to elevate your workflow?
+              Ready to launch your workflow?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
               Stop configuring and start shipping. Spin up a production-ready

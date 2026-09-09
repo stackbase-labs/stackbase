@@ -1,11 +1,11 @@
 services:
   web:
-    container_name: build-elevate-web
+    container_name: stackbase-web
     build:
       context: .
       dockerfile: ./apps/web/Dockerfile.prod
       args:
-        API_INTERNAL_URL: http://build-elevate-api-service.build-elevate.svc.cluster.local:4000
+        API_INTERNAL_URL: http://stackbase-api-service.stackbase.svc.cluster.local:4000
     env_file:
       - ./apps/web/.env.production
     ports:
@@ -22,7 +22,7 @@ services:
       - no-new-privileges:true
 
   api:
-    container_name: build-elevate-api
+    container_name: stackbase-api
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile.prod
@@ -47,15 +47,15 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    container_name: build-elevate-postgres
+    container_name: stackbase-postgres
     environment:
-      POSTGRES_DB: build-elevate-app
+      POSTGRES_DB: stackbase-app
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
       - 5432:5432
     volumes:
-      - build-elevate-app_postgres_data:/var/lib/postgresql/data
+      - stackbase-app_postgres_data:/var/lib/postgresql/data
     networks:
       - app_network
     healthcheck:
@@ -66,7 +66,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  build-elevate-app_postgres_data:
+  stackbase-app_postgres_data:
 
 # Define a network, which allows containers to communicate
 # with each other, by using their container name as a hostname

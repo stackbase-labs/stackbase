@@ -1,36 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: build-elevate-api-deployment
-  namespace: build-elevate
+  name: stackbase-api-deployment
+  namespace: stackbase
   labels:
-    app: build-elevate-api
+    app: stackbase-api
 spec:
   # replicas is intentionally omitted: the HorizontalPodAutoscaler
   # (k8s/api-hpa.yml) owns this value. Setting it here would reset the
   # pod count on every `kubectl apply`, fighting the autoscaler.
   selector:
     matchLabels:
-      app: build-elevate-api
+      app: stackbase-api
   template:
     metadata:
       labels:
-        app: build-elevate-api
+        app: stackbase-api
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "4000"
         prometheus.io/path: "/metrics"
     spec:
       containers:
-        - name: build-elevate-api
-          image: vijaysingh2219/build-elevate-api:latest
+        - name: stackbase-api
+          image: your-dockerhub-username/stackbase-api:latest
           ports:
             - containerPort: 4000
           envFrom:
             - secretRef:
-                name: build-elevate-api-env
+                name: stackbase-api-env
             - configMapRef:
-                name: build-elevate-config
+                name: stackbase-config
           env:
             - name: POD_NAME
               valueFrom:

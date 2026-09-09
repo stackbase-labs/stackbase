@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile, access, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
+import { LEGACY_MANIFEST_FILE, MANIFEST_FILE } from "./branding.js";
 import { toKebabCase } from "./utils.js";
 
-export const MANIFEST_FILE = ".build-elevate.json";
+export { LEGACY_MANIFEST_FILE, MANIFEST_FILE };
 
 // Increase this number whenever we change the shape of the manifest, so the
 // upgrade and diff commands can tell which version of the file they're reading.
@@ -15,7 +16,7 @@ export interface ManifestFeatures {
   studio: boolean;
 }
 
-export interface BuildElevateManifest {
+export interface StackbaseManifest {
   version: number; // which version of the manifest format this file uses (see MANIFEST_VERSION)
   commit: string; // exact git SHA cloned from main — source of truth for upgrade comparisons
   template: string;
@@ -24,6 +25,8 @@ export interface BuildElevateManifest {
   features: ManifestFeatures; // the optional features the user chose to include when the project was created
   files: Record<string, string>; // filePath -> sha256 hash (first 12 chars)
 }
+
+export type LegacyBuildElevateManifest = StackbaseManifest;
 
 /**
  * Works out which optional features a project includes.
@@ -34,7 +37,7 @@ export interface BuildElevateManifest {
  * its files are deleted, so a missing folder or file tells us it was left out.
  */
 export const resolveFeatures = async (
-  manifest: BuildElevateManifest,
+  manifest: StackbaseManifest,
 ): Promise<ManifestFeatures> => {
   if (manifest.features) return manifest.features;
 
@@ -73,21 +76,35 @@ export const manifestExists = async (): Promise<boolean> => {
     await access(MANIFEST_FILE);
     return true;
   } catch {
-    return false;
+    try {
+      await access(LEGACY_MANIFEST_FILE);
+      return true;
+    } catch {
+      return false;
+    }
   }
 };
 
-export const readManifest = async (): Promise<BuildElevateManifest | null> => {
+const readManifestFile = async (
+  filePath: string,
+): Promise<StackbaseManifest | null> => {
   try {
-    const content = await readFile(MANIFEST_FILE, "utf8");
-    return JSON.parse(content) as BuildElevateManifest;
+    const content = await readFile(filePath, "utf8");
+    return JSON.parse(content) as StackbaseManifest;
   } catch {
     return null;
   }
 };
 
+export const readManifest = async (): Promise<StackbaseManifest | null> => {
+  return (
+    (await readManifestFile(MANIFEST_FILE)) ??
+    (await readManifestFile(LEGACY_MANIFEST_FILE))
+  );
+};
+
 export const writeManifest = async (
-  manifest: BuildElevateManifest,
+  manifest: StackbaseManifest,
 ): Promise<void> => {
   await writeFile(MANIFEST_FILE, JSON.stringify(manifest, null, 2) + "\n");
 };
@@ -127,6 +144,7 @@ const SKIP_FILES = new Set([
   "tsconfig.scripts.json",
   "tsconfig.tsbuildinfo",
   // the manifest itself
+  ".stackbase.json",
   ".build-elevate.json",
   // internal files deleted during init
   "SCREENSHOTS.md",
@@ -207,7 +225,7 @@ export const buildManifest = async (
   projectName: string,
   features: ManifestFeatures,
   projectRoot: string = process.cwd(),
-): Promise<BuildElevateManifest> => {
+): Promise<StackbaseManifest> => {
   const allFiles = await walkDir(projectRoot, projectRoot);
   const files: Record<string, string> = {};
 

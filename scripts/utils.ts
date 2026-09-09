@@ -2,8 +2,9 @@ import { type ExecSyncOptions, exec as execRaw } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
+import { REPO } from "./branding.js";
 
-export const url = "vijaysingh2219/build-elevate";
+export const url = REPO;
 
 export const execSyncOpts: ExecSyncOptions = { stdio: "ignore" };
 export const execOpts = { stdio: "ignore" as const };
@@ -154,6 +155,11 @@ export const applyProjectName = (
   projectName: string,
 ): string => {
   let result = content;
+  result = result.replaceAll("stackbase_", `${toSnakeCase(projectName)}_`);
+  result = result.replaceAll("STACKBASE_", `${toConstantCase(projectName)}_`);
+  result = result.replaceAll("stackbase", toKebabCase(projectName));
+  result = result.replaceAll("Stackbase", toTitleCase(projectName));
+  result = result.replaceAll("STACKBASE", toConstantCase(projectName));
   result = result.replaceAll("build-elevate", toKebabCase(projectName));
   result = result.replaceAll("buildElevate", toCamelCase(projectName));
   result = result.replaceAll("BuildElevate", toPascalCase(projectName));
@@ -187,7 +193,7 @@ export const getFilesToReplaceProjectName = (): string[] => {
     "docker-compose.prod.yml",
     "docker-compose.observability.yml",
     "deploy/observability/prometheus.yml",
-    "deploy/observability/grafana/provisioning/dashboards/build-elevate.yml",
+    "deploy/observability/grafana/provisioning/dashboards/stackbase.yml",
     "deploy/observability/grafana/dashboards/api-overview.json",
     "deploy.sh",
     "k8s/namespace.yml",

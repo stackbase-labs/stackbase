@@ -53,7 +53,7 @@ export const generatePageMetadata = (
 // Page-specific metadata
 export const pageMetadata = {
   home: {
-    title: 'Build Elevate | Fullstack Turborepo Starter Template',
+    title: 'Stackbase | Fullstack Turborepo Starter Template',
     description: SITE_DESCRIPTION,
   },
   dashboard: {
@@ -81,11 +81,11 @@ export const pageMetadata = {
   auth: {
     signIn: {
       title: 'Sign In',
-      description: 'Sign in to your build-elevate account.',
+      description: 'Sign in to your Stackbase account.',
     },
     signUp: {
       title: 'Sign Up',
-      description: 'Create a new build-elevate account.',
+      description: 'Create a new stackbase account.',
     },
     forgotPassword: {
       title: 'Forgot Password',

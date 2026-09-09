@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # Set this to your Docker Hub (or other registry) username before deploying.
-USERNAME="vijaysingh2219"
-PROJECT="build-elevate"
-NAMESPACE="build-elevate"
+USERNAME="your-dockerhub-username"
+PROJECT="stackbase"
+NAMESPACE="stackbase"
 
 # Apps are built and deployed only when their Kubernetes manifests are present,
 # so this script works for full-stack, web-only, and api-only projects without

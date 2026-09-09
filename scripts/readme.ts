@@ -20,7 +20,7 @@ const buildHeroSection = ({
 
 ${templateDescriptions[template]}
 
-Built with [build-elevate](https://github.com/vijaysingh2219/build-elevate) - A production-grade full-stack starter.
+Built with [Stackbase](https://github.com/stackbase-labs/stackbase) - A production-grade full-stack starter.
 `;
 
 const buildGettingStartedSection = ({
@@ -283,7 +283,7 @@ After deploying, verify the rollout:
 ${scriptPrefix} k8s:verify
 \`\`\`
 
-See [Kubernetes docs](https://build-elevate.vercel.app/docs/deployment/kubernetes) for the full guide.
+See [Kubernetes docs](https://stackbase-labs.vercel.app/docs/deployment/kubernetes) for the full guide.
 `;
 
 /**

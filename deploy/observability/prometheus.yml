@@ -3,7 +3,7 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: build-elevate-api
+  - job_name: stackbase-api
     metrics_path: /metrics
     static_configs:
       - targets:

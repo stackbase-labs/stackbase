@@ -8,7 +8,7 @@ export function baseOptions(): BaseLayoutProps {
       title: (
         <div className="flex items-center gap-2">
           <Layers className="h-5 w-5 text-primary" />
-          <span className="font-semibold">Build Elevate</span>
+          <span className="font-semibold">Stackbase</span>
         </div>
       ),
     },
@@ -29,10 +29,10 @@ export function baseOptions(): BaseLayoutProps {
         type: "icon",
         icon: <NPM />,
         text: "NPM",
-        url: "https://www.npmjs.com/package/build-elevate",
+        url: "https://www.npmjs.com/package/stackbase",
         external: true,
       },
     ],
-    githubUrl: "https://github.com/vijaysingh2219/build-elevate",
+    githubUrl: "https://github.com/stackbase-labs/stackbase",
   };
 }

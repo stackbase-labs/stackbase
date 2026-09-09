@@ -1,13 +1,13 @@
 ---
 title: Command Line Interface
-description: Reference for all build-elevate CLI commands - init, upgrade, and diff.
+description: Reference for all stackbase CLI commands - init, upgrade, and diff.
 icon: Terminal
 ---
 
-The `build-elevate` CLI is the entry point for scaffolding new projects and keeping them in sync with the latest template. It is distributed as an npm package.
+The `stackbase` CLI is the entry point for scaffolding new projects and keeping them in sync with the latest template. It is distributed as an npm package.
 
 ```npm
-pnpm dlx build-elevate@latest <command>
+pnpm dlx stackbase@latest <command>
 ```
 
 <Callout type="info">
@@ -21,10 +21,10 @@ pnpm dlx build-elevate@latest <command>
 
 ### `init`
 
-Scaffolds a new project from the `build-elevate` template.
+Scaffolds a new project from the `Stackbase` template.
 
 ```npm
-pnpm dlx build-elevate@latest init [project-name] [options]
+pnpm dlx stackbase@latest init [project-name] [options]
 ```
 
 #### Arguments
@@ -63,47 +63,48 @@ pnpm dlx build-elevate@latest init [project-name] [options]
 2. Clones the repository via `degit` (no `.git` history).
 3. Removes apps and packages not relevant to the chosen template.
 4. Runs `updateTurboLintEnv` to strip environment variables from `turbo.json` that are not used by the template.
-5. Replaces all occurrences of `build-elevate` (in all case formats - kebab, camel, pascal, snake, constant, title) with your project name across all relevant files.
+5. Replaces Stackbase project identifiers with your project name across all relevant files.
 6. Cleans up CLI-specific fields from `package.json` (`bin`, `files`, `homepage`, `repository`, etc.) and resets `version` to `1.0.0`.
 7. Strips the `cli:` catalog from `pnpm-workspace.yaml` and removes template-irrelevant catalog sections.
 8. Configures the chosen package manager (replaces `workspace:` protocols, updates `packageManager` field, adjusts Dockerfiles).
 9. Copies `.env.example` files to `.env.local` / `.env` with a shared generated `BETTER_AUTH_SECRET`.
 10. Deletes internal-only content (`scripts/`, `assets/`, `apps/docs/`, `SCREENSHOTS.md`, etc.).
-11. Writes a `.build-elevate.json` manifest recording the commit SHA, template, project name, and a SHA-256 hash of every tracked file in its final post-mutation state.
+11. Writes a `.stackbase.json` manifest recording the commit SHA, template, project name, and a SHA-256 hash of every tracked file in its final post-mutation state.
 12. Initialises a Git repository and creates the initial commit.
 
 #### Examples
 
 ```bash
 # Interactive - prompts for name, template, package manager, etc.
-pnpm dlx build-elevate@latest init
+pnpm dlx stackbase@latest init
 
 # Non-interactive fullstack project
-pnpm dlx build-elevate@latest init my-app --yes
+pnpm dlx stackbase@latest init my-app --yes
 
 # Frontend-only project with bun
-pnpm dlx build-elevate@latest init my-app -t web -p bun
+pnpm dlx stackbase@latest init my-app -t web -p bun
 
 # API-only project, skip Git
-pnpm dlx build-elevate@latest init my-api -t api --no-git
+pnpm dlx stackbase@latest init my-api -t api --no-git
 
 # Scaffold without installing dependencies
-pnpm dlx build-elevate@latest init my-app --skip-install
+pnpm dlx stackbase@latest init my-app --skip-install
 ```
 
 ---
 
 ### `upgrade`
 
-Upgrades your scaffolded project to the latest `build-elevate` template.
+Upgrades your scaffolded project to the latest `Stackbase` template.
 
 ```npm
-pnpm dlx build-elevate@latest upgrade [options]
+pnpm dlx stackbase@latest upgrade [options]
 ```
 
 <Callout type="warn">
   This command must be run from the root of a project that was scaffolded with
-  `init` command. It requires a `.build-elevate.json` manifest to be present.
+  `init` command. It requires a `.stackbase.json` manifest. Legacy
+  `.build-elevate.json` manifests are still supported.
 </Callout>
 
 #### Options
@@ -122,7 +123,7 @@ For each tracked file, it compares three values:
 
 | Value         | Description                                                                                    |
 | ------------- | ---------------------------------------------------------------------------------------------- |
-| `savedHash`   | SHA-256 of the file at scaffold time, stored in `.build-elevate.json`                          |
+| `savedHash`   | SHA-256 of the file at scaffold time, stored in `.stackbase.json`                              |
 | `currentHash` | SHA-256 of the file as it exists on disk right now                                             |
 | `newHash`     | SHA-256 of the file fetched from the latest GitHub commit, after applying init-time transforms |
 
@@ -135,7 +136,7 @@ The decision matrix:
 | `newHash === savedHash` and `currentHash !== savedHash` | Template unchanged, user edited - skip (your changes are kept) |
 | All three differ                                        | Both you and the template changed this file - **conflict**     |
 
-Files that are conflicts are listed with a message directing you to `build-elevate diff <file>`.
+Files that are conflicts are listed with a message directing you to `stackbase diff <file>`.
 
 #### Init-time transforms
 
@@ -157,7 +158,7 @@ The following are always skipped regardless of changes:
 - `.env.example` - intentionally upgradeable (see below)
 - `README.md` - rewritten by `init` with project-specific content
 - `pnpm-lock.yaml`, `bun.lockb`, `package-lock.json` - regenerated by package manager
-- `.build-elevate.json` - the manifest itself
+- `.stackbase.json` - the manifest itself
 - `apps/docs/` - internal documentation app, deleted during `init`
 - `scripts/`, `assets/` - internal CLI content, deleted during `init`
 - Binary and generated files (images, fonts, `.map` files, etc.)
@@ -176,7 +177,7 @@ Files outside the scope of your original template are never added:
 
 #### Manifest and conflict tracking
 
-The `.build-elevate.json` manifest commit pointer is **only advanced when all conflicts are resolved**. If conflicts remain after a run, the manifest keeps the old commit SHA so that `build-elevate diff` can still show what needs to be applied.
+The `.stackbase.json` manifest commit pointer is **only advanced when all conflicts are resolved**. If conflicts remain after a run, the manifest keeps the old commit SHA so that `stackbase diff` can still show what needs to be applied.
 
 Once you manually resolve all conflicts and re-run `upgrade` with no new conflicts, the commit pointer advances to the latest.
 
@@ -200,22 +201,22 @@ Crucially, the base is set to the template's hash, **not** a re-hash of your fil
 
 ```bash
 # Preview changes without writing
-pnpm dlx build-elevate upgrade  --dry-run
+pnpm dlx stackbase upgrade  --dry-run
 
 # Apply upgrade
-pnpm dlx build-elevate upgrade
+pnpm dlx stackbase upgrade
 
 # Apply upgrade, skip prompts
-pnpm dlx build-elevate upgrade  --yes
+pnpm dlx stackbase upgrade  --yes
 
 # Advance to latest past conflicts, keeping your local edits
-pnpm dlx build-elevate upgrade  --force
+pnpm dlx stackbase upgrade  --force
 ```
 
 #### Example output
 
 ```
-┌  build-elevate upgrade
+┌  stackbase upgrade
 │
 ◇  Current: d55f5fa  →  Latest: 6669a80
 │
@@ -232,7 +233,7 @@ pnpm dlx build-elevate upgrade  --force
 │
 │    ⚠ apps/api/src/config/corsOptions.ts
 │
-│  Run `build-elevate diff <file>` to see exactly what changed in the template.
+│  Run `stackbase diff <file>` to see exactly what changed in the template.
 │
 └  Upgraded to 6669a80 with 1 conflict(s) to resolve manually.
 ```
@@ -241,10 +242,10 @@ pnpm dlx build-elevate upgrade  --force
 
 ### `diff`
 
-Shows a colored line-by-line diff of what changed in the **build-elevate template** for a specific file between your scaffolded commit and the latest.
+Shows a colored line-by-line diff of what changed in the **Stackbase template** for a specific file between your scaffolded commit and the latest.
 
 ```npm
-pnpm dlx build-elevate diff <file>
+pnpm dlx stackbase diff <file>
 ```
 
 <Callout>
@@ -293,15 +294,15 @@ This is expected behaviour, it means the file was listed as modified by you, but
 
 ```bash
 # Show what changed in the template for next.config.ts
-pnpm dlx build-elevate diff apps/web/next.config.ts
+pnpm dlx stackbase diff apps/web/next.config.ts
 
 # Windows paths work too
-pnpm dlx build-elevate diff .\apps\web\next.config.ts
+pnpm dlx stackbase diff .\apps\web\next.config.ts
 ```
 
 ---
 
-## The `.build-elevate.json` manifest
+## The `.stackbase.json` manifest
 
 The manifest is written by `init` and read by `upgrade` and `diff`. It is committed to your repository and should never be added to `.gitignore`.
 
@@ -331,7 +332,7 @@ The manifest is written by `init` and read by `upgrade` and `diff`. It is commit
 <Callout type="warn">
   If your manifest is missing the `projectName` field (projects scaffolded
   before `v1.2.0`), `upgrade` will exit with an error. Add `"projectName":
-  "your-project-name"` manually to `.build-elevate.json` to resolve this.
+  "your-project-name"` manually to `.stackbase.json` to resolve this.
 </Callout>
 
 ---
@@ -342,18 +343,18 @@ The recommended flow for keeping your project up to date:
 
 ```bash
 # 1. Check what would change
-pnpm dlx build-elevate upgrade  --dry-run
+pnpm dlx stackbase upgrade  --dry-run
 
 # 2. Apply the upgrade
-pnpm dlx build-elevate upgrade
+pnpm dlx stackbase upgrade
 
 # 3. For each conflict listed, inspect the template diff
-pnpm dlx build-elevate diff apps/api/src/config/corsOptions.ts
+pnpm dlx stackbase diff apps/api/src/config/corsOptions.ts
 
 # 4. Manually apply the relevant changes to your file
 
 # 5. Re-run upgrade - with conflicts resolved, the manifest advances
-pnpm dlx build-elevate upgrade
+pnpm dlx stackbase upgrade
 
 # 6. Install updated dependencies
 pnpm install

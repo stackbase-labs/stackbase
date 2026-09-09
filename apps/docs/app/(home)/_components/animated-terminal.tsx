@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { Terminal } from "lucide-react";
 
-const COMMAND = "pnpm dlx build-elevate@latest init my-saas";
+const COMMAND = "pnpm dlx stackbase@latest init my-saas";
 
 const OUTPUT_LINES = [
   { text: "✓ Initializing project structure...", muted: true },

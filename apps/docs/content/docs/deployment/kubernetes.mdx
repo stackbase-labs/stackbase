@@ -5,7 +5,7 @@ description: Deploy the web and API applications to any Kubernetes cluster using
 
 ## Overview
 
-build-elevate ships a complete set of Kubernetes manifests in the `k8s/` directory, plus a `deploy.sh` script that builds and pushes your Docker images and applies the manifests, and a `verify.sh` script that checks the rollout afterward.
+Stackbase ships a complete set of Kubernetes manifests in the `k8s/` directory, plus a `deploy.sh` script that builds and pushes your Docker images and applies the manifests, and a `verify.sh` script that checks the rollout afterward.
 
 The manifests are template-aware: a **full-stack** project gets both web and API resources, while **web-only** and **api-only** projects ship only the manifests for the app they include.
 
@@ -13,7 +13,7 @@ The manifests are template-aware: a **full-stack** project gets both web and API
 
 | File                     | Purpose                                                           |
 | ------------------------ | ----------------------------------------------------------------- |
-| `k8s/namespace.yml`      | Dedicated `build-elevate` namespace                               |
+| `k8s/namespace.yml`      | Dedicated `stackbase` namespace                                   |
 | `k8s/configmap.yml`      | Non-secret config (`NODE_ENV`; `API_INTERNAL_URL` for fullstack)  |
 | `k8s/api-deployment.yml` | API Deployment with resource limits and readiness/liveness probes |
 | `k8s/api-service.yml`    | ClusterIP Service for the API on port 4000                        |
@@ -131,11 +131,11 @@ The ingress mirrors the local dev rewrite: requests to `/api/v1/*` are stripped 
 
 ```txt
 Internet → nginx Ingress (:80/:443)
-         ├─ /api/v1/*  → rewrite /api/v1/* → /api/* → build-elevate-api-service (:4000) → Express API
-         └─ /*         → build-elevate-web-service (:3000) → Next.js pages
+         ├─ /api/v1/*  → rewrite /api/v1/* → /api/* → stackbase-api-service (:4000) → Express API
+         └─ /*         → stackbase-web-service (:3000) → Next.js pages
 
 Next.js server-side fetches (SSR) reach the API in-cluster via
-API_INTERNAL_URL → build-elevate-api-service (:4000), bypassing the ingress.
+API_INTERNAL_URL → stackbase-api-service (:4000), bypassing the ingress.
 ```
 
 Next.js server-side fetches (SSR) don't go back out through the ingress — they reach the API directly over the cluster network via `API_INTERNAL_URL` (set in `k8s/configmap.yml`), pointed at the API's ClusterIP service.
@@ -179,5 +179,5 @@ kubectl port-forward -n [your-project] svc/[your-project]-web-service 3000:3000 
 
 <Callout type="info">
   Need help? Check the [Troubleshooting Guide](/docs/troubleshooting) or open an
-  issue on [GitHub](https://github.com/vijaysingh2219/build-elevate/issues).
+  issue on [GitHub](https://github.com/stackbase-labs/stackbase/issues).
 </Callout>

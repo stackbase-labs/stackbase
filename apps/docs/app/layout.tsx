@@ -16,26 +16,27 @@ const fontMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://build-elevate.vercel.app",
+    process.env.NEXT_PUBLIC_SITE_URL || "https://stackbase-labs.vercel.app",
   ),
   title: {
-    template: "%s | build-elevate",
-    default: "build-elevate — The Open-Source Foundation for Modern Monorepos",
+    template: "%s | Stackbase",
+    default: "Stackbase — The Open-Source Foundation for Modern Monorepos",
   },
   description:
     "A CLI that scaffolds scalable Turborepos with authentication, infrastructure, and best practices built in.",
   openGraph: {
-    title: "build-elevate — The Open-Source Foundation for Modern Monorepos",
+    title: "Stackbase — The Open-Source Foundation for Modern Monorepos",
     description:
       "A CLI that scaffolds scalable Turborepos with authentication, infrastructure, and best practices built in.",
-    url: "https://build-elevate.vercel.app",
-    siteName: "build-elevate",
+    url:
+      process.env.NEXT_PUBLIC_SITE_URL || "https://stackbase-labs.vercel.app",
+    siteName: "Stackbase",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "build-elevate",
+        alt: "Stackbase",
       },
     ],
     locale: "en_US",
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "build-elevate — The Open-Source Foundation for Modern Monorepos",
+    title: "Stackbase — The Open-Source Foundation for Modern Monorepos",
     description:
       "A CLI that scaffolds scalable Turborepos with authentication, infrastructure, and best practices built in.",
     images: ["/og-image.png"],

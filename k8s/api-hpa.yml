@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: build-elevate-api-hpa
-  namespace: build-elevate
+  name: stackbase-api-hpa
+  namespace: stackbase
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: build-elevate-api-deployment
+    name: stackbase-api-deployment
   minReplicas: 2
   maxReplicas: 10
   metrics:

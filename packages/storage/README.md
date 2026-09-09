@@ -1,6 +1,6 @@
 # @workspace/storage
 
-Production-ready, vendor-agnostic file storage for **build-elevate**. Built with the modular AWS SDK v3 to support **AWS S3, Cloudflare R2, MinIO, Supabase Storage, and Wasabi** out of the box.
+Production-ready, vendor-agnostic file storage for **stackbase**. Built with the modular AWS SDK v3 to support **AWS S3, Cloudflare R2, MinIO, Supabase Storage, and Wasabi** out of the box.
 
 ## Features
 

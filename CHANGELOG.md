@@ -1,6 +1,8 @@
 # Changelog
 
-All changes, fixes and updates to build-elevate.
+All changes, fixes and updates to Stackbase.
+
+> Stackbase was formerly known as build-elevate. Entries before the rebrand refer to the project under its previous name.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 `Latest` is derived from position and is not stored here.

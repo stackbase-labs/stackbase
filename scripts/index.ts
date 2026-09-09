@@ -5,6 +5,7 @@ import { dirname, join } from "path";
 import { initialize } from "./initialize.js";
 import { upgrade } from "./upgrade.js";
 import { diff } from "./diff.js";
+import { CLI_NAME, PRODUCT_NAME } from "./branding.js";
 
 // Get package.json version
 const __filename = fileURLToPath(import.meta.url);
@@ -14,9 +15,9 @@ const packageJson = JSON.parse(
 );
 
 program
-  .name("build-elevate")
+  .name(CLI_NAME)
   .description(
-    "Production-grade full-stack starter with Next.js, Express, and authentication",
+    `${PRODUCT_NAME} CLI for scaffolding production-ready full-stack Turborepo applications`,
   )
   .version(packageJson.version);
 
@@ -37,10 +38,10 @@ program
 program
   .command("upgrade")
   .description(
-    "Upgrade your project to the latest build-elevate template version.\n\n" +
+    `Upgrade your project to the latest ${PRODUCT_NAME} template version.\n\n` +
       "Files you have not modified are updated automatically.\n" +
       "Files you have modified are listed as conflicts for manual review.\n\n" +
-      "Run `build-elevate diff <file>` to inspect what changed in the template for any conflict.",
+      "Run `stackbase diff <file>` to inspect what changed in the template for any conflict.",
   )
   .option("-y, --yes", "Skip confirmation prompts")
   .option(
@@ -62,12 +63,12 @@ program
 program
   .command("diff <file>")
   .description(
-    "Show what changed in the build-elevate template for a specific file.\n\n" +
+    "Show what changed in the Stackbase template for a specific file.\n\n" +
       "Compares the file between your scaffolded version and the latest template version.\n" +
       "Use this to understand what you need to manually apply after an upgrade conflict.\n\n" +
       "Example:\n" +
-      "  build-elevate diff apps/web/next.config.ts\n" +
-      "  build-elevate diff apps/api/src/config/corsOptions.ts",
+      "  stackbase diff apps/web/next.config.ts\n" +
+      "  stackbase diff apps/api/src/config/corsOptions.ts",
   )
   .action((filePath: string) => diff(filePath));
 

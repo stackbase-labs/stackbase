@@ -18,13 +18,13 @@ export default function Page() {
         </p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <Button asChild size="sm">
-            <Link href="https://github.com/vijaysingh2219/build-elevate" target="_blank">
+            <Link href="https://github.com/stackbase-labs/stackbase" target="_blank">
               View on GitHub
             </Link>
           </Button>
           <Button asChild variant="secondary" size="sm">
             <Link
-              href="https://github.com/vijaysingh2219/build-elevate?tab=readme-ov-file#readme"
+              href="https://github.com/stackbase-labs/stackbase?tab=readme-ov-file#readme"
               target="_blank"
             >
               Read Docs

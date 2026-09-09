@@ -4,6 +4,7 @@ import { join, resolve } from "node:path";
 import { cwd } from "node:process";
 import degit from "degit";
 import { buildManifest, writeManifest } from "./manifest.js";
+import { MANIFEST_FILE, PRODUCT_NAME, REPO } from "./branding.js";
 import {
   cancel,
   intro,
@@ -42,18 +43,18 @@ import {
   K8S_DOCKERHUB_FILES,
 } from "./update.js";
 
-const branch = process.env.BUILD_ELEVATE_BRANCH ?? "main";
+const branch = process.env.STACKBASE_BRANCH ?? "main";
 
 const getLatestCommit = async (): Promise<string> => {
   const res = await fetch(
-    `https://api.github.com/repos/vijaysingh2219/build-elevate/commits/${branch}`,
+    `https://api.github.com/repos/${REPO}/commits/${branch}`,
     { headers: { Accept: "application/vnd.github.sha" } },
   );
   if (!res.ok) throw new Error("Failed to resolve latest commit SHA");
   return (await res.text()).trim(); // returns just the SHA string with this Accept header
 };
 
-const cloneBuildElevate = async (name: string): Promise<string> => {
+const cloneStackbase = async (name: string): Promise<string> => {
   const commitHash = await getLatestCommit();
 
   const emitter = degit(`${url}#${branch}`, {
@@ -646,7 +647,7 @@ const initializeGit = async () => {
   await exec("git branch -M main", execSyncOpts);
   await exec("git add .", execSyncOpts);
   await exec(
-    'git commit --no-verify -m "✨ Initial commit from Build Elevate"',
+    `git commit --no-verify -m "✨ Initial commit from ${PRODUCT_NAME}"`,
     execSyncOpts,
   );
 };
@@ -949,7 +950,7 @@ export const initialize = async (
   } = {},
 ) => {
   try {
-    intro("Let's start a Build Elevate project!");
+    intro(`Let's start a ${PRODUCT_NAME} project!`);
 
     // Validate template if provided
     if (
@@ -1014,10 +1015,10 @@ export const initialize = async (
     await validatePrerequisites(name, projectDir, !shouldInitGit);
     s.stop("✓ Prerequisites validated");
 
-    s.start("Cloning Build Elevate...");
+    s.start(`Cloning ${PRODUCT_NAME}...`);
     let commitHash: string;
     try {
-      commitHash = await cloneBuildElevate(toKebabCase(name));
+      commitHash = await cloneStackbase(toKebabCase(name));
       if (options.verbose) log.info("✓ Cloned repository");
     } catch (error) {
       throw new Error(
@@ -1139,7 +1140,7 @@ export const initialize = async (
       studio: includeStudio,
     });
     await writeManifest(manifest);
-    if (options.verbose) log.info("✓ Written .build-elevate.json manifest");
+    if (options.verbose) log.info(`✓ Written ${MANIFEST_FILE} manifest`);
 
     if (shouldInitGit) {
       s.message("Initializing Git repository...");
@@ -1159,7 +1160,7 @@ export const initialize = async (
     const devCommand =
       packageManager === "pnpm" ? "pnpm dev" : packageManager + " run dev";
     outro(
-      `🎉 Your Build Elevate project is ready!\n\nNext steps:\n  ${cdCommand}${installCommand}\n  Update .env files with your database and API keys\n  ${devCommand}`,
+      `🎉 Your ${PRODUCT_NAME} project is ready!\n\nNext steps:\n  ${cdCommand}${installCommand}\n  Update .env files with your database and API keys\n  ${devCommand}`,
     );
   } catch (error) {
     const message =

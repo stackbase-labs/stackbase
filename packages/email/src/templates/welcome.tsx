@@ -19,7 +19,7 @@ export const WelcomeTemplate = ({ name, getStartedUrl }: WelcomeEmailProps) => {
         <EmailHeading>Welcome, {name}!</EmailHeading>
         <EmailText variant="greeting">Hi {name},</EmailText>
         <EmailText>
-          Thank you for joining us! We're excited to have you on board. Build Elevate is designed to
+          Thank you for joining us! We're excited to have you on board. Stackbase is designed to
           help you streamline your development workflow with powerful tools and integrations.
         </EmailText>
         <EmailText>Here's what you can do now:</EmailText>
@@ -35,7 +35,7 @@ export const WelcomeTemplate = ({ name, getStartedUrl }: WelcomeEmailProps) => {
         <EmailText variant="footer">
           Best regards,
           <br />
-          The Build Elevate Team
+          The Stackbase Team
         </EmailText>
       </EmailContainer>
     </EmailLayout>

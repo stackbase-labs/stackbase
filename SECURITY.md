@@ -8,7 +8,7 @@ Security fixes are applied to the latest released version. Please make sure you 
 
 **Please do not report security vulnerabilities through public GitHub issues, discussions, or pull requests.**
 
-Instead, report them privately through [GitHub Security Advisories](https://github.com/vijaysingh2219/build-elevate/security/advisories/new).
+Instead, report them privately through [GitHub Security Advisories](https://github.com/stackbase-labs/stackbase/security/advisories/new).
 
 Please include as much of the following as you can:
 
@@ -23,4 +23,4 @@ Please include as much of the following as you can:
 - We will investigate and keep you updated on our progress.
 - Once a fix is released, we will publicly credit you (unless you prefer to remain anonymous).
 
-Thank you for helping keep build-elevate and its users safe.
+Thank you for helping keep Stackbase and its users safe.

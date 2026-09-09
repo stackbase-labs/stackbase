@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: Build Elevate
+  - name: Stackbase
     orgId: 1
-    folder: Build Elevate
+    folder: Stackbase
     type: file
     disableDeletion: false
     editable: true

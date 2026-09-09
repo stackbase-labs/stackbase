@@ -210,7 +210,7 @@ export const applyDockerComposeCleanup = (
   return updated;
 };
 
-export const TEMPLATE_DOCKERHUB_USERNAME = "vijaysingh2219";
+export const TEMPLATE_DOCKERHUB_USERNAME = "your-dockerhub-username";
 export const DOCKERHUB_USERNAME_PLACEHOLDER = "your-dockerhub-username";
 
 // Files that embed the registry username (image: field or shell variable).
@@ -244,8 +244,8 @@ export const applyDomainName = (
     `        - ${domainName}`,
   );
   updated = updated.replace(
-    /^\s*#\s*secretName:\s*build-elevate-tls/m,
-    "      secretName: build-elevate-tls",
+    /^(\s*)#\s*secretName:\s*([a-z0-9-]+-tls)/m,
+    "$1secretName: $2",
   );
 
   // Add host to rules

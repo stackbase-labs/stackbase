@@ -1,17 +1,17 @@
 {
-  "name": "build-elevate",
+  "name": "stackbase",
   "version": "1.7.0",
-  "description": "Production-grade full-stack starter with Next.js, Express, and Better Auth - Get from idea to production faster",
+  "description": "Stackbase CLI for scaffolding production-ready full-stack Turborepo applications with Next.js, Express, Better Auth, and Prisma",
   "type": "module",
   "author": "Vijay Singh",
   "license": "MIT",
-  "homepage": "https://github.com/vijaysingh2219/build-elevate#readme",
+  "homepage": "https://github.com/stackbase-labs/stackbase#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vijaysingh2219/build-elevate.git"
+    "url": "git+https://github.com/stackbase-labs/stackbase.git"
   },
   "bugs": {
-    "url": "https://github.com/vijaysingh2219/build-elevate/issues"
+    "url": "https://github.com/stackbase-labs/stackbase/issues"
   },
   "keywords": [
     "starter",
@@ -30,7 +30,7 @@
     "cli"
   ],
   "bin": {
-    "build-elevate": "./dist/index.js"
+    "stackbase": "./dist/index.js"
   },
   "files": [
     "dist/index.js"

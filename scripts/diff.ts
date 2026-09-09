@@ -1,8 +1,13 @@
 import { intro, log } from "@clack/prompts";
-import { readManifest, manifestExists } from "./manifest.js";
+import {
+  LEGACY_MANIFEST_FILE,
+  MANIFEST_FILE,
+  readManifest,
+  manifestExists,
+} from "./manifest.js";
 import { getLatestCommit } from "./upgrade.js";
+import { CLI_NAME, PRODUCT_NAME, REPO } from "./branding.js";
 
-const REPO = "vijaysingh2219/build-elevate";
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 
 const getFileAtCommit = async (
@@ -163,19 +168,19 @@ const coloredDiff = (
 export const diff = async (filePath: string) => {
   try {
     const normalizedPath = filePath.replace(/\\/g, "/");
-    intro(`build-elevate diff: ${normalizedPath}`);
+    intro(`${CLI_NAME} diff: ${normalizedPath}`);
 
     // 1. Check manifest
     if (!(await manifestExists())) {
       log.error(
-        "No .build-elevate.json found. This project was not scaffolded with build-elevate.",
+        `No ${MANIFEST_FILE} or ${LEGACY_MANIFEST_FILE} found. This project was not scaffolded with ${PRODUCT_NAME}.`,
       );
       process.exit(1);
     }
 
     const manifest = await readManifest();
     if (!manifest) {
-      log.error("Failed to read .build-elevate.json.");
+      log.error(`Failed to read ${MANIFEST_FILE} or ${LEGACY_MANIFEST_FILE}.`);
       process.exit(1);
     }
 
@@ -222,7 +227,7 @@ export const diff = async (filePath: string) => {
         "How to read this diff:\n\n" +
           "  - Lines marked  +  were ADDED to the template\n" +
           "  - Lines marked  -  were REMOVED from the template\n\n" +
-          "These are changes in build-elevate, not in your local file.\n" +
+          `These are changes in ${PRODUCT_NAME}, not in your local file.\n` +
           "Apply the relevant parts manually to your file.",
       );
       coloredDiff(oldContent, newContent, normalizedPath, fromCommit, toCommit);

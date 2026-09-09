@@ -17,7 +17,7 @@ export async function GET(
     <DefaultImage
       title={page.data.title}
       description={page.data.description}
-      site="build-elevate"
+      site="stackbase"
     />,
     {
       width: 1200,

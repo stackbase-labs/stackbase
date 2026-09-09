@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Verifies the build-elevate Kubernetes deployment, working outward:
+# Verifies the stackbase Kubernetes deployment, working outward:
 # pods -> deployments -> services/endpoints -> ingress -> live HTTP -> HPA.
 # Exits non-zero on any failure so it can be used in CI.
 set -uo pipefail
 
-PROJECT="build-elevate"
-NAMESPACE="build-elevate"
+PROJECT="stackbase"
+NAMESPACE="stackbase"
 FAIL=0
 
 # Detect which apps were deployed from the manifests that exist.

@@ -34,6 +34,7 @@
     "@types/supertest": "catalog:dev",
     "@vitest/coverage-v8": "catalog:dev",
     "@workspace/eslint-config": "workspace:*",
+    "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "@workspace/vitest-presets": "workspace:*",
     "eslint": "catalog:eslint",

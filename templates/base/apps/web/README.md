@@ -35,7 +35,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/mydb
 ```
 
 > [!NOTE]
-> You also need to update the same DATABASE_URL in the packages/db/.env file (by copying the contents of .env.example in the packages/db/ directory), as Prisma reads it from there.
+> You also need to update the same DATABASE_URL in the packages/db/.env.local file (by copying the contents of .env.example in the packages/db/ directory), as Prisma reads it from there.
 
 #### Auth.js Secret
 

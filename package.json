@@ -1,27 +1,17 @@
 {
-  "name": "stackbase",
-  "version": "1.7.0",
-  "description": "Stackbase is a production-ready full-stack starter with Next.js, Express, Better Auth, and Prisma.",
+  "name": "stackbase-workspace",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
-  "author": "Vijay Singh",
-  "license": "MIT",
-  "homepage": "https://github.com/stackbase-labs/stackbase#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/stackbase-labs/stackbase.git"
-  },
-  "bugs": {
-    "url": "https://github.com/stackbase-labs/stackbase/issues"
+  "author": {
+    "name": "Vijay Singh",
+    "url": "https://github.com/vijaysingh2219"
   },
   "scripts": {
-    "build": "turbo build",
-    "build:cli": "pnpm --filter stackbase build",
+    "build": "turbo build --filter docs --filter stackbase",
+    "build:cli": "pnpm --filter ./packages/stackbase build",
     "clean": "turbo clean",
-    "dev": "turbo dev",
-    "docker:dev": "docker-compose up --build",
-    "docker:observability": "docker-compose -f docker-compose.observability.yml up",
-    "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
+    "dev": "turbo dev --filter docs",
     "lint": "turbo lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write .",
@@ -30,13 +20,9 @@
     "check-types": "turbo check-types",
     "start": "turbo start",
     "test": "turbo test",
-    "prepare": "husky",
-    "k8s:deploy": "sh deploy.sh",
-    "k8s:verify": "sh k8s/verify.sh"
+    "prepare": "husky"
   },
   "devDependencies": {
-    "@types/node": "catalog:dev",
-    "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:eslint",
     "husky": "catalog:dev",
     "lint-staged": "catalog:dev",

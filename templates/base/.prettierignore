@@ -13,7 +13,6 @@ package-lock.json
 
 # Prisma client (auto-generated)
 packages/db/generated
-**/packages/db/generated
 
 # Environment files
 .env

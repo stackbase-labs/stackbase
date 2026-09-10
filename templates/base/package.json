@@ -1,0 +1,43 @@
+{
+  "name": "stackbase",
+  "description": "Stackbase is a production-ready full-stack starter with Next.js, Express, Better Auth, and Prisma.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "turbo build",
+    "clean": "turbo clean",
+    "dev": "turbo dev",
+    "docker:dev": "docker-compose up --build",
+    "docker:observability": "docker-compose -f docker-compose.observability.yml up",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
+    "lint": "turbo lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write .",
+    "format:path": "prettier --write",
+    "format:check": "prettier --check .",
+    "check-types": "turbo check-types",
+    "start": "turbo start",
+    "test": "turbo test",
+    "prepare": "husky",
+    "k8s:deploy": "sh deploy.sh",
+    "k8s:verify": "sh k8s/verify.sh"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "@workspace/typescript-config": "workspace:*",
+    "eslint": "catalog:eslint",
+    "husky": "catalog:dev",
+    "lint-staged": "catalog:dev",
+    "prettier": "catalog:prettier",
+    "prettier-plugin-organize-imports": "catalog:prettier",
+    "prettier-plugin-packagejson": "catalog:prettier",
+    "prettier-plugin-tailwindcss": "catalog:prettier",
+    "turbo": "catalog:core",
+    "typescript": "catalog:dev"
+  },
+  "packageManager": "pnpm@11.1.1",
+  "engines": {
+    "node": ">=20"
+  }
+}

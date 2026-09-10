@@ -10,7 +10,7 @@ Stackbase includes a local observability stack for the Express API. Prometheus s
 ## What You Get
 
 - **Prometheus** on `http://localhost:9090`
-- **Grafana** on `http://localhost:3002`
+- **Grafana** on `http://localhost:3003`
 - **API metrics endpoint** on `http://localhost:4000/metrics`
 - **Provisioned dashboard** named **Stackbase API Overview**
 - **RED metrics** for request rate, errors, and duration
@@ -45,7 +45,7 @@ pnpm docker:observability
 Then open:
 
 - **Prometheus**: [http://localhost:9090](http://localhost:9090)
-- **Grafana**: [http://localhost:3002](http://localhost:3002)
+- **Grafana**: [http://localhost:3003](http://localhost:3003)
 
 Grafana uses these local credentials:
 
@@ -189,7 +189,7 @@ Empty panels usually mean either the API has not received matching traffic yet o
 The local stack uses:
 
 - `9090` for Prometheus
-- `3002` for Grafana
+- `3003` for Grafana
 - `4000` for the API
 
 If one of those ports is already taken, change the port mapping in `docker-compose.observability.yml` and restart the stack.

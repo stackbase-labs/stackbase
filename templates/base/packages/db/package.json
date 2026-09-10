@@ -34,6 +34,7 @@
   "devDependencies": {
     "@types/node": "catalog:dev",
     "@types/pg": "catalog:core",
+    "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "prisma": "catalog:core",
     "typescript": "catalog:dev"

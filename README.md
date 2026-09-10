@@ -1,9 +1,10 @@
-<!-- markdownlint-disable MD033 -->
+<!-- markdownlint-disable MD033 MD036 -->
+
 <h1 align="center">Stackbase</h1>
 
 <div align="center">
 
-[![Quick Start](https://img.shields.io/badge/Quick_Start-blue?style=for-the-badge)](./README.md#-quick-start)
+[![Quick Start](https://img.shields.io/badge/Quick_Start-blue?style=for-the-badge)](#quick-start)
 [![CI](https://img.shields.io/github/actions/workflow/status/stackbase-labs/stackbase/ci.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/stackbase-labs/stackbase/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/stackbase?style=for-the-badge&color=CB3837&logo=npm)](https://www.npmjs.com/package/stackbase)
 [![npm downloads](https://img.shields.io/npm/dy/stackbase?style=for-the-badge&color=20c997)](https://www.npmjs.com/package/stackbase)
@@ -12,443 +13,240 @@
 [![Docs](https://img.shields.io/badge/Documentation-Live-6366f1?style=for-the-badge&logo=vercel)](https://stackbase-labs.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-333?style=for-the-badge&logo=github)](https://github.com/stackbase-labs/stackbase)
 
-<!-- markdownlint-disable MD036 -->
-
-**Launch your SaaS product faster. Everything you need is built in.**
+**A production-ready full-stack starter for shipping SaaS products faster.**
 
 <p align="center">
   <img src="assets/og-image.png" alt="Stackbase" />
 </p>
 
-<!-- markdownlint-enable MD036 -->
-
-<!-- markdownlint-enable MD033 -->
-
 </div>
 
----
+<!-- markdownlint-enable MD033 MD036 -->
 
 > [!TIP]
-> **Perfect for SaaS teams, startups, and developers tired of reinventing the same setup.** Skip weeks of boilerplate, onboard new developers in hours, and ship features on day one. Stackbase has you covered.
+> **Built for SaaS teams, startups, and developers who want a production-ready foundation without rebuilding the same setup.**
 
-**You're launching tomorrow. Your backend isn't designed. Your auth isn't configured. Your database isn't connected. And you have 3 other things to do.**
+Stackbase is a production-ready monorepo starter with authentication, database, email templates, UI components, rate limiting, and deployment configs already wired together.
 
-Stackbase is a production-ready monorepo starter that bundles everything you need — authentication, database, email templates, UI components, rate limiting, and deployment configs — into a single, cohesive foundation.
+Built with **Turborepo**, **Next.js 16**, **Express**, **Better Auth**, **Prisma**, and **shadcn/ui**, it gives you a cohesive base for shipping real products faster.
 
-Built with **Turborepo**, **Next.js 16**, **Express**, **Better Auth**, **Prisma**, and **shadcn/ui**, it's designed for teams that want to focus on their product, not boilerplate. **Launch in days. Deploy with confidence.**
+## Who It's For
 
----
+Stackbase is built for teams and builders who want a real application foundation before they start product work.
 
-## 📑 Table of Contents
+- **Founders and solo builders** who want to ship an MVP without spending the first week wiring auth, database, email, and deployment basics.
+- **SaaS and agency teams** that need consistent project structure, shared packages, and repeatable setup across client or product work.
+- **Developers learning production architecture** who want to study a full-stack monorepo with real auth, database, API, UI, and deployment patterns.
 
-- [Who is this for?](#-who-is-this-for)
-- [What's Included](#-whats-included)
-- [Quick Start](#-quick-start)
-- [Project Structure](#-project-structure)
-- [Applications](#-applications)
-- [Packages](#-packages)
-- [Technology Stack](#-technology-stack)
-- [Development](#-development)
-- [Docker](#-docker)
-- [Kubernetes](#-kubernetes)
-- [Documentation](#-documentation)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
-- [Security](#-security)
-- [Support](#-support)
-- [License](#-license)
-- [Acknowledgments](#-acknowledgments)
+## Contents
 
----
+- [Who It's For](#who-its-for)
+- [Quick Start](#quick-start)
+- [Templates](#templates)
+- [Generated Project](#generated-project)
+- [What's Included](#whats-included)
+- [Repository Layout](#repository-layout)
+- [Development](#development)
+- [Deployment](#deployment)
+- [Build Elevate](#build-elevate)
+- [Contributing](#contributing)
+- [Security](#security)
+- [Links](#links)
 
-## 🎯 Who is this for?
+## Quick Start
 
-<!-- markdownlint-disable MD033 -->
-<table>
-  <tr>
-    <td width="33%" valign="top">
-      <h3>🚀 Startup Founders & Solo Builders</h3>
-      <p>You need a working product yesterday. Spend zero time on architecture decisions and infrastructure. Full-stack, production-ready, deployable in hours. Everything you need to launch an MVP without the pain.</p>
-    </td>
-    <td width="33%" valign="top">
-      <h3>👨‍💼 SaaS & Agency Teams</h3>
-      <p>Onboard new developers in hours instead of weeks. Unified monorepo structure, shared patterns, beautiful components, and consistent tooling. Engineers spend time on features, not setup guides.</p>
-    </td>
-    <td width="33%" valign="top">
-      <h3>🎓 Junior Developers & Students</h3>
-      <p>Learn how a production SaaS is actually built. See authentication, database design, API patterns, and deployment in action. A real starter template that teaches you more than any tutorial.</p>
-    </td>
-  </tr>
-</table>
-<!-- markdownlint-enable MD033 -->
+### Requirements
 
----
+- Node.js 20+
+- pnpm, npm, or Bun
+- Docker Desktop, if you enable Docker-based workflows
 
-## 📋 What's Included
-
-<!-- markdownlint-disable MD033 -->
-<table>
-<tr>
-<td width="50%" valign="top">
-<h3>✅ Production Ready</h3>
-<p>Comes with authentication, database, email, rate limiting, and deployment configs. No "setup guide hell" — everything works out of the box.</p>
-</td>
-<td width="50%" valign="top">
-<h3>⚡ Developer Experience</h3>
-<p>Full TypeScript, hot reload, Vitest testing, ESLint, Prettier, Docker, and a Turborepo monorepo that actually makes sense. Ship faster with better tools.</p>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-<h3>🏗️ Modular Architecture</h3>
-<p>Authentication, database, email, UI components, and utilities are all separate, reusable packages. Share code between frontend and backend effortlessly.</p>
-</td>
-<td width="50%" valign="top">
-<h3>🚀 Deploy Anywhere</h3>
-<p>Vercel for frontend. Railway, Heroku, or AWS for API. PostgreSQL anywhere. Mix and match platforms without rewriting anything.</p>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-<h3>👥 Designed for Teams</h3>
-<p>Consistent patterns, shared linting config, unified deployment. New team members don't need weeks to understand the codebase structure.</p>
-</td>
-<td width="50%" valign="top">
-<h3>📖 Fully Documented</h3>
-<p>Comprehensive documentation built with Fumadocs. From installation to deployment, troubleshooting to API reference — everything explained.</p>
-</td>
-</tr>
-</table>
-<!-- markdownlint-enable MD033 -->
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Node.js 20+** ([download](https://nodejs.org))
-- **pnpm 10.32+** (recommended) or npm/bun
-- For Docker: [Docker Desktop](https://docker.com)
-
-### 1. Install Prerequisites
-
-You'll need Node.js 20+ and pnpm (or npm/bun):
+### Create a Project
 
 ```bash
-# Check Node.js
-node --version  # Should be v20+
-
-# Install pnpm (recommended)
-npm install -g pnpm@latest
+pnpm dlx stackbase@latest init my-app
 ```
 
-### 2. Create Your Project
-
-The fastest way to get started:
+Then start it:
 
 ```bash
-pnpm dlx stackbase@latest init my-project
-```
-
-This interactive CLI will:
-
-- Ask for your project name
-- Help you choose a package manager
-- Optionally include Docker
-- Optionally include Prisma Studio
-- Scaffold everything and install dependencies
-
-### 3. Start Building
-
-```bash
-cd my-project
+cd my-app
 pnpm dev
 ```
 
-Your full stack is now running:
+Default local services:
 
-- **Web Frontend**: <http://localhost:3000>
-- **REST API**: <http://localhost:4000>
-- **Email Preview**: <http://localhost:3002>
-- **Database UI**: <http://localhost:5555>
+| Service       | URL                     |
+| ------------- | ----------------------- |
+| Web app       | <http://localhost:3000> |
+| API           | <http://localhost:4000> |
+| Email preview | <http://localhost:3002> |
+| Prisma Studio | <http://localhost:5555> |
 
-That's it. No more setup. Start building features.
+CLI docs: [stackbase-labs.vercel.app/docs/cli](https://stackbase-labs.vercel.app/docs/cli)
 
----
+## Templates
 
-## 📂 Project Structure
+Stackbase uses one canonical source template at [`templates/base`](templates/base/) and prunes it for the template you choose. This keeps presets small without maintaining separate copies of the same application.
+
+Current CLI templates:
+
+| Template    | Best For                     | Includes                                      |
+| ----------- | ---------------------------- | --------------------------------------------- |
+| `fullstack` | Complete application starter | Web, API, auth, database, email, storage      |
+| `web`       | Frontend-led products        | Web app, UI, auth, database, email packages   |
+| `api`       | Backend services             | API, database, auth, contracts, rate limiting |
+
+## Generated Project
+
+The full generated project uses this structure after `stackbase init`:
+
+```txt
+my-app/
+├── apps/
+│   ├── web/              # Next.js frontend
+│   ├── api/              # Express API
+│   ├── email/            # React Email preview
+│   └── studio/           # Prisma Studio wrapper
+├── packages/
+│   ├── auth/             # Better Auth setup
+│   ├── db/               # Prisma schema and client
+│   ├── ui/               # shadcn/ui component package
+│   ├── email/            # Transactional email package
+│   ├── storage/          # Object storage helpers
+│   ├── rate-limit/       # Upstash Redis rate limits
+│   ├── contracts/        # Shared validation schemas
+│   ├── logger/           # Shared logging
+│   ├── utils/            # Shared utilities
+│   ├── eslint-config/
+│   ├── prettier-config/
+│   ├── typescript-config/
+│   └── vitest-presets/
+├── docker-compose.yml
+├── pnpm-workspace.yaml
+├── turbo.json
+└── package.json
+```
+
+Some folders are removed depending on the selected template.
+
+## What's Included
+
+| Area          | Stackbase Includes                                             |
+| ------------- | -------------------------------------------------------------- |
+| Frontend      | Next.js 16, React, Tailwind CSS, shadcn/ui, dashboard patterns |
+| API           | Express, typed middleware, CORS, errors, health checks         |
+| Auth          | Better Auth, sessions, OAuth-ready structure, 2FA flows        |
+| Database      | Prisma, PostgreSQL, generated client, Studio workflow          |
+| Email         | React Email templates with Resend integration                  |
+| Storage       | S3-compatible upload and delete helpers                        |
+| Rate limiting | Upstash Redis limiters for API and auth flows                  |
+| Observability | Prometheus metrics and Grafana dashboard provisioning          |
+| Deployment    | Docker Compose, production Dockerfiles, Kubernetes manifests   |
+| Quality       | TypeScript, ESLint, Prettier, Vitest, shared workspace config  |
+| Updates       | `.stackbase.json`, `stackbase upgrade`, conflict diffs         |
+
+## Repository Layout
+
+This repository is both the product source and the template registry.
 
 ```txt
 stackbase/
 ├── apps/
-│   ├── web/              # Next.js frontend application
-│   ├── api/              # Express REST API server
-│   ├── email/            # React Email template development
-│   ├── studio/           # Prisma Studio (database UI)
-│   └── docs/             # Fumadocs documentation site
+│   └── docs/                  # Documentation site
 ├── packages/
-│   ├── auth/             # Better Auth integration & session management
-│   ├── db/               # Prisma ORM & database client
-│   ├── ui/               # React component library (shadcn/ui)
-│   ├── email/            # Email template library with Resend
-│   ├── utils/            # Shared utilities & TypeScript types
-│   ├── rate-limit/       # API rate limiting with Upstash Redis
-│   ├── eslint-config/    # Unified ESLint configuration
-│   ├── prettier-config/  # Code formatting configuration
-│   ├── typescript-config/# Shared TypeScript compiler options
-│   └── vitest-presets/   # Testing presets for Node.js & React
-├── package.json          # Root package configuration
-├── pnpm-workspace.yaml   # Monorepo workspace configuration
-├── turbo.json            # Turborepo pipeline configuration
-└── docker-compose.yml    # Local development database (PostgreSQL)
+│   └── stackbase/             # Public CLI package
+├── templates/
+│   └── base/                  # Canonical scaffold source
+├── assets/                    # Repository assets
+├── CHANGELOG.md
+├── pnpm-workspace.yaml
+└── package.json
 ```
 
-## 📦 Applications
+The CLI clones `templates/base` from the repository and then applies project-name replacement, package-manager cleanup, template pruning, environment setup, and manifest generation.
 
-| Application | Port | Description                                        |
-| ----------- | ---- | -------------------------------------------------- |
-| **Web**     | 3000 | Next.js frontend with authentication and dashboard |
-| **API**     | 4000 | Express REST API with middleware and endpoints     |
-| **Email**   | 3002 | React Email template preview and development       |
-| **Studio**  | 5555 | Prisma Studio for database management              |
+## Development
 
-## 📚 Packages
+Install dependencies:
 
-### Application Packages
+```bash
+pnpm install
+```
 
-- **[@workspace/auth](packages/auth/)** - Better Auth integration, session management, and OAuth flows
-- **[@workspace/db](packages/db/)** - Prisma ORM, database schema, and PostgreSQL client
-- **[@workspace/ui](packages/ui/)** - React component library built with shadcn/ui and Tailwind CSS
-- **[@workspace/email](packages/email/)** - Email templates using React Email and Resend integration
-- **[@workspace/utils](packages/utils/)** - Shared utility functions and type definitions
-- **[@workspace/rate-limit](packages/rate-limit/)** - API rate limiting with Upstash Redis
-
-### Configuration Packages
-
-- **[@workspace/eslint-config](packages/eslint-config/)** - Unified ESLint rules and linting setup
-- **[@workspace/prettier-config](packages/prettier-config/)** - Consistent code formatting configuration
-- **[@workspace/typescript-config](packages/typescript-config/)** - Shared TypeScript compiler options
-- **[@workspace/vitest-presets](packages/vitest-presets/)** - Testing configuration for Node.js and React
-
-## 🧰 Technology Stack
-
-| Layer                | Technology                                                         | Purpose                                       |
-| -------------------- | ------------------------------------------------------------------ | --------------------------------------------- |
-| **Build System**     | [Turborepo](https://turborepo.org)                                 | High-performance monorepo orchestration       |
-| **Frontend**         | [Next.js 16](https://nextjs.org)                                   | React framework with App Router and Turbopack |
-| **Backend**          | [Express](https://expressjs.com)                                   | Lightweight, unopinionated web framework      |
-| **Database**         | [Prisma](https://prisma.io) + [PostgreSQL](https://postgresql.org) | Modern ORM and relational database            |
-| **Authentication**   | [Better Auth](https://better-auth.com)                             | Session-based auth with OAuth support         |
-| **UI Components**    | [shadcn/ui](https://ui.shadcn.com)                                 | Accessible component library                  |
-| **Styling**          | [Tailwind CSS](https://tailwindcss.com)                            | Utility-first CSS framework                   |
-| **Email**            | [React Email](https://react.email) + [Resend](https://resend.com)  | Email template development & delivery         |
-| **Rate Limiting**    | [Upstash Redis](https://upstash.com)                               | Serverless Redis for rate limiting            |
-| **Testing**          | [Vitest](https://vitest.dev)                                       | JavaScript testing framework                  |
-| **Linting**          | [ESLint](https://eslint.org)                                       | JavaScript linting and code quality           |
-| **Formatting**       | [Prettier](https://prettier.io)                                    | Code formatter                                |
-| **Language**         | [TypeScript](https://www.typescriptlang.org)                       | JavaScript with static typing                 |
-| **Containerization** | [Docker](https://docker.com)                                       | Container-based deployment                    |
-| **Orchestration**    | [Kubernetes](https://kubernetes.io)                                | Container orchestration                       |
-
-## 🚀 Development
-
-### Running All Applications
-
-Start all services in development mode with hot reload:
+Run the docs app from the repository root:
 
 ```bash
 pnpm dev
 ```
 
-### Running Individual Applications
+Work on the CLI:
 
 ```bash
-# Start only the web app
-pnpm dev --filter=web
-
-# Start only the API
-pnpm dev --filter=api
-
-# Start a specific package
-pnpm dev --filter=@workspace/auth
+pnpm --filter ./packages/stackbase check-types
+pnpm --filter ./packages/stackbase build
+node packages/stackbase/dist/index.js --help
 ```
 
-### Common Commands
+Run checks:
 
 ```bash
-# Build all applications and packages
-pnpm build
-
-# Check TypeScript types across the monorepo
-pnpm check-types
-
-# Run linting
 pnpm lint
-
-# Fix linting issues
-pnpm lint:fix
-
-# Format code with Prettier
-pnpm format
-
-# Run tests
+pnpm check-types
 pnpm test
-
-# Clean build artifacts and node_modules
-pnpm clean
+pnpm format:check
 ```
 
-### Database
+Template packages live under `templates/base`, but they are still part of the pnpm workspace so docs and CLI verification can resolve shared packages locally.
 
-```bash
-# Generate Prisma client (required after schema changes)
-pnpm db:generate
+## Deployment
 
-# Create a new migration
-pnpm db:migrate
+Generated projects include deployment assets:
 
-# Reset the database (⚠️ deletes all data)
-pnpm db:reset
+- Docker Compose for local and production workflows
+- Production Dockerfiles for `apps/web` and `apps/api`
+- Kubernetes manifests under `k8s/`
+- Prometheus and Grafana config under `deploy/observability/`
 
-# Open Prisma Studio UI
-pnpm studio
-```
+Deployment docs:
 
-### Environment Variables
+- [Docker](https://stackbase-labs.vercel.app/docs/configuration/docker)
+- [Kubernetes](https://stackbase-labs.vercel.app/docs/deployment/kubernetes)
+- [Vercel](https://stackbase-labs.vercel.app/docs/deployment/vercel)
+- [Observability](https://stackbase-labs.vercel.app/docs/configuration/observability)
 
-Each application requires environment variables. Copy the example files and update them:
+## Build Elevate
 
-```bash
-cp apps/web/.env.example apps/web/.env.local
-cp apps/api/.env.example apps/api/.env.local
-cp packages/db/.env.example packages/db/.env
-```
+Stackbase is the successor to Build Elevate, with a separate package, repository identity, and release line.
 
-See [Environment Variables Documentation](https://stackbase-labs.vercel.app/docs/configuration/environment-variables) for a complete reference.
+- New projects should use `stackbase`.
+- Existing Build Elevate projects should stay on the `build-elevate` package and separate maintenance branch.
+- Stackbase projects use `.stackbase.json`; `.build-elevate.json` is not supported by the Stackbase CLI.
+- Move old projects to Stackbase manually when you want the new template architecture.
 
-## 🐳 Docker
+## Contributing
 
-### Local Development
+Contributions are welcome.
 
-Using Docker Compose for PostgreSQL:
-
-```bash
-docker-compose up -d
-```
-
-This starts a PostgreSQL database at `postgresql://postgres:password@localhost:5432/stackbase-app`.
-
-### Production Deployment
-
-Build and run services as containers:
-
-```bash
-docker-compose -f docker-compose.prod.yml up --build
-```
-
-Services include:
-
-- **Web** (Next.js) on port 3000
-- **API** (Express) on port 4000
-- **PostgreSQL** on port 5432
-- Health checks and restart policies configured
-
-See [Docker Documentation](https://stackbase-labs.vercel.app/docs/configuration/docker) for more details.
-
-### Local Observability
-
-Run Prometheus and Grafana locally to visualize the API metrics exposed at `http://localhost:4000/metrics`:
-
-```bash
-pnpm --filter api dev
-pnpm docker:observability
-```
-
-Then open:
-
-- **Prometheus**: <http://localhost:9090>
-- **Grafana**: <http://localhost:3002> (`admin` / `admin`)
-
-The provisioned Grafana dashboard is named **Stackbase API Overview** and includes request rate, status codes, p95 latency, per-route latency, and in-flight request panels. Generate a little traffic with `curl http://localhost:4000/health` or an API route if the dashboard is empty at first.
-
-## ⛵ Kubernetes
-
-Production-ready manifests for deploying both the Next.js frontend and Express API to any Kubernetes cluster (EKS, GKE, AKS, k3s, minikube) live in the [`k8s/`](k8s/) directory — Deployments, Services, nginx Ingress, HorizontalPodAutoscalers (2 → 10 pods), and a post-deploy health-check script.
-
-Once your cluster has an nginx Ingress controller and the Metrics Server installed, deploy and verify with:
-
-```bash
-pnpm k8s:deploy   # build & push images, create secrets, apply manifests, wait for rollout
-pnpm k8s:verify   # check pods, endpoints, in-cluster HTTP, ingress, and HPA metrics
-```
-
-See the [Kubernetes Deployment Guide](https://stackbase-labs.vercel.app/docs/deployment/kubernetes) for cluster requirements, TLS/cert-manager setup, traffic flow, and troubleshooting.
-
-## 📖 Documentation
-
-Visit [https://stackbase-labs.vercel.app/docs](https://stackbase-labs.vercel.app/docs) to view the documentation.
-
-## 🚢 Deployment
-
-### Vercel
-
-Deploy the Next.js frontend to Vercel with one click:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/stackbase-labs/stackbase)
-
-See [Vercel Deployment Guide](https://stackbase-labs.vercel.app/docs/deployment/vercel) for detailed instructions.
-
-### Other Platforms
-
-The modular structure makes it easy to deploy to any platform:
-
-- **Web (Next.js)**: Vercel, Netlify, Railway, Heroku
-- **API (Express)**: Railway, Heroku, AWS, DigitalOcean
-- **Database (PostgreSQL)**: AWS RDS, Heroku Postgres, Railway, Neon
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Whether it's a bug fix, a new feature, or a documentation improvement, we'd love your help.
-
-1. Fork the repository and create your branch from `main`.
+1. Fork the repository and create a branch from `main`.
 2. Install dependencies with `pnpm install`.
-3. Make your changes, then run `pnpm lint`, `pnpm check-types`, and `pnpm test`.
-4. Open a pull request with a clear description of what and why.
+3. Make your changes.
+4. Run `pnpm lint`, `pnpm check-types`, and `pnpm test`.
+5. Open a pull request with a clear description.
 
-Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guidelines and development workflow.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
-## 🔒 Security
+## Security
 
-If you discover a security vulnerability, please **do not** open a public issue. Review our [Security Policy](./SECURITY.md) for instructions on reporting it responsibly.
+Please do not open public issues for vulnerabilities. Review [SECURITY.md](SECURITY.md) for responsible disclosure.
 
-## 💬 Support
+## Links
 
-- 📖 **Documentation** — [stackbase-labs.vercel.app/docs](https://stackbase-labs.vercel.app/docs)
-- 🐛 **Bugs & feature requests** — [open an issue](https://github.com/stackbase-labs/stackbase/issues)
-- 💡 **Questions & ideas** — [start a discussion](https://github.com/stackbase-labs/stackbase/discussions)
-- 📸 **Screenshots** — see [SCREENSHOTS.md](./SCREENSHOTS.md)
-- 📝 **Release notes** — see [CHANGELOG.md](./CHANGELOG.md)
+- Documentation: [stackbase-labs.vercel.app/docs](https://stackbase-labs.vercel.app/docs)
+- npm: [stackbase](https://www.npmjs.com/package/stackbase)
+- Issues: [github.com/stackbase-labs/stackbase/issues](https://github.com/stackbase-labs/stackbase/issues)
+- Changelog: [CHANGELOG.md](CHANGELOG.md)
 
-If Stackbase saves you time, consider giving it a ⭐ — it helps others discover the project.
+## License
 
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-Stackbase is built on top of amazing open-source projects:
-
-- [Turborepo](https://turbo.build/repo) - Monorepo build system
-- [Next.js](https://nextjs.org) - React framework
-- [Express](https://expressjs.com) - Web framework
-- [Better Auth](https://better-auth.com) - Authentication
-- [Prisma](https://prisma.io) - ORM
-- [shadcn/ui](https://ui.shadcn.com) - Component library
-- [React Email](https://react.email) - Email templates
-- [Turbopack](https://turbo.build/pack) - Rust-based bundler
-
----
+MIT. See [LICENSE](LICENSE).

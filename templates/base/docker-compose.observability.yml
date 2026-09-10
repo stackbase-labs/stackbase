@@ -19,7 +19,7 @@ services:
     image: grafana/grafana-oss:latest
     container_name: stackbase-grafana
     ports:
-      - 3002:3000
+      - 3003:3000
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin

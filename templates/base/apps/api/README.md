@@ -15,27 +15,27 @@ pnpm install
 Copy the example environment file:
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Then, update the variables in your `.env` file
+Then, update the variables in your `.env.local` file
 
-### 3. Running the Server
+### 3. Run the Server
 
-To start the server in development mode, run:
+#### Development
 
 ```bash
 pnpm dev
 ```
 
-For production, build the server and then start it:
+#### Production
 
 ```bash
 pnpm build
 pnpm start
 ```
 
-The server will be running at `http://localhost:4000` (or the port you specified in the `.env` file).
+The server runs at `http://localhost:4000` by default. Set `PORT` in `.env.local` to use a different port.
 
 ### 4. API Endpoints
 
@@ -53,7 +53,3 @@ The server will be running at `http://localhost:4000` (or the port you specified
 - **Credentials & CORS**: Whitelists origins and handles credentials safely.
 - **Rate Limiting**: Distributed Upstash Redis rate limiting on `/api` routes.
 - **Error Handling**: Centralized error handling and correlated logging.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](../../LICENSE) file for details.

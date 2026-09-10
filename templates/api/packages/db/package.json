@@ -1,0 +1,41 @@
+{
+  "name": "@workspace/db",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist generated .turbo node_modules",
+    "studio": "prisma studio --port 5555 --browser none",
+    "db:deploy": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset --force",
+    "format": "prisma format"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "@prisma/adapter-pg": "catalog:core",
+    "@prisma/client": "catalog:core",
+    "@prisma/client-runtime-utils": "catalog:core",
+    "@t3-oss/env-nextjs": "catalog:core",
+    "dotenv": "catalog:core",
+    "pg": "catalog:core",
+    "zod": "catalog:core"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "@types/pg": "catalog:core",
+    "@workspace/typescript-config": "workspace:*",
+    "prisma": "catalog:core",
+    "typescript": "catalog:dev"
+  }
+}

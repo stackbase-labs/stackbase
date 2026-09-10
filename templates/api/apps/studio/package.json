@@ -1,0 +1,12 @@
+{
+  "name": "studio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "studio": "pnpm --filter @workspace/db run studio"
+  },
+  "devDependencies": {
+    "prisma": "catalog:core"
+  }
+}

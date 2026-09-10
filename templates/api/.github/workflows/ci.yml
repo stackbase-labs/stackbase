@@ -1,0 +1,234 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "*.config.*"
+      - "**/eslint.config.js"
+      - "package.json"
+      - "pnpm-*.yaml"
+      - "tsconfig*.json"
+      - "turbo.json"
+      - ".github/workflows/**"
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "*.config.*"
+      - "**/eslint.config.js"
+      - "package.json"
+      - "pnpm-*.yaml"
+      - "tsconfig*.json"
+      - "turbo.json"
+      - ".github/workflows/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v5
+        with:
+          path: .turbo
+          key: turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-
+
+      - name: Generate Prisma client
+        run: pnpm --filter @workspace/db db:generate
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+
+      - name: Run ESLint
+        run: pnpm lint
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v5
+        with:
+          path: .turbo
+          key: turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-
+
+      - name: Generate Prisma client
+        run: pnpm --filter @workspace/db db:generate
+
+      - name: Run type checking
+        run: pnpm check-types
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v5
+        with:
+          path: .turbo
+          key: turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-
+
+      - name: Generate Prisma client
+        run: pnpm --filter @workspace/db db:generate
+
+      - name: Build packages
+        run: pnpm --filter "@workspace/*" build
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+
+      - name: Run tests
+        run: pnpm test
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v5
+        with:
+          path: .turbo
+          key: turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-
+
+      - name: Generate Prisma client
+        run: pnpm --filter @workspace/db db:generate
+
+      - name: Build apps and packages
+        run: pnpm build
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+          BETTER_AUTH_SECRET: "ci-dummy-secret-do-not-use-in-production"
+          API_INTERNAL_URL: "http://api:4000"
+          UPSTASH_REDIS_REST_URL: "https://placeholder.upstash.io"
+          UPSTASH_REDIS_REST_TOKEN: "placeholder-token"
+
+  format-check:
+    name: Format Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check formatting
+        run: pnpm format:check

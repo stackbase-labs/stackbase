@@ -1,0 +1,30 @@
+{
+  "name": "@workspace/vitest-presets",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "web/vitest.config.ts",
+    "web/vitest.config.mjs",
+    "node/vitest.config.ts",
+    "node/vitest.config.mjs"
+  ],
+  "exports": {
+    "./web": "./web/vitest.config.mjs",
+    "./node": "./node/vitest.config.ts"
+  },
+  "scripts": {
+    "clean": "rm -rf node_modules",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "vitest": "catalog:dev",
+    "@vitejs/plugin-react": "catalog:dev"
+  },
+  "devDependencies": {
+    "@workspace/eslint-config": "workspace:^",
+    "@workspace/prettier-config": "workspace:*"
+  }
+}

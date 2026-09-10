@@ -1,0 +1,53 @@
+services:
+  api:
+    container_name: api-api
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile.prod
+    env_file:
+      - ./apps/api/.env.production
+    ports:
+      - 4000:4000
+    networks:
+      - app_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    security_opt:
+      - no-new-privileges:true
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: api-postgres
+    environment:
+      POSTGRES_DB: api-app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+    volumes:
+      - api-app_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  api-app_postgres_data:
+
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  app_network:
+    driver: bridge

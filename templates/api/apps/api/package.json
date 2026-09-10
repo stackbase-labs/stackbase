@@ -1,0 +1,45 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist .turbo node_modules",
+    "dev": "tsx --watch src/index.ts",
+    "lint": "tsc --noEmit && eslint \"src/**/*.ts*\" --max-warnings 0",
+    "lint:fix": "eslint \"src/**/*.ts*\" --fix",
+    "check-types": "tsc --noEmit",
+    "start": "node dist/index.js",
+    "test": "vitest run --coverage"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "@workspace/auth": "workspace:*",
+    "@workspace/contracts": "workspace:*",
+    "@workspace/logger": "workspace:*",
+    "@workspace/rate-limit": "workspace:*",
+    "@workspace/storage": "workspace:*",
+    "@workspace/utils": "workspace:*",
+    "cors": "catalog:server",
+    "dotenv": "catalog:core",
+    "express": "catalog:server",
+    "helmet": "catalog:server",
+    "pino-http": "catalog:server",
+    "prom-client": "catalog:server"
+  },
+  "devDependencies": {
+    "@types/cors": "catalog:server",
+    "@types/express": "catalog:server",
+    "@types/node": "catalog:dev",
+    "@types/supertest": "catalog:dev",
+    "@vitest/coverage-v8": "catalog:dev",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "@workspace/vitest-presets": "workspace:*",
+    "eslint": "catalog:eslint",
+    "supertest": "catalog:dev",
+    "tsx": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
+  }
+}

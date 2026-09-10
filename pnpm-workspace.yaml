@@ -103,11 +103,3 @@ catalogs:
     prettier-plugin-organize-imports: ^4.3.0
     prettier-plugin-packagejson: ^3.0.2
     prettier-plugin-tailwindcss: ^0.7.2
-
-  cli:
-    "@clack/prompts": ^0.7.0
-    commander: ^12.1.0
-    degit: ^2.8.4
-    "@types/degit": ^2.8.3
-    yaml: ^2.8.1
-    tsup: ^8.0.1

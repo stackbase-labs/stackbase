@@ -29,7 +29,7 @@
     "boilerplate",
     "scaffold",
     "cli",
-    "fullstack",
+    "full-stack",
     "monorepo",
     "turborepo",
     "nextjs",
@@ -55,17 +55,17 @@
     "prepublish": "pnpm build"
   },
   "dependencies": {
-    "@clack/prompts": "catalog:cli",
-    "commander": "catalog:cli",
-    "degit": "catalog:cli",
-    "yaml": "catalog:cli"
+    "@clack/prompts": "^1.8.0",
+    "commander": "^14.0.3",
+    "degit": "^3.10.0",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
-    "@types/degit": "catalog:cli",
+    "@types/degit": "^2.8.6",
     "@types/node": "catalog:dev",
     "@workspace/eslint-config": "workspace:*",
     "eslint": "catalog:eslint",
-    "tsup": "catalog:cli",
+    "tsup": "^8.5.1",
     "typescript": "catalog:dev"
   }
 }

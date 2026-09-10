@@ -1,0 +1,45 @@
+{
+  "name": "@workspace/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./globals.css": "./src/styles/globals.css",
+    "./postcss.config": "./postcss.config.mjs",
+    "./lib/*": "./src/lib/*.ts",
+    "./components/*": "./src/components/*.tsx",
+    "./hooks/*": "./src/hooks/*.ts"
+  },
+  "scripts": {
+    "clean": "rm -rf dist .turbo node_modules",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "@hookform/resolvers": "catalog:web",
+    "class-variance-authority": "catalog:web",
+    "clsx": "catalog:web",
+    "input-otp": "catalog:web",
+    "lucide-react": "catalog:web",
+    "next-themes": "catalog:web",
+    "radix-ui": "catalog:web",
+    "react": "catalog:core",
+    "react-dom": "catalog:core",
+    "react-hook-form": "catalog:web",
+    "tailwind-merge": "catalog:web",
+    "tw-animate-css": "catalog:web",
+    "zod": "catalog:core"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "catalog:web",
+    "@types/node": "catalog:dev",
+    "@types/react": "catalog:core",
+    "@types/react-dom": "catalog:core",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "tailwindcss": "catalog:web",
+    "typescript": "catalog:dev"
+  }
+}

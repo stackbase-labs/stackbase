@@ -1,0 +1,20 @@
+**/node_modules
+**/.next
+**/dist
+**/build
+**/.turbo
+**/.DS_Store
+.git
+*.log
+.env*
+!.env.production
+# Test files & folders (optional but recommended)
+**/__tests__/
+**/*.test.*
+**/*.spec.*
+
+# Coverage
+coverage
+
+# TypeScript incremental build info
+**/tsconfig.tsbuildinfo

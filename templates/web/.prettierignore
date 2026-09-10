@@ -1,0 +1,39 @@
+# Node modules
+node_modules
+
+# Output / build directories
+dist
+.next
+.turbo
+coverage
+
+# Dependency lockfiles (formatting not needed)
+pnpm-lock.yaml
+package-lock.json
+
+# Prisma client (auto-generated)
+packages/db/generated
+
+# Environment files
+.env
+.env.*
+
+# Logs
+*.log
+
+# Git
+.git
+
+# Config files
+*.config.js
+*.config.mjs
+*.json
+!tsconfig.json
+!turbo.json
+next-env.d.ts
+
+# React Email
+.react-email
+
+# Docs
+.source/

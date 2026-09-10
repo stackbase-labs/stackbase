@@ -1,0 +1,40 @@
+{
+  "name": "@workspace/storage",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist generated .turbo node_modules",
+    "dev": "tsc --build --watch",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "@aws-sdk/client-s3": "catalog:core",
+    "@aws-sdk/s3-request-presigner": "catalog:core",
+    "@t3-oss/env-nextjs": "catalog:core",
+    "@workspace/contracts": "workspace:*",
+    "dotenv": "catalog:core",
+    "zod": "catalog:core"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "@workspace/eslint-config": "workspace:^",
+    "@workspace/prettier-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "@workspace/vitest-presets": "workspace:*",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
+  }
+}

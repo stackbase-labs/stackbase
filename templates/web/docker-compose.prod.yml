@@ -1,0 +1,49 @@
+services:
+  web:
+    container_name: stackbase-web
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile.prod
+      args:
+        API_INTERNAL_URL: ${API_INTERNAL_URL:-http://localhost:4000}
+    env_file:
+      - ./apps/web/.env.production
+    ports:
+      - 3000:3000
+    networks:
+      - app_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: stackbase-postgres
+    environment:
+      POSTGRES_DB: stackbase-app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+    volumes:
+      - stackbase-app_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  stackbase-app_postgres_data:
+
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  app_network:
+    driver: bridge

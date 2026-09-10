@@ -1,0 +1,34 @@
+{
+  "extends": "@workspace/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"],
+      "@workspace/auth/*": ["../../packages/auth/src/*"],
+      "@workspace/rate-limit/*": ["../../packages/rate-limit/src/*"],
+      "@workspace/ui/*": ["../../packages/ui/src/*"],
+      "@workspace/utils/*": ["../../packages/utils/src/*"]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "references": [
+    {
+      "path": "../../packages/utils"
+    }
+  ],
+  "include": [
+    "next-env.d.ts",
+    "next.config.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../packages/auth/src/**/*",
+    "../../packages/db/src/**/*",
+    "../../packages/ui/src/**/*",
+    "../../packages/utils/src/**/*"
+  ],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "@workspace/utils",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./helpers": {
+      "types": "./src/helpers/index.ts",
+      "import": "./src/helpers/index.ts",
+      "default": "./dist/helpers/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo node_modules",
+    "dev": "tsc --build --watch",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "date-fns": "catalog:core",
+    "zod": "catalog:core"
+  },
+  "devDependencies": {
+    "@workspace/eslint-config": "workspace:^",
+    "@workspace/prettier-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "typescript": "catalog:dev"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@workspace/email",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist generated .turbo node_modules",
+    "dev": "tsc --watch",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "@react-email/ui": "catalog:core",
+    "@t3-oss/env-nextjs": "catalog:core",
+    "react": "catalog:core",
+    "react-email": "catalog:core",
+    "resend": "catalog:core",
+    "zod": "catalog:core"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "@workspace/eslint-config": "workspace:^",
+    "@workspace/prettier-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "@types/react": "catalog:core",
+    "@types/react-dom": "catalog:core",
+    "typescript": "catalog:dev"
+  }
+}

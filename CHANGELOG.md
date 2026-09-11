@@ -5,6 +5,17 @@ All changes, fixes and updates to build-elevate.
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 `Latest` is derived from position and is not stored here.
 
+## [1.7.1] - 2026-09-11 [Patch] - Organization Migration & Web Catalog Resolution
+
+Updates repository routing to the `stackbase-labs/stackbase` organization on the `legacy` branch and resolves pnpm catalog dependencies for web-only projects.
+
+### Fixed
+
+- **CLI:** Point template cloning, diffs, upgrades, and latest commit lookups to `stackbase-labs/stackbase#legacy`
+- **Catalog:** Moved `pino`, `pino-http`, and `pino-pretty` to the `core` catalog so `@workspace/logger` resolves dependencies cleanly in `web`-only templates where the `server` catalog is removed
+- **Format:** Added `@workspace/prettier-config` to `api`, `db`, and `ui` devDependencies to resolve Prettier configuration resolution in isolated workspaces
+- **Package:** Updated repository, homepage, and bugs metadata in `package.json` to the new organization
+
 ## [1.7.0] - 2026-09-09 [Minor] - API Observability with Prometheus & Grafana
 
 Adds first-class API observability with Prometheus-compatible metrics, local Prometheus/Grafana infrastructure, and documentation for inspecting request and runtime behavior during development.

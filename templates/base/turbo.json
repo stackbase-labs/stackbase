@@ -10,7 +10,7 @@
       "env": ["DATABASE_URL", "API_INTERNAL_URL", "NEXT_PUBLIC_API_URL"]
     },
     "check-types": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["db:generate", "^build"]
     },
     "clean": {
       "cache": false

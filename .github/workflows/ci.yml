@@ -8,6 +8,7 @@ on:
     paths:
       - "apps/**"
       - "packages/**"
+      - "templates/**"
       - "*.config.*"
       - "**/eslint.config.js"
       - "package.json"
@@ -22,6 +23,7 @@ on:
     paths:
       - "apps/**"
       - "packages/**"
+      - "templates/**"
       - "*.config.*"
       - "**/eslint.config.js"
       - "package.json"
@@ -67,15 +69,8 @@ jobs:
           restore-keys: |
             turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-
 
-      - name: Generate Prisma client
-        run: pnpm --filter @workspace/db db:generate
-        env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
-
       - name: Run ESLint
         run: pnpm lint
-        env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
 
   type-check:
     name: Type Check
@@ -109,13 +104,8 @@ jobs:
           restore-keys: |
             turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-
 
-      - name: Generate Prisma client
-        run: pnpm --filter @workspace/db db:generate
-
       - name: Run type checking
         run: pnpm check-types
-        env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
 
   test:
     name: Test
@@ -149,18 +139,8 @@ jobs:
           restore-keys: |
             turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-
 
-      - name: Generate Prisma client
-        run: pnpm --filter @workspace/db db:generate
-
-      - name: Build packages
-        run: pnpm --filter "@workspace/*" build
-        env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
-
       - name: Run tests
         run: pnpm test
-        env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
 
   build:
     name: Build
@@ -194,17 +174,10 @@ jobs:
           restore-keys: |
             turbo-${{ github.job }}-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-
 
-      - name: Generate Prisma client
-        run: pnpm --filter @workspace/db db:generate
-
       - name: Build apps and packages
         run: pnpm build
         env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
-          BETTER_AUTH_SECRET: "ci-dummy-secret-do-not-use-in-production"
-          API_INTERNAL_URL: "http://api:4000"
-          UPSTASH_REDIS_REST_URL: "https://placeholder.upstash.io"
-          UPSTASH_REDIS_REST_TOKEN: "placeholder-token"
+          NEXT_PUBLIC_SITE_URL: "https://stackbase-labs.vercel.app"
 
   format-check:
     name: Format Check
@@ -232,3 +205,52 @@ jobs:
 
       - name: Check formatting
         run: pnpm format:check
+
+  check-templates:
+    name: Check Template (${{ matrix.template }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [base, web, api]
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: templates/${{ matrix.template }}/pnpm-lock.yaml
+
+      - name: Install template dependencies
+        run: pnpm --dir templates/${{ matrix.template }} install
+
+      - name: Generate Prisma client
+        run: pnpm --dir templates/${{ matrix.template }} --filter @workspace/db db:generate
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v5
+        with:
+          path: templates/${{ matrix.template }}/.turbo
+          key: turbo-${{ matrix.template }}-${{ runner.os }}-${{ hashFiles(format('templates/{0}/pnpm-lock.yaml', matrix.template), format('templates/{0}/turbo.json', matrix.template)) }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ matrix.template }}-${{ runner.os }}-${{ hashFiles(format('templates/{0}/pnpm-lock.yaml', matrix.template), format('templates/{0}/turbo.json', matrix.template)) }}-
+
+      - name: Run template type checking
+        run: pnpm --dir templates/${{ matrix.template }} check-types
+
+      - name: Run template linting
+        run: pnpm --dir templates/${{ matrix.template }} lint
+
+      - name: Run template tests
+        run: pnpm --dir templates/${{ matrix.template }} test

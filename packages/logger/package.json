@@ -20,8 +20,8 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
-    "pino": "catalog:server",
-    "pino-pretty": "catalog:server"
+    "pino": "catalog:core",
+    "pino-pretty": "catalog:core"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",

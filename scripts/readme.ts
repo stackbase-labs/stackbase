@@ -20,7 +20,7 @@ const buildHeroSection = ({
 
 ${templateDescriptions[template]}
 
-Built with [build-elevate](https://github.com/vijaysingh2219/build-elevate) - A production-grade full-stack starter.
+Built with [build-elevate](https://github.com/stackbase-labs/stackbase) - A production-grade full-stack starter.
 `;
 
 const buildGettingStartedSection = ({

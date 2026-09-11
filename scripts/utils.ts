@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 
-export const url = "vijaysingh2219/build-elevate";
+export const url = "stackbase-labs/stackbase";
 
 export const execSyncOpts: ExecSyncOptions = { stdio: "ignore" };
 export const execOpts = { stdio: "ignore" as const };

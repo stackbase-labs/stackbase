@@ -26,7 +26,7 @@ import {
 } from "./update.js";
 import { applyProjectName, internalContentFiles } from "./utils.js";
 
-const REPO = "vijaysingh2219/build-elevate";
+const REPO = "stackbase-labs/stackbase";
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 const API_BASE = `https://api.github.com/repos/${REPO}`;
 
@@ -185,7 +185,8 @@ const isExcludedByFeatures = (
 };
 
 export const getLatestCommit = async (): Promise<string> => {
-  const res = await fetch(`${API_BASE}/commits/main`, {
+  const branch = process.env.BUILD_ELEVATE_BRANCH ?? "legacy";
+  const res = await fetch(`${API_BASE}/commits/${branch}`, {
     headers: { Accept: "application/vnd.github.sha" },
   });
   if (!res.ok) {

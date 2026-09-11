@@ -2,7 +2,7 @@ import { intro, log } from "@clack/prompts";
 import { readManifest, manifestExists } from "./manifest.js";
 import { getLatestCommit } from "./upgrade.js";
 
-const REPO = "vijaysingh2219/build-elevate";
+const REPO = "stackbase-labs/stackbase";
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 
 const getFileAtCommit = async (

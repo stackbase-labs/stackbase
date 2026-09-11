@@ -42,11 +42,11 @@ import {
   K8S_DOCKERHUB_FILES,
 } from "./update.js";
 
-const branch = process.env.BUILD_ELEVATE_BRANCH ?? "main";
+const branch = process.env.BUILD_ELEVATE_BRANCH ?? "legacy";
 
 const getLatestCommit = async (): Promise<string> => {
   const res = await fetch(
-    `https://api.github.com/repos/vijaysingh2219/build-elevate/commits/${branch}`,
+    `https://api.github.com/repos/stackbase-labs/stackbase/commits/${branch}`,
     { headers: { Accept: "application/vnd.github.sha" } },
   );
   if (!res.ok) throw new Error("Failed to resolve latest commit SHA");

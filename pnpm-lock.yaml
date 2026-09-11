@@ -73,6 +73,15 @@ catalogs:
     pg:
       specifier: ^8.20.0
       version: 8.20.0
+    pino:
+      specifier: ^9.5.0
+      version: 9.14.0
+    pino-http:
+      specifier: ^10.3.0
+      version: 10.5.0
+    pino-pretty:
+      specifier: ^13.0.0
+      version: 13.1.3
     prisma:
       specifier: ^7.8.0
       version: 7.8.0
@@ -203,15 +212,6 @@ catalogs:
     helmet:
       specifier: ^8.1.0
       version: 8.1.0
-    pino:
-      specifier: ^9.5.0
-      version: 9.14.0
-    pino-http:
-      specifier: ^10.3.0
-      version: 10.5.0
-    pino-pretty:
-      specifier: ^13.0.0
-      version: 13.1.3
     prom-client:
       specifier: ^15.1.3
       version: 15.1.3
@@ -357,8 +357,11 @@ importers:
       helmet:
         specifier: catalog:server
         version: 8.1.0
+      pino:
+        specifier: catalog:core
+        version: 9.14.0
       pino-http:
-        specifier: catalog:server
+        specifier: catalog:core
         version: 10.5.0
       prom-client:
         specifier: catalog:server
@@ -382,6 +385,9 @@ importers:
       '@workspace/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@workspace/prettier-config':
+        specifier: workspace:*
+        version: link:../../packages/prettier-config
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -700,6 +706,9 @@ importers:
       '@types/pg':
         specifier: catalog:core
         version: 8.20.0
+      '@workspace/prettier-config':
+        specifier: workspace:*
+        version: link:../prettier-config
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -798,10 +807,10 @@ importers:
   packages/logger:
     dependencies:
       pino:
-        specifier: catalog:server
+        specifier: catalog:core
         version: 9.14.0
       pino-pretty:
-        specifier: catalog:server
+        specifier: catalog:core
         version: 13.1.3
     devDependencies:
       '@types/node':
@@ -972,6 +981,9 @@ importers:
       '@workspace/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@workspace/prettier-config':
+        specifier: workspace:*
+        version: link:../prettier-config
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -10962,7 +10974,7 @@ snapshots:
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react-hooks: 7.0.1(eslint@9.39.2(jiti@2.6.1))
@@ -10999,7 +11011,7 @@ snapshots:
       tinyglobby: 0.2.17
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -11013,7 +11025,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9

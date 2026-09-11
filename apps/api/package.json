@@ -24,7 +24,8 @@
     "dotenv": "catalog:core",
     "express": "catalog:server",
     "helmet": "catalog:server",
-    "pino-http": "catalog:server",
+    "pino": "catalog:core",
+    "pino-http": "catalog:core",
     "prom-client": "catalog:server"
   },
   "devDependencies": {
@@ -34,6 +35,7 @@
     "@types/supertest": "catalog:dev",
     "@vitest/coverage-v8": "catalog:dev",
     "@workspace/eslint-config": "workspace:*",
+    "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "@workspace/vitest-presets": "workspace:*",
     "eslint": "catalog:eslint",

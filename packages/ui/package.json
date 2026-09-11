@@ -38,6 +38,7 @@
     "@types/react": "catalog:core",
     "@types/react-dom": "catalog:core",
     "@workspace/eslint-config": "workspace:*",
+    "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "tailwindcss": "catalog:web",
     "typescript": "catalog:dev"

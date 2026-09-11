@@ -123,6 +123,7 @@ export const getFilesToReplaceProjectName = (): string[] => {
     "apps/web/config/site-shared.ts",
     "apps/web/config/site.ts",
     "apps/api/src/metrics/index.ts",
+    "apps/api/src/__tests__/unit/server.test.ts",
     "docker-compose.yml",
     "docker-compose.prod.yml",
     "docker-compose.observability.yml",

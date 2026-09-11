@@ -80,6 +80,27 @@ const downloadTemplate = async (
   name: string,
   template: TemplateName,
 ): Promise<string> => {
+  if (process.env.STACKBASE_LOCAL_TEMPLATES_DIR) {
+    const localTemplatePath = join(
+      process.env.STACKBASE_LOCAL_TEMPLATES_DIR,
+      templateRegistry[template].path,
+    );
+    await cp(localTemplatePath, name, {
+      recursive: true,
+      force: true,
+      filter: (source) => {
+        const basename = source.split(/[\\/]/).pop();
+        return (
+          basename !== "node_modules" &&
+          basename !== ".turbo" &&
+          basename !== ".next" &&
+          basename !== "dist"
+        );
+      },
+    });
+    return "local-test-commit";
+  }
+
   const commitHash = await getLatestCommit();
   const tempDir = await mkdtemp(join(tmpdir(), "stackbase-"));
 
@@ -875,6 +896,12 @@ export const initialize = async (
     yes?: boolean;
     verbose?: boolean;
     packageManager?: string;
+    docker?: boolean;
+    kubernetes?: boolean;
+    observability?: boolean;
+    studio?: boolean;
+    dockerHubUsername?: string;
+    domainName?: string;
   } = {},
 ) => {
   try {
@@ -923,20 +950,27 @@ export const initialize = async (
 
     // Docker is prompted only if the template supports it
     const includeDocker = templateConfig.capabilities.docker
-      ? options.yes
-        ? true
-        : await getDockerChoice()
+      ? options.docker !== undefined
+        ? options.docker
+        : options.yes
+          ? true
+          : await getDockerChoice()
       : false;
 
     // Kubernetes is offered only if the template supports it AND Docker is included
     const includeKubernetes =
-      templateConfig.capabilities.kubernetes && includeDocker && !options.yes
-        ? await getKubernetesChoice()
+      templateConfig.capabilities.kubernetes && includeDocker
+        ? options.kubernetes !== undefined
+          ? options.kubernetes
+          : !options.yes
+            ? await getKubernetesChoice()
+            : false
         : false;
 
-    let dockerHubUsername = DOCKERHUB_USERNAME_PLACEHOLDER;
-    let domainName = "";
-    if (includeKubernetes) {
+    let dockerHubUsername =
+      options.dockerHubUsername || DOCKERHUB_USERNAME_PLACEHOLDER;
+    let domainName = options.domainName || "";
+    if (includeKubernetes && !options.dockerHubUsername && !options.yes) {
       dockerHubUsername = await getDockerHubUsername();
       domainName = await getDomainName();
     }
@@ -944,16 +978,20 @@ export const initialize = async (
     // Observability is offered only if the template supports it AND Docker is included
     const includeObservability =
       templateConfig.capabilities.observability && includeDocker
-        ? options.yes
-          ? true
-          : await getObservabilityChoice()
+        ? options.observability !== undefined
+          ? options.observability
+          : options.yes
+            ? true
+            : await getObservabilityChoice()
         : false;
 
     // Studio is offered if the template supports it
     const includeStudio = templateConfig.capabilities.studio
-      ? options.yes
-        ? true
-        : await getStudioChoice()
+      ? options.studio !== undefined
+        ? options.studio
+        : options.yes
+          ? true
+          : await getStudioChoice()
       : false;
 
     const s = spinner();

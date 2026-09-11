@@ -10,7 +10,7 @@ const config = {
   singleQuote: true,
   trailingComma: "all",
   printWidth: 100,
-  endOfLine: "lf",
+  endOfLine: "auto",
   overrides: [
     {
       files: ["**/*.{ts,tsx,md}"],

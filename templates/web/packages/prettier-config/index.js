@@ -3,17 +3,17 @@
 /** @type { PrettierConfig } */
 const config = {
   plugins: [
-    "prettier-plugin-organize-imports",
-    "prettier-plugin-tailwindcss",
-    "prettier-plugin-packagejson",
+    'prettier-plugin-organize-imports',
+    'prettier-plugin-tailwindcss',
+    'prettier-plugin-packagejson',
   ],
   singleQuote: true,
-  trailingComma: "all",
+  trailingComma: 'all',
   printWidth: 100,
-  endOfLine: "lf",
+  endOfLine: 'auto',
   overrides: [
     {
-      files: ["**/*.{ts,tsx,md}"],
+      files: ['**/*.{ts,tsx,md}'],
     },
   ],
 };

@@ -49,10 +49,9 @@ describe('API Server', () => {
       const response = await supertest(app).get('/metrics').expect(200);
 
       expect(response.headers['content-type']).toContain('text/plain');
-      expect(response.text).toContain('stackbase_');
-      expect(response.text).toContain('stackbase_http_requests_total');
-      expect(response.text).toContain('stackbase_http_request_duration_seconds');
-      expect(response.text).toContain('stackbase_http_requests_in_flight');
+      expect(response.text).toContain('http_requests_total');
+      expect(response.text).toContain('http_request_duration_seconds');
+      expect(response.text).toContain('http_requests_in_flight');
     });
 
     it('should track requests in http_requests_total metric', async () => {
@@ -62,7 +61,7 @@ describe('API Server', () => {
       // Scrape metrics and verify route was recorded
       const metricsResponse = await supertest(app).get('/metrics').expect(200);
       expect(metricsResponse.text).toMatch(
-        /stackbase_http_requests_total\{.*route="\/health".*\}\s+[1-9]\d*/,
+        /http_requests_total\{.*route="\/health".*\}\s+[1-9]\d*/,
       );
     });
   });

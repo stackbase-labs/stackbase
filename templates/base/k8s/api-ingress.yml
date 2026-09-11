@@ -4,11 +4,11 @@ metadata:
   name: stackbase-api-ingress
   namespace: stackbase
   annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/use-regex: 'true'
     # Strips /api/v1/ prefix: /api/v1/users → /api/users on the API service
     nginx.ingress.kubernetes.io/rewrite-target: /api/$2
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-body-size: '10m'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '60'
     # Uncomment to enable TLS via cert-manager:
     # cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:

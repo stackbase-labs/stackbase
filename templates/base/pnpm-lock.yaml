@@ -43,7 +43,7 @@ catalogs:
       specifier: ^1.35.5
       version: 1.35.5
     better-auth:
-      specifier: ^1.6.11
+      specifier: ~1.6.11
       version: 1.6.11
     date-fns:
       specifier: ^4.1.0
@@ -256,6 +256,9 @@ importers:
       '@types/node':
         specifier: catalog:dev
         version: 25.8.0
+      '@workspace/prettier-config':
+        specifier: workspace:*
+        version: link:packages/prettier-config
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:packages/typescript-config

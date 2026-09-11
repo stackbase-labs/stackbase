@@ -6,29 +6,29 @@ on:
       - main
       - dev
     paths:
-      - "apps/**"
-      - "packages/**"
-      - "*.config.*"
-      - "**/eslint.config.js"
-      - "package.json"
-      - "pnpm-*.yaml"
-      - "tsconfig*.json"
-      - "turbo.json"
-      - ".github/workflows/**"
+      - 'apps/**'
+      - 'packages/**'
+      - '*.config.*'
+      - '**/eslint.config.js'
+      - 'package.json'
+      - 'pnpm-*.yaml'
+      - 'tsconfig*.json'
+      - 'turbo.json'
+      - '.github/workflows/**'
   pull_request:
     branches:
       - main
       - dev
     paths:
-      - "apps/**"
-      - "packages/**"
-      - "*.config.*"
-      - "**/eslint.config.js"
-      - "package.json"
-      - "pnpm-*.yaml"
-      - "tsconfig*.json"
-      - "turbo.json"
-      - ".github/workflows/**"
+      - 'apps/**'
+      - 'packages/**'
+      - '*.config.*'
+      - '**/eslint.config.js'
+      - 'package.json'
+      - 'pnpm-*.yaml'
+      - 'tsconfig*.json'
+      - 'turbo.json'
+      - '.github/workflows/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -70,12 +70,12 @@ jobs:
       - name: Generate Prisma client
         run: pnpm --filter @workspace/db db:generate
         env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+          DATABASE_URL: 'postgresql://user:pass@localhost:5432/test'
 
       - name: Run ESLint
         run: pnpm lint
         env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+          DATABASE_URL: 'postgresql://user:pass@localhost:5432/test'
 
   type-check:
     name: Type Check
@@ -115,7 +115,7 @@ jobs:
       - name: Run type checking
         run: pnpm check-types
         env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+          DATABASE_URL: 'postgresql://user:pass@localhost:5432/test'
 
   test:
     name: Test
@@ -155,12 +155,12 @@ jobs:
       - name: Build packages
         run: pnpm --filter "@workspace/*" build
         env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+          DATABASE_URL: 'postgresql://user:pass@localhost:5432/test'
 
       - name: Run tests
         run: pnpm test
         env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+          DATABASE_URL: 'postgresql://user:pass@localhost:5432/test'
 
   build:
     name: Build
@@ -200,11 +200,11 @@ jobs:
       - name: Build apps and packages
         run: pnpm build
         env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
-          BETTER_AUTH_SECRET: "ci-dummy-secret-do-not-use-in-production"
-          API_INTERNAL_URL: "http://api:4000"
-          UPSTASH_REDIS_REST_URL: "https://placeholder.upstash.io"
-          UPSTASH_REDIS_REST_TOKEN: "placeholder-token"
+          DATABASE_URL: 'postgresql://user:pass@localhost:5432/test'
+          BETTER_AUTH_SECRET: 'ci-dummy-secret-do-not-use-in-production'
+          API_INTERNAL_URL: 'http://api:4000'
+          UPSTASH_REDIS_REST_URL: 'https://placeholder.upstash.io'
+          UPSTASH_REDIS_REST_TOKEN: 'placeholder-token'
 
   format-check:
     name: Format Check

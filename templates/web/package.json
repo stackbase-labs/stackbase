@@ -20,8 +20,10 @@
     "test": "turbo test",
     "prepare": "husky"
   },
+  "prettier": "@workspace/prettier-config",
   "devDependencies": {
     "@types/node": "catalog:dev",
+    "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:eslint",
     "husky": "catalog:dev",

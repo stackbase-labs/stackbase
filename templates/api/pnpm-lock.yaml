@@ -189,6 +189,9 @@ importers:
       '@types/node':
         specifier: catalog:dev
         version: 25.8.0
+      '@workspace/prettier-config':
+        specifier: workspace:*
+        version: link:packages/prettier-config
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:packages/typescript-config

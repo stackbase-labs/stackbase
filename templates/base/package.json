@@ -23,8 +23,10 @@
     "k8s:deploy": "sh deploy.sh",
     "k8s:verify": "sh k8s/verify.sh"
   },
+  "prettier": "@workspace/prettier-config",
   "devDependencies": {
     "@types/node": "catalog:dev",
+    "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:eslint",
     "husky": "catalog:dev",

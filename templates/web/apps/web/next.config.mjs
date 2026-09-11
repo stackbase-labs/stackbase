@@ -2,16 +2,16 @@ import process from 'node:process';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@workspace/ui', '@workspace/auth', '@workspace/email', '@workspace/db', '@workspace/rate-limiter', '@workspace/utils', '@t3-oss/env-nextjs'],
+  transpilePackages: ['@workspace/ui', '@workspace/auth', '@workspace/email', '@workspace/db', '@workspace/rate-limit', '@workspace/utils', '@t3-oss/env-nextjs'],
   output: 'standalone',
   async rewrites() {
-    const productionTarget = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL;
-    const developmentTarget = process.env.NEXT_PUBLIC_API_URL || process.env.API_INTERNAL_URL || 'http://localhost:4000';
-
-    const rawApiTarget = process.env.NODE_ENV === 'production' ? productionTarget : developmentTarget;
+    const rawApiTarget =
+      process.env.API_INTERNAL_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      (process.env.NODE_ENV === 'production' ? null : 'http://localhost:4000');
 
     if (!rawApiTarget) {
-      throw new Error('Missing API rewrite target. Set API_INTERNAL_URL in production.');
+      return [];
     }
 
     const apiTarget = normalizeApiBaseUrl(rawApiTarget);

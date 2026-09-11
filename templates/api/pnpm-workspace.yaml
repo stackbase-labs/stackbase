@@ -1,9 +1,9 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - 'apps/*'
+  - 'packages/*'
 
 allowBuilds:
-  "@prisma/engines": true
+  '@prisma/engines': true
   esbuild: true
   prisma: true
   sharp: true
@@ -12,12 +12,12 @@ allowBuilds:
 catalogs:
   server:
     express: ^5.2.1
-    "@types/express": ^5.0.6
+    '@types/express': ^5.0.6
     cors: ^2.8.6
-    "@types/cors": ^2.8.19
+    '@types/cors': ^2.8.19
     helmet: ^8.1.0
     morgan: ^1.10.1
-    "@types/morgan": ^1.9.10
+    '@types/morgan': ^1.9.10
     pino: ^9.5.0
     pino-http: ^10.3.0
     pino-pretty: ^13.0.0
@@ -27,43 +27,43 @@ catalogs:
     turbo: ^2.9.14
     react: ^19.2.4
     react-dom: ^19.2.4
-    "@types/react-dom": ^19.2.3
-    "@types/react": ^19.2.7
+    '@types/react-dom': ^19.2.3
+    '@types/react': ^19.2.7
     zod: ^4.3.6
-    "@t3-oss/env-nextjs": ^0.13.11
+    '@t3-oss/env-nextjs': ^0.13.11
     dotenv: ^17.4.2
     better-auth: ^1.6.11
     prisma: ^7.8.0
     pg: ^8.20.0
-    "@types/pg": ^8.20.0
-    "@prisma/client": ^7.8.0
-    "@prisma/adapter-pg": ^7.8.0
-    "@prisma/client-runtime-utils": ^7.8.0
+    '@types/pg': ^8.20.0
+    '@prisma/client': ^7.8.0
+    '@prisma/adapter-pg': ^7.8.0
+    '@prisma/client-runtime-utils': ^7.8.0
     date-fns: ^4.1.0
-    "@upstash/ratelimit": ^2.0.6
-    "@upstash/redis": ^1.35.5
-    "@react-email/ui": ^6.1.4
+    '@upstash/ratelimit': ^2.0.6
+    '@upstash/redis': ^1.35.5
+    '@react-email/ui': ^6.1.4
     react-email: ^6.1.4
     resend: 6.9.4
-    "@aws-sdk/client-s3": ^3.758.0
-    "@aws-sdk/s3-request-presigner": ^3.758.0
+    '@aws-sdk/client-s3': ^3.758.0
+    '@aws-sdk/s3-request-presigner': ^3.758.0
 
   dev:
     typescript: ^5.9.3
     husky: ^9.1.7
     lint-staged: ^16.4.0
-    "@types/node": ^25.8.0
+    '@types/node': ^25.8.0
     tsx: ^4.22.1
-    "@turbo/gen": ^2.9.14
+    '@turbo/gen': ^2.9.14
     vitest: ^4.1.7
-    "@vitest/coverage-v8": 4.1.7
-    "@vitejs/plugin-react": 6.0.2
-    "@testing-library/react": ^16.3.2
-    "@testing-library/user-event": ^14.6.1
-    "@testing-library/jest-dom": ^6.9.1
+    '@vitest/coverage-v8': 4.1.7
+    '@vitejs/plugin-react': 6.0.2
+    '@testing-library/react': ^16.3.2
+    '@testing-library/user-event': ^14.6.1
+    '@testing-library/jest-dom': ^6.9.1
     jsdom: ^29.0.1
     supertest: ^7.1.4
-    "@types/supertest": ^6.0.3
+    '@types/supertest': ^6.0.3
 
   eslint:
     eslint: ^9.39.1
@@ -74,10 +74,10 @@ catalogs:
     eslint-plugin-turbo: ^2.8.20
     typescript-eslint: ^8.57.1
     globals: ^17.4.0
-    "@eslint/js": ^9.39.1
-    "@next/eslint-plugin-next": ^16.2.0
-    "@typescript-eslint/eslint-plugin": ^8.59.3
-    "@typescript-eslint/parser": ^8.59.3
+    '@eslint/js': ^9.39.1
+    '@next/eslint-plugin-next': ^16.2.0
+    '@typescript-eslint/eslint-plugin': ^8.59.3
+    '@typescript-eslint/parser': ^8.59.3
 
   prettier:
     prettier: ^3.8.1

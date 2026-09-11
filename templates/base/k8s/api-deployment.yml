@@ -17,9 +17,9 @@ spec:
       labels:
         app: stackbase-api
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "4000"
-        prometheus.io/path: "/metrics"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '4000'
+        prometheus.io/path: '/metrics'
     spec:
       containers:
         - name: stackbase-api
@@ -38,11 +38,11 @@ spec:
                   fieldPath: metadata.name
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: '100m'
+              memory: '128Mi'
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: '500m'
+              memory: '512Mi'
           readinessProbe:
             httpGet:
               path: /readyz

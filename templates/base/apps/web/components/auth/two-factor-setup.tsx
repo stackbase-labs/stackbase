@@ -64,11 +64,11 @@ export function TwoFactorSetup({
       return result.data;
     },
     onSuccess: async (data) => {
-      if (data) {
+      if (data && 'totpURI' in data) {
         // Generate QR code image from TOTP URI
         const qrCodeDataUrl = await QRCode.toDataURL(data.totpURI);
         setQrCode(qrCodeDataUrl);
-        setBackupCodes(data.backupCodes || []);
+        setBackupCodes(('backupCodes' in data && data.backupCodes) || []);
         setStep('verify');
         setPassword('');
       }

@@ -4,8 +4,8 @@ metadata:
   name: stackbase-web-ingress
   namespace: stackbase
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-body-size: '10m'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '60'
     # Uncomment to enable TLS via cert-manager:
     # cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:

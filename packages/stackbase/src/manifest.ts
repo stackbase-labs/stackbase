@@ -14,6 +14,7 @@ export interface ManifestFeatures {
   docker: boolean;
   kubernetes: boolean;
   studio: boolean;
+  observability?: boolean;
 }
 
 export interface StackbaseManifest {
@@ -37,8 +38,6 @@ export interface StackbaseManifest {
 export const resolveFeatures = async (
   manifest: StackbaseManifest,
 ): Promise<ManifestFeatures> => {
-  if (manifest.features) return manifest.features;
-
   const exists = async (p: string): Promise<boolean> => {
     try {
       await access(p);
@@ -48,10 +47,25 @@ export const resolveFeatures = async (
     }
   };
 
+  if (manifest.features) {
+    return {
+      docker: manifest.features.docker,
+      kubernetes: manifest.features.kubernetes,
+      studio: manifest.features.studio,
+      observability:
+        manifest.features.observability ??
+        (manifest.template === "web"
+          ? false
+          : manifest.features.docker &&
+            (await exists("docker-compose.observability.yml"))),
+    };
+  }
+
   return {
     docker: await exists("docker-compose.prod.yml"),
     kubernetes: await exists("k8s"),
     studio: await exists("apps/studio"),
+    observability: await exists("docker-compose.observability.yml"),
   };
 };
 
@@ -114,9 +128,6 @@ const SKIP_DIRS = new Set([
   "coverage",
   ".react-email",
   "packages/db/generated",
-  "packages/stackbase", // internal CLI — deleted by deleteInternalContent() anyway
-  "assets", // internal — also deleted
-  "apps/docs", // internal — also deleted
 ]);
 
 const SKIP_FILES = new Set([
@@ -134,9 +145,6 @@ const SKIP_FILES = new Set([
   "tsconfig.tsbuildinfo",
   // the manifest itself
   ".stackbase.json",
-  // internal files deleted during init
-  "SCREENSHOTS.md",
-  ".npmignore",
 ]);
 
 const SKIP_EXTENSIONS = new Set([
@@ -184,7 +192,7 @@ const walkDir = async (
     if (entry.isDirectory()) {
       // Skip if the dir name itself is in SKIP_DIRS
       if (SKIP_DIRS.has(entry.name)) continue;
-      // Skip if the relative path matches (e.g. "apps/docs")
+      // Skip if the relative path matches (e.g. "packages/db/generated")
       if (SKIP_DIRS.has(relPath)) continue;
       await walkDir(fullPath, root, results);
     } else if (entry.isFile()) {

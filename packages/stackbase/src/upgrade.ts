@@ -12,25 +12,18 @@ import {
   MANIFEST_VERSION,
   type ManifestFeatures,
 } from "./manifest.js";
-import { CLI_NAME, REPO, PRODUCT_NAME, TEMPLATE_PATH } from "./branding.js";
+import { CLI_NAME, REPO, PRODUCT_NAME } from "./branding.js";
 import {
-  applyTurboLintEnv,
   applyPackageJsonCleanup,
-  applyPnpmCatalogCleanup,
-  applyAuthIndexCleanup,
-  applyAuthPackageJsonCleanup,
-  applyAuthKeysCleanup,
-  applyDockerComposeCleanup,
   applyDockerfilesPackageManagerCleanup,
   applyDockerHubUsernameCleanup,
-  applyConfigMapCleanup,
   K8S_DOCKERHUB_FILES,
 } from "./update.js";
-import { applyProjectName, internalContentFiles } from "./utils.js";
+import { applyProjectName } from "./utils.js";
+import { getTemplatePath } from "./templates.js";
 
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 const API_BASE = `https://api.github.com/repos/${REPO}`;
-const TEMPLATE_PREFIX = `${TEMPLATE_PATH}/`;
 
 // Files/dirs we never write during upgrade — mirrors the skip logic in manifest.ts
 
@@ -44,20 +37,9 @@ const SKIP_SEGMENTS = new Set([
   "build",
   ".cache",
   "coverage",
-  "assets",
 ]);
 
-// Full path prefixes — skip anything that starts with these
-const SKIP_PREFIXES = [
-  "apps/docs", // internal docs app — deleted during init
-  "packages/stackbase", // internal CLI package — deleted during init
-];
-
 const SKIP_EXACT = new Set([
-  // Files that only belong to this repo and get deleted when a project is
-  // created (for example CONTRIBUTING.md, SECURITY.md, CHANGELOG.md). We reuse
-  // the shared list so this set and the delete step can't fall out of sync.
-  ...internalContentFiles,
   MANIFEST_FILE,
   "README.md",
   "LICENSE",
@@ -95,58 +77,10 @@ const shouldSkip = (filePath: string): boolean => {
   if (fileName.startsWith(".env") && fileName !== ".env.example") return true;
   // Skip if any individual path segment is a skipped dir name
   if (filePath.split("/").some((seg) => SKIP_SEGMENTS.has(seg))) return true;
-  // Skip if path starts with a skipped prefix (e.g. "apps/docs/...")
-  if (
-    SKIP_PREFIXES.some(
-      (prefix) => filePath === prefix || filePath.startsWith(prefix + "/"),
-    )
-  )
-    return true;
   // Skip by extension
   const ext = fileName.includes(".") ? "." + fileName.split(".").pop()! : "";
   if (SKIP_EXTENSIONS.has(ext)) return true;
   return false;
-};
-
-/**
- * Returns path prefixes excluded for a given template.
- * Mirrors removeAppsByTemplate() in init.ts exactly.
- */
-const getTemplateExcludedPrefixes = (template: string): string[] => {
-  switch (template) {
-    case "web":
-      return [
-        "apps/api",
-        "apps/email",
-        "k8s/api-deployment.yml",
-        "k8s/api-service.yml",
-        "k8s/api-ingress.yml",
-        "k8s/api-hpa.yml",
-        "docker-compose.observability.yml",
-        "deploy/observability",
-      ];
-    case "api":
-      return [
-        "apps/web",
-        "apps/email",
-        "packages/ui",
-        "packages/auth/src/client.ts",
-        "k8s/web-deployment.yml",
-        "k8s/web-service.yml",
-        "k8s/web-ingress.yml",
-        "k8s/web-hpa.yml",
-      ];
-    case "fullstack":
-    default:
-      return [];
-  }
-};
-
-const isExcludedByTemplate = (filePath: string, template: string): boolean => {
-  const excluded = getTemplateExcludedPrefixes(template);
-  return excluded.some(
-    (prefix) => filePath === prefix || filePath.startsWith(prefix + "/"),
-  );
 };
 
 /**
@@ -158,12 +92,11 @@ const isExcludedByTemplate = (filePath: string, template: string): boolean => {
 const FEATURE_PATHS: Record<keyof ManifestFeatures, string[]> = {
   docker: [
     "docker-compose.prod.yml",
-    "docker-compose.observability.yml",
-    "deploy/observability",
     "apps/api/Dockerfile.prod",
     "apps/web/Dockerfile.prod",
     ".dockerignore",
   ],
+  observability: ["docker-compose.observability.yml", "deploy/observability"],
   kubernetes: ["k8s", "deploy.sh"],
   studio: ["apps/studio"],
 };
@@ -200,10 +133,12 @@ export const getLatestCommit = async (): Promise<string> => {
 
 const getFileAtCommit = async (
   commit: string,
+  template: string,
   filePath: string,
 ): Promise<string | null> => {
+  const templatePrefix = getTemplatePath(template);
   const res = await fetch(
-    `${RAW_BASE}/${commit}/${TEMPLATE_PREFIX}${filePath}`,
+    `${RAW_BASE}/${commit}/${templatePrefix}/${filePath}`,
   );
   if (res.ok) return res.text();
 
@@ -263,33 +198,20 @@ const applyInitTransforms = (
     result = applyDockerHubUsernameCleanup(result);
   }
 
-  // 2. Apply per-file init-time transformations
-  if (filePath === "turbo.json") {
-    result = applyTurboLintEnv(result, template);
-  } else if (filePath === "package.json") {
+  // 2. Apply per-file init-time transformations.
+  if (filePath === "package.json") {
     result = applyPackageJsonCleanup(
       result,
       template,
       features.docker,
       features.kubernetes,
+      features.observability,
     );
-  } else if (filePath === "pnpm-workspace.yaml") {
-    result = applyPnpmCatalogCleanup(result, template);
-  } else if (filePath === "docker-compose.prod.yml") {
-    result = applyDockerComposeCleanup(result, template);
   } else if (
     filePath === "apps/api/Dockerfile.prod" ||
     filePath === "apps/web/Dockerfile.prod"
   ) {
     result = applyDockerfilesPackageManagerCleanup(result, packageManager);
-  } else if (filePath === "k8s/configmap.yml") {
-    result = applyConfigMapCleanup(result, template);
-  } else if (filePath === "packages/auth/src/index.ts" && template === "api") {
-    result = applyAuthIndexCleanup(result);
-  } else if (filePath === "packages/auth/package.json" && template === "api") {
-    result = applyAuthPackageJsonCleanup(result);
-  } else if (filePath === "packages/auth/src/keys.ts" && template === "api") {
-    result = applyAuthKeysCleanup(result);
   }
 
   return result;
@@ -305,7 +227,7 @@ export const upgrade = async (
     // 1. Check manifest exists
     if (!(await manifestExists())) {
       log.error(
-        `No ${MANIFEST_FILE} found.\n\nThis project was either not scaffolded with ${PRODUCT_NAME}, or was created before Stackbase upgrade support was added.\n\nTo manually upgrade, compare your files against the latest template at:\nhttps://github.com/${REPO}/${TEMPLATE_PATH}`,
+        `No ${MANIFEST_FILE} found.\n\nThis project was either not scaffolded with ${PRODUCT_NAME}, or was created before Stackbase upgrade support was added.\n\nTo manually upgrade, compare your files against the latest template at:\nhttps://github.com/${REPO}/tree/main/templates/base`,
       );
       process.exit(1);
     }
@@ -317,6 +239,7 @@ export const upgrade = async (
     }
 
     const baseCommit = manifest.commit;
+    const templatePrefix = `${getTemplatePath(manifest.template)}/`;
 
     // Find out which optional features this project includes. Older manifests
     // don't store this, so in that case we work it out from the files on disk,
@@ -356,8 +279,8 @@ export const upgrade = async (
       .filter((entry) => entry.type === "blob")
       .map((entry) => entry.path);
     const templateTreeFiles = latestTreePaths
-      .filter((path) => path.startsWith(TEMPLATE_PREFIX))
-      .map((path) => path.slice(TEMPLATE_PREFIX.length));
+      .filter((path) => path.startsWith(templatePrefix))
+      .map((path) => path.slice(templatePrefix.length));
     const latestTreeFiles =
       templateTreeFiles.length > 0 ? templateTreeFiles : latestTreePaths;
 
@@ -375,12 +298,14 @@ export const upgrade = async (
     for (const filePath of allFiles) {
       // Never touch skipped paths (env files, lock files, internal dirs etc.)
       if (shouldSkip(filePath)) continue;
-      // Never add/update files that don't belong to this template
-      if (isExcludedByTemplate(filePath, manifest.template)) continue;
       // Don't bring back files for optional features the user chose to skip
       if (isExcludedByFeatures(filePath, features)) continue;
 
-      const rawContent = await getFileAtCommit(latestCommit, filePath);
+      const rawContent = await getFileAtCommit(
+        latestCommit,
+        manifest.template,
+        filePath,
+      );
 
       // File no longer exists in new template — skip, don't delete user files
       if (rawContent === null) continue;
@@ -445,7 +370,11 @@ export const upgrade = async (
       }
 
       // Fetch old template version and apply same transforms for an accurate diff
-      const rawOldContent = await getFileAtCommit(baseCommit, filePath);
+      const rawOldContent = await getFileAtCommit(
+        baseCommit,
+        manifest.template,
+        filePath,
+      );
       const oldContent =
         rawOldContent !== null
           ? applyInitTransforms(

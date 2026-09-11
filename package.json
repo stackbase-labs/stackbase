@@ -8,18 +8,22 @@
     "url": "https://github.com/vijaysingh2219"
   },
   "scripts": {
+    "dev": "turbo dev --filter docs",
     "build": "turbo build --filter docs --filter stackbase",
     "build:cli": "pnpm --filter ./packages/stackbase build",
-    "clean": "turbo clean",
-    "dev": "turbo dev --filter docs",
+    "start": "turbo start",
     "lint": "turbo lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write .",
-    "format:path": "prettier --write",
     "format:check": "prettier --check .",
+    "format:path": "prettier --write",
     "check-types": "turbo check-types",
-    "start": "turbo start",
     "test": "turbo test",
+    "pub:cli": "pnpm --filter stackbase run pub:release",
+    "pub:cli:beta": "pnpm --filter stackbase run pub:beta",
+    "pub:cli:rc": "pnpm --filter stackbase run pub:rc",
+    "pub:cli:next": "pnpm --filter stackbase run pub:next",
+    "clean": "turbo clean",
     "prepare": "husky"
   },
   "devDependencies": {

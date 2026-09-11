@@ -2,32 +2,9 @@ import { type ExecSyncOptions, exec as execRaw } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
-import { TEMPLATE_REPO } from "./branding.js";
-
-export const url = TEMPLATE_REPO;
+import { normalizeTemplateName } from "./templates.js";
 
 export const execSyncOpts: ExecSyncOptions = { stdio: "ignore" };
-export const execOpts = { stdio: "ignore" as const };
-
-export const internalContentDirs = [
-  "packages/stackbase",
-  "apps/docs",
-  "assets",
-];
-
-export const internalContentFiles = [
-  "CONTRIBUTING.md",
-  "SECURITY.md",
-  "SCREENSHOTS.md",
-  ".npmignore",
-  "CHANGELOG.md",
-  ".markdownlint.yaml",
-];
-
-export const allInternalContent = [
-  ...internalContentDirs,
-  ...internalContentFiles,
-];
 
 export const exec = promisify(execRaw);
 
@@ -97,28 +74,11 @@ export const toKebabCase = (str: string): string => {
     .toLowerCase();
 };
 
-export const toCamelCase = (str: string): string => {
-  return str
-    .toLowerCase()
-    .replace(/[-_\s]+(.)?/g, (_, char) => (char ? char.toUpperCase() : ""));
-};
-
-export const toPascalCase = (str: string): string => {
-  const camel = toCamelCase(str);
-  return camel.charAt(0).toUpperCase() + camel.slice(1);
-};
-
 export const toSnakeCase = (str: string): string => {
   return str
     .replace(/([a-z])([A-Z])/g, "$1_$2")
     .replace(/[\s-]+/g, "_")
     .toLowerCase();
-};
-
-export const toCapitalCase = (str: string): string => {
-  return str
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 export const toConstantCase = (str: string): string => {
@@ -129,27 +89,6 @@ export const toTitleCase = (str: string): string => {
   return str
     .replace(/[-_]/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
-};
-
-// Replace utility functions
-export const replaceInFile = async (
-  filePath: string,
-  search: string | RegExp,
-  replace: string,
-) => {
-  const content = await readFile(filePath, "utf8");
-  const updated = content.replace(search, replace);
-  await writeFile(filePath, updated);
-};
-
-export const replaceAllInFile = async (
-  filePath: string,
-  search: string | RegExp,
-  replace: string,
-) => {
-  const content = await readFile(filePath, "utf8");
-  const updated = content.replaceAll(search, replace);
-  await writeFile(filePath, updated);
 };
 
 export const applyProjectName = (
@@ -248,84 +187,13 @@ export const updateAuthSecretInEnvFile = async (
 
 // Descriptions for each template
 export const templateDescriptions: Record<string, string> = {
-  fullstack:
-    "Full-stack application with Next.js frontend, Express backend, authentication and PostgreSQL database",
+  base: "Full-stack application with Next.js frontend, Express backend, authentication and PostgreSQL database",
   web: "Frontend application with Next.js, authentication, and modern UI",
   api: "Backend API with Express, PostgreSQL, and authentication",
 };
 
 // Get description for a given template
 export const getDescription = (template: string): string => {
-  return templateDescriptions[template] || "";
-};
-
-// Environment variables required by each template
-export const envsByTemplate: Record<string, string[]> = {
-  fullstack: [
-    "GOOGLE_CLIENT_ID",
-    "GOOGLE_CLIENT_SECRET",
-    "NEXT_PUBLIC_BASE_URL",
-    "API_INTERNAL_URL",
-    "NODE_ENV",
-    "PORT",
-    "ALLOWED_ORIGINS",
-    "CORS_ALLOW_MISSING_ORIGIN",
-    "BETTER_AUTH_URL",
-    "RESEND_TOKEN",
-    "RESEND_EMAIL_FROM",
-    "UPSTASH_REDIS_REST_URL",
-    "UPSTASH_REDIS_REST_TOKEN",
-    "LOG_LEVEL",
-    "POD_NAME",
-    "S3_BUCKET",
-    "S3_REGION",
-    "S3_ACCESS_KEY_ID",
-    "S3_SECRET_ACCESS_KEY",
-    "S3_ENDPOINT",
-    "S3_PUBLIC_URL",
-    "S3_FORCE_PATH_STYLE",
-  ],
-  web: [
-    "GOOGLE_CLIENT_ID",
-    "GOOGLE_CLIENT_SECRET",
-    "NEXT_PUBLIC_BASE_URL",
-    "API_INTERNAL_URL",
-    "NODE_ENV",
-    "BETTER_AUTH_URL",
-    "RESEND_TOKEN",
-    "RESEND_EMAIL_FROM",
-    "UPSTASH_REDIS_REST_URL",
-    "UPSTASH_REDIS_REST_TOKEN",
-    "LOG_LEVEL",
-    "POD_NAME",
-    "S3_BUCKET",
-    "S3_REGION",
-    "S3_ACCESS_KEY_ID",
-    "S3_SECRET_ACCESS_KEY",
-    "S3_ENDPOINT",
-    "S3_PUBLIC_URL",
-    "S3_FORCE_PATH_STYLE",
-  ],
-  api: [
-    "GOOGLE_CLIENT_ID",
-    "GOOGLE_CLIENT_SECRET",
-    "NODE_ENV",
-    "PORT",
-    "ALLOWED_ORIGINS",
-    "CORS_ALLOW_MISSING_ORIGIN",
-    "BETTER_AUTH_URL",
-    "RESEND_TOKEN",
-    "RESEND_EMAIL_FROM",
-    "UPSTASH_REDIS_REST_URL",
-    "UPSTASH_REDIS_REST_TOKEN",
-    "LOG_LEVEL",
-    "POD_NAME",
-    "S3_BUCKET",
-    "S3_REGION",
-    "S3_ACCESS_KEY_ID",
-    "S3_SECRET_ACCESS_KEY",
-    "S3_ENDPOINT",
-    "S3_PUBLIC_URL",
-    "S3_FORCE_PATH_STYLE",
-  ],
+  const normalized = normalizeTemplateName(template) ?? template;
+  return templateDescriptions[normalized] || "";
 };

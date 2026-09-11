@@ -52,7 +52,12 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "prepublish": "pnpm build"
+    "prepublish": "pnpm build",
+    "pub:release": "pnpm build && pnpm publish --access public",
+    "pub:beta": "pnpm build && pnpm publish --no-git-checks --access public --tag beta",
+    "pub:rc": "pnpm build && pnpm publish --no-git-checks --access public --tag rc",
+    "pub:next": "pnpm build && pnpm publish --no-git-checks --access public --tag next",
+    "test": "vitest run"
   },
   "dependencies": {
     "@clack/prompts": "^1.8.0",
@@ -66,6 +71,7 @@
     "@workspace/eslint-config": "workspace:*",
     "eslint": "catalog:eslint",
     "tsup": "^8.5.1",
-    "typescript": "catalog:dev"
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
   }
 }

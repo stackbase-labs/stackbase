@@ -1,7 +1,15 @@
-import { copyFile, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import {
+  copyFile,
+  cp,
+  mkdtemp,
+  readFile,
+  readdir,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import yaml from "yaml";
-import { join, resolve } from "node:path";
-import { cwd } from "node:process";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import degit from "degit";
 import { buildManifest, writeManifest } from "./manifest.js";
 import { MANIFEST_FILE, PRODUCT_NAME, REPO } from "./branding.js";
@@ -16,30 +24,28 @@ import {
   text,
 } from "@clack/prompts";
 import {
+  normalizeTemplateName,
+  templateNames,
+  templateRegistry,
+  type TemplateName,
+} from "./templates.js";
+import {
   directoryExists,
   exec,
   execSyncOpts,
   generateSecret,
-  internalContentDirs,
-  internalContentFiles,
   isCommandAvailable,
   replaceProjectNameInAll,
   updateAuthSecretInEnvFile,
-  url,
   validateProjectName,
   toKebabCase,
 } from "./utils.js";
-import { createProjectReadme } from "./readme.js";
 import {
-  removeAuthClientArtifactsForApi,
-  updateTurboLintEnv,
   applyPackageJsonCleanup,
-  applyPnpmCatalogCleanup,
-  applyDockerComposeCleanup,
   applyDockerfilesPackageManagerCleanup,
   applyDockerHubUsernameCleanup,
   applyDomainName,
-  applyConfigMapCleanup,
+  DOCKERHUB_USERNAME_PLACEHOLDER,
   K8S_DOCKERHUB_FILES,
 } from "./update.js";
 
@@ -64,56 +70,54 @@ const getLatestCommit = async (): Promise<string> => {
   return (await res.text()).trim(); // returns just the SHA string with this Accept header
 };
 
-const cloneStackbase = async (name: string): Promise<string> => {
+/**
+ * Downloads the selected template from GitHub using degit strictly as the
+ * repository archive downloader. Degit fetches the repository tarball into a
+ * temporary directory, after which only the selected template directory is
+ * copied to the destination project path.
+ */
+const downloadTemplate = async (
+  name: string,
+  template: TemplateName,
+): Promise<string> => {
   const commitHash = await getLatestCommit();
+  const tempDir = await mkdtemp(join(tmpdir(), "stackbase-"));
 
-  const emitter = degit(`${url}#${branch}`, {
+  const emitter = degit(`${REPO}#${branch}`, {
     cache: false,
     force: true,
     verbose: false,
   });
 
-  await emitter.clone(name);
+  try {
+    await emitter.clone(tempDir);
+    await cp(join(tempDir, templateRegistry[template].path), name, {
+      recursive: true,
+      force: true,
+    });
+  } finally {
+    await rm(tempDir, { recursive: true, force: true });
+  }
 
   return commitHash;
 };
 
-const deleteInternalContent = async () => {
-  const errors: string[] = [];
-
-  // Parallelize folder deletion
-  const folderPromises = internalContentDirs.map(async (folder) => {
-    try {
-      await rm(folder, { recursive: true, force: true });
-    } catch (error) {
-      errors.push(
-        `Failed to delete ${folder}: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
-  });
-
-  // Parallelize file deletion
-  const filePromises = internalContentFiles.map(async (file) => {
-    try {
-      await rm(file, { force: true });
-    } catch (error) {
-      errors.push(
-        `Failed to delete ${file}: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
-  });
-
-  await Promise.all([...folderPromises, ...filePromises]);
-
-  if (errors.length > 0) {
-    log.warn(`Some internal files could not be deleted:\n${errors.join("\n")}`);
+const removeObservabilityFiles = async () => {
+  try {
+    await Promise.all([
+      rm("docker-compose.observability.yml", { force: true }),
+      rm("deploy/observability", { recursive: true, force: true }),
+    ]);
+  } catch (error) {
+    log.warn(
+      `Some Observability files could not be deleted: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 };
 
 const removeDockerFiles = async () => {
   const dockerFiles = [
     "docker-compose.prod.yml",
-    "docker-compose.observability.yml",
     "apps/api/Dockerfile.prod",
     "apps/web/Dockerfile.prod",
     ".dockerignore",
@@ -132,10 +136,7 @@ const removeDockerFiles = async () => {
     }
   });
 
-  await Promise.all([
-    ...deletePromises,
-    rm("deploy/observability", { recursive: true, force: true }),
-  ]);
+  await Promise.all([...deletePromises, removeObservabilityFiles()]);
 
   if (errors.length > 0) {
     log.warn(`Some Docker files could not be deleted:\n${errors.join("\n")}`);
@@ -165,7 +166,7 @@ const replaceDockerHubUsername = async (username: string) => {
           await writeFile(file, updated);
         }
       } catch {
-        // file doesn't exist - already removed by template pruning
+        // File doesn't exist in the selected template
       }
     }),
   );
@@ -183,82 +184,10 @@ const replaceDomainName = async (domainName: string) => {
           await writeFile(file, updated);
         }
       } catch {
-        // file doesn't exist - already removed by template pruning
+        // File doesn't exist in the selected template
       }
     }),
   );
-};
-
-const updateK8sForTemplate = async (template: string) => {
-  if (template !== "web" && template !== "api") return;
-
-  const dropRole = template === "web" ? "api" : "web";
-  const dropFiles = [
-    `k8s/${dropRole}-deployment.yml`,
-    `k8s/${dropRole}-service.yml`,
-    `k8s/${dropRole}-ingress.yml`,
-    `k8s/${dropRole}-hpa.yml`,
-  ];
-
-  try {
-    await Promise.all(dropFiles.map((file) => rm(file, { force: true })));
-
-    const configMapPath = "k8s/configmap.yml";
-    const content = await readFile(configMapPath, "utf8");
-    const updated = applyConfigMapCleanup(content, template);
-    if (updated !== content) {
-      await writeFile(configMapPath, updated);
-    }
-  } catch (error) {
-    log.warn(
-      `Failed to update Kubernetes manifests for ${template} template: ${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
-};
-
-const updateDockerComposeForTemplate = async (template: string) => {
-  const dockerComposePath = "docker-compose.prod.yml";
-
-  try {
-    const content = await readFile(dockerComposePath, "utf8");
-    const updated = applyDockerComposeCleanup(content, template);
-    if (updated !== content) {
-      await writeFile(dockerComposePath, updated);
-    }
-    if (template === "api") {
-      await rm("apps/web/Dockerfile.prod", { force: true });
-    } else if (template === "web") {
-      await rm("apps/api/Dockerfile.prod", { force: true });
-      await rm("docker-compose.observability.yml", { force: true });
-      await rm("deploy/observability", { recursive: true, force: true });
-    }
-  } catch (error) {
-    log.warn(
-      `Failed to update docker-compose.prod.yml: ${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
-};
-
-const removeAppsByTemplate = async (template: string) => {
-  const errors: string[] = [];
-
-  try {
-    if (template === "web") {
-      // Remove API and email apps
-      await rm("apps/api", { recursive: true, force: true });
-      await rm("apps/email", { recursive: true, force: true });
-    } else if (template === "api") {
-      // Remove web and email apps
-      await rm("apps/web", { recursive: true, force: true });
-      await rm("apps/email", { recursive: true, force: true });
-      await rm("packages/ui", { recursive: true, force: true });
-    }
-    // For 'fullstack', keep everything
-  } catch (error) {
-    throw new Error(
-      `Failed to remove apps for ${template} template: ${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
 };
 
 const getPackageManager = async (provided?: string, yes?: boolean) => {
@@ -330,11 +259,11 @@ const getPackageManager = async (provided?: string, yes?: boolean) => {
   return pm as string;
 };
 
-const findAllPackageJsons = async (dir: string): Promise<string[]> => {
+const findAllPackageJsons = async (dir: string = "."): Promise<string[]> => {
   let results: string[] = [];
   const list = await readdir(dir, { withFileTypes: true });
   for (const file of list) {
-    const filePath = join(dir, file.name);
+    const filePath = join(dir, file.name).replace(/\\/g, "/");
     if (file.isDirectory()) {
       if (
         file.name === "node_modules" ||
@@ -370,20 +299,9 @@ const replaceCatalogVersions = async () => {
     catalogLookups[catalogName] = packages;
   }
 
-  const packageJsonFiles = await findAllPackageJsons(".");
+  const packageJsonFiles = await findAllPackageJsons();
 
-  const rootPackageJson = resolve(cwd(), "package.json");
-  const allFiles = new Set<string>();
-
-  for (const file of packageJsonFiles) {
-    allFiles.add(resolve(file));
-  }
-
-  allFiles.add(rootPackageJson);
-
-  const normalizedFiles = Array.from(allFiles);
-
-  for (const filePath of normalizedFiles) {
+  for (const filePath of packageJsonFiles) {
     const content = await readFile(filePath, "utf8");
     let packageJson: PackageJson;
     try {
@@ -456,20 +374,9 @@ const replaceWorkspaceProtocols = async (packageManager: string) => {
     return;
   }
 
-  const packageJsonFiles = await findAllPackageJsons(".");
+  const packageJsonFiles = await findAllPackageJsons();
 
-  const rootPackageJson = resolve(cwd(), "package.json");
-  const allFiles = new Set<string>();
-
-  for (const file of packageJsonFiles) {
-    allFiles.add(resolve(file));
-  }
-
-  allFiles.add(rootPackageJson);
-
-  const normalizedFiles = Array.from(allFiles);
-
-  for (const filePath of normalizedFiles) {
+  for (const filePath of packageJsonFiles) {
     const content = await readFile(filePath, "utf8");
     let packageJson: PackageJson;
     try {
@@ -556,8 +463,8 @@ const updateDockerfilesForPackageManager = async (packageManager: string) => {
       if (updated !== content) {
         await writeFile(dockerfile, updated);
       }
-    } catch (error) {
-      // Ignore if file doesn't exist (template may have removed it)
+    } catch {
+      // Ignore if file doesn't exist in the selected template
     }
   }
 };
@@ -599,7 +506,9 @@ const configurePackageManager = async (packageManager: string) => {
     }
     try {
       await rm("pnpm-lock.yaml", { force: true });
-    } catch {}
+    } catch {
+      // Lockfile might not exist
+    }
   } else if (packageManager === "npm") {
     if (packageJson) {
       packageJson.packageManager = "npm@11.7.0";
@@ -610,10 +519,14 @@ const configurePackageManager = async (packageManager: string) => {
     }
     try {
       await rm("pnpm-lock.yaml", { force: true });
-    } catch {}
+    } catch {
+      // Lockfile might not exist
+    }
     try {
       await rm("pnpm-workspace.yaml", { force: true });
-    } catch {}
+    } catch {
+      // Workspace file might not exist
+    }
   }
 
   if (packageJson && packageManager !== "pnpm") {
@@ -681,8 +594,8 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
     try {
       await copyFile(join(source, ".env.example"), join(source, target));
       await updateAuthSecretInEnvFile(join(source, target), authSecret);
-    } catch (error) {
-      // Skip if source app doesn't exist (based on template choice)
+    } catch {
+      // Skip if package or app is not part of the selected template
     }
   });
 
@@ -705,8 +618,8 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
       try {
         await copyFile(join(source, ".env.example"), join(source, target));
         await updateAuthSecretInEnvFile(join(source, target), authSecret);
-      } catch (error) {
-        // Skip if source app doesn't exist (based on template choice)
+      } catch {
+        // Skip if package or app is not part of the selected template
       }
     });
 
@@ -722,6 +635,7 @@ const cleanupPackageJson = async (
   template: string,
   includeDocker: boolean,
   includeKubernetes: boolean,
+  includeObservability: boolean,
 ) => {
   const packageJsonPath = "package.json";
   const content = await readFile(packageJsonPath, "utf8");
@@ -730,6 +644,7 @@ const cleanupPackageJson = async (
     template,
     includeDocker,
     includeKubernetes,
+    includeObservability,
   );
   await writeFile(packageJsonPath, updated);
 };
@@ -742,26 +657,19 @@ const updateLicense = async (projectName: string) => {
 
   // Replace the copyright line with new project name and current year
   const updated = content.replace(
-    /Copyright \(c\) \d{4} .+/,
+    /Copyright \(c\) (?:\d{4} .+|\[year\] \[fullname\])/,
     `Copyright (c) ${currentYear} ${projectName}`,
   );
 
   await writeFile(licensePath, updated);
 };
 
-const updatePnpmCatalog = async (template: string) => {
-  const workspacePath = "pnpm-workspace.yaml";
-  const workspaceFile = await readFile(workspacePath, "utf8");
-  const updatedContent = applyPnpmCatalogCleanup(workspaceFile, template);
-  await writeFile(workspacePath, updatedContent);
-};
-
 const getName = async () => {
   const value = await text({
     message: "What is your project named?",
     placeholder: "my app",
-    validate(value: string) {
-      if (value.length === 0) {
+    validate(value?: string) {
+      if (!value || value.length === 0) {
         return "Please enter a project name.";
       }
       const error = validateProjectName(value);
@@ -782,24 +690,12 @@ const getName = async () => {
 const getProjectTemplate = async () => {
   const value = await select({
     message: "What type of project would you like to create?",
-    options: [
-      {
-        value: "fullstack",
-        label: "🚀 Full-Stack Application",
-        hint: "Complete setup: Web + API + Database + Auth",
-      },
-      {
-        value: "web",
-        label: "🎨 Frontend Application",
-        hint: "Next.js app with authentication & UI",
-      },
-      {
-        value: "api",
-        label: "⚡ Backend API",
-        hint: "Express REST API with database & auth",
-      },
-    ],
-    initialValue: "fullstack",
+    options: templateNames.map((template) => ({
+      value: template,
+      label: templateRegistry[template].label,
+      hint: templateRegistry[template].hint,
+    })),
+    initialValue: "base",
   });
 
   if (isCancel(value)) {
@@ -807,7 +703,7 @@ const getProjectTemplate = async () => {
     process.exit(0);
   }
 
-  return value.toString() as "fullstack" | "web" | "api";
+  return value.toString() as TemplateName;
 };
 
 const getDockerChoice = async () => {
@@ -908,6 +804,28 @@ const getStudioChoice = async () => {
   return value as boolean;
 };
 
+const getObservabilityChoice = async () => {
+  const value = await select({
+    message: "Include observability configuration?",
+    options: [
+      {
+        value: true,
+        label: "Yes",
+        hint: "Prometheus and Grafana local stack",
+      },
+      { value: false, label: "No", hint: "Skip observability setup" },
+    ],
+    initialValue: true,
+  });
+
+  if (isCancel(value)) {
+    cancel("Operation cancelled.");
+    process.exit(0);
+  }
+
+  return value as boolean;
+};
+
 const validatePrerequisites = async (
   name: string,
   projectDir: string,
@@ -963,12 +881,13 @@ export const initialize = async (
     intro(`Let's start a ${PRODUCT_NAME} project!`);
 
     // Validate template if provided
-    if (
-      options.template &&
-      !["fullstack", "web", "api"].includes(options.template)
-    ) {
+    const providedTemplate = options.template
+      ? normalizeTemplateName(options.template)
+      : null;
+
+    if (options.template && !providedTemplate) {
       log.error(
-        `Invalid template: ${options.template}. Choose from: fullstack, web, api`,
+        `Invalid template: ${options.template}. Choose from: base, web, api`,
       );
       process.exit(1);
     }
@@ -990,32 +909,52 @@ export const initialize = async (
     const name = projectName || (options.yes ? "my-app" : await getName());
 
     const template =
-      options.template ||
-      (options.yes ? "fullstack" : await getProjectTemplate());
+      providedTemplate || (options.yes ? "base" : await getProjectTemplate());
 
     const packageManager = await getPackageManager(
       options.packageManager,
       options.yes,
     );
 
+    const templateConfig = templateRegistry[template];
+
     // Handle --no-git flag
     const shouldInitGit = options.git !== false;
 
-    const includeDocker = options.yes ? true : await getDockerChoice();
+    // Docker is prompted only if the template supports it
+    const includeDocker = templateConfig.capabilities.docker
+      ? options.yes
+        ? true
+        : await getDockerChoice()
+      : false;
 
-    // Kubernetes runs the Docker images, so it's only offered when Docker is
-    // included. It's opt-in (default No) and skipped entirely under --yes.
+    // Kubernetes is offered only if the template supports it AND Docker is included
     const includeKubernetes =
-      includeDocker && !options.yes ? await getKubernetesChoice() : false;
+      templateConfig.capabilities.kubernetes && includeDocker && !options.yes
+        ? await getKubernetesChoice()
+        : false;
 
-    let dockerHubUsername = "your-dockerhub-username";
+    let dockerHubUsername = DOCKERHUB_USERNAME_PLACEHOLDER;
     let domainName = "";
     if (includeKubernetes) {
       dockerHubUsername = await getDockerHubUsername();
       domainName = await getDomainName();
     }
 
-    const includeStudio = options.yes ? true : await getStudioChoice();
+    // Observability is offered only if the template supports it AND Docker is included
+    const includeObservability =
+      templateConfig.capabilities.observability && includeDocker
+        ? options.yes
+          ? true
+          : await getObservabilityChoice()
+        : false;
+
+    // Studio is offered if the template supports it
+    const includeStudio = templateConfig.capabilities.studio
+      ? options.yes
+        ? true
+        : await getStudioChoice()
+      : false;
 
     const s = spinner();
     const projectDir = join(cwd, toKebabCase(name));
@@ -1025,48 +964,37 @@ export const initialize = async (
     await validatePrerequisites(name, projectDir, !shouldInitGit);
     s.stop("✓ Prerequisites validated");
 
-    s.start(`Cloning ${PRODUCT_NAME}...`);
+    s.start(`Downloading ${PRODUCT_NAME} template...`);
     let commitHash: string;
     try {
-      commitHash = await cloneStackbase(toKebabCase(name));
-      if (options.verbose) log.info("✓ Cloned repository");
+      commitHash = await downloadTemplate(toKebabCase(name), template);
+      if (options.verbose) log.info("✓ Downloaded template");
     } catch (error) {
       throw new Error(
-        `Failed to clone repository. Check your internet connection and try again. ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to download template. Check your internet connection and try again. ${error instanceof Error ? error.message : String(error)}`,
       );
     }
 
-    s.message("Moving into repository...");
+    s.message("Preparing project directory...");
     process.chdir(projectDir);
     if (options.verbose) log.info(`✓ Changed directory to ${projectDir}`);
-
-    if (template !== "fullstack") {
-      s.message(`Configuring ${template} project...`);
-      await removeAppsByTemplate(template);
-      // Remove client.ts from auth for API-only template
-      await removeAuthClientArtifactsForApi(template);
-      if (options.verbose) log.info(`✓ Configured ${template} template`);
-    }
-
-    s.message("Configuring turbo.json lint env for template...");
-    await updateTurboLintEnv(template);
-    if (options.verbose) log.info("✓ Updated turbo.json lint env");
 
     s.message("Replacing project name...");
     await replaceProjectNameInAll(name);
     if (options.verbose) log.info("✓ Replaced project name in all files");
 
     s.message("Cleaning up package.json...");
-    await cleanupPackageJson(template, includeDocker, includeKubernetes);
+    await cleanupPackageJson(
+      template,
+      includeDocker,
+      includeKubernetes,
+      includeObservability,
+    );
     if (options.verbose) log.info("✓ Cleaned up package.json");
 
     s.message("Updating LICENSE...");
     await updateLicense(name);
     if (options.verbose) log.info("✓ Updated LICENSE");
-
-    s.message("Updating pnpm catalog...");
-    await updatePnpmCatalog(template);
-    if (options.verbose) log.info("✓ Updated pnpm catalog");
 
     s.message(`Configuring for ${packageManager}...`);
     await configurePackageManager(packageManager);
@@ -1075,10 +1003,6 @@ export const initialize = async (
     s.message("Setting up environment variable files...");
     await setupEnvironmentVariables(includeDocker);
     if (options.verbose) log.info("✓ Environment files created");
-
-    s.message("Deleting internal content...");
-    await deleteInternalContent();
-    if (options.verbose) log.info("✓ Deleted internal content");
 
     if (!includeStudio) {
       s.message("Removing Prisma Studio app...");
@@ -1090,11 +1014,10 @@ export const initialize = async (
       s.message("Removing Docker files...");
       await removeDockerFiles();
       if (options.verbose) log.info("✓ Removed Docker files");
-    } else if (template !== "fullstack") {
-      s.message("Updating Docker configuration for template...");
-      await updateDockerComposeForTemplate(template);
-      if (options.verbose)
-        log.info(`✓ Updated Docker configuration for ${template} template`);
+    } else if (!includeObservability) {
+      s.message("Removing Observability files...");
+      await removeObservabilityFiles();
+      if (options.verbose) log.info("✓ Removed Observability files");
     }
 
     if (!includeKubernetes) {
@@ -1105,9 +1028,6 @@ export const initialize = async (
       s.message("Configuring Kubernetes manifests...");
       await replaceDockerHubUsername(dockerHubUsername);
       await replaceDomainName(domainName);
-      if (template !== "fullstack") {
-        await updateK8sForTemplate(template);
-      }
       if (options.verbose) log.info("✓ Configured Kubernetes manifests");
     }
 
@@ -1128,26 +1048,19 @@ export const initialize = async (
       // Build workspace packages
       try {
         await buildWorkspacePackages(packageManager);
-      } catch {}
+      } catch {
+        // Initial package build failure is non-fatal
+      }
     } else {
       if (options.verbose) log.info("⊘ Skipped dependency installation");
     }
-
-    // Update README.md with project details
-    s.message("Creating project README...");
-    await createProjectReadme(
-      name,
-      template,
-      includeDocker,
-      packageManager as "npm" | "pnpm" | "bun",
-      includeKubernetes,
-    );
 
     s.message("Writing upgrade manifest...");
     const manifest = await buildManifest(commitHash, template, name, {
       docker: includeDocker,
       kubernetes: includeKubernetes,
       studio: includeStudio,
+      observability: includeObservability,
     });
     await writeManifest(manifest);
     if (options.verbose) log.info(`✓ Written ${MANIFEST_FILE} manifest`);

@@ -35,42 +35,42 @@ pnpm dlx stackbase@latest init [project-name] [options]
 
 #### Options
 
-| Flag                              | Description                                                                                                                        |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `-t, --template <type>`           | Project template: `fullstack`, `web`, or `api`. Defaults to `fullstack` if `--yes` is set.                                         |
-| `-p, --package-manager <manager>` | Package manager to use: `pnpm`, `npm`, or `bun`. Auto-detected from your environment if omitted.                                   |
-| `--no-git`                        | Skip Git repository initialization.                                                                                                |
-| `--skip-install`                  | Skip dependency installation.                                                                                                      |
-| `-y, --yes`                       | Skip all prompts and use defaults (`fullstack` template, best available package manager, Docker included, Prisma Studio included). |
-| `-v, --verbose`                   | Print detailed output for each step.                                                                                               |
+| Flag                              | Description                                                                                                                   |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `-t, --template <type>`           | Project template: `base`, `web`, or `api` (`fullstack` supported as alias). Defaults to `base` if `--yes` is set.             |
+| `-p, --package-manager <manager>` | Package manager to use: `pnpm`, `npm`, or `bun`. Auto-detected from your environment if omitted.                              |
+| `--no-git`                        | Skip Git repository initialization.                                                                                           |
+| `--skip-install`                  | Skip dependency installation.                                                                                                 |
+| `-y, --yes`                       | Skip all prompts and use defaults (`base` template, best available package manager, Docker included, Prisma Studio included). |
+| `-v, --verbose`                   | Print detailed output for each step.                                                                                          |
 
 #### Templates
 
 <Callout>
-  Each template removes the parts of the monorepo that are not relevant, so your
-  scaffolded project only contains what you need.
+  Stackbase provides separate, dedicated standalone templates for each
+  architecture:
 </Callout>
 
-| Template    | Includes                                                       |
-| ----------- | -------------------------------------------------------------- |
-| `fullstack` | `apps/web` + `apps/api` + `apps/email` + all packages          |
-| `web`       | `apps/web` + `packages/ui` + auth/db/email packages            |
-| `api`       | `apps/api` + db/auth/rate-limit packages (no UI, no email app) |
+| Template | Best For                     | Includes                                                                                                                                                              |
+| -------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base`   | Complete application starter | Web (`apps/web`), API (`apps/api`), email preview (`apps/email`), Prisma Studio (`apps/studio`), all shared packages, Docker, Observability, and Kubernetes manifests |
+| `web`    | Frontend-led products        | Web app (`apps/web`), Prisma Studio (`apps/studio`), UI, auth, db, email, storage packages, and Docker                                                                |
+| `api`    | Backend services             | API (`apps/api`), Prisma Studio (`apps/studio`), db, auth, storage, contracts, rate-limit packages, Docker, and Observability                                         |
+
+> `fullstack` is supported as a backwards-compatible alias for `base`.
 
 #### What `init` does internally
 
-1. Resolves the latest commit SHA on `main` from the GitHub API before cloning - this SHA becomes the baseline for future upgrades.
-2. Clones `templates/base` from the repository via `degit` (no `.git` history).
-3. Removes apps and packages not relevant to the chosen template.
-4. Runs `updateTurboLintEnv` to strip environment variables from `turbo.json` that are not used by the template.
-5. Replaces Stackbase project identifiers with your project name across all relevant files.
-6. Cleans up CLI-specific fields from `package.json` (`bin`, `files`, `homepage`, `repository`, etc.) and resets `version` to `1.0.0`.
-7. Strips the `cli:` catalog from `pnpm-workspace.yaml` and removes template-irrelevant catalog sections.
-8. Configures the chosen package manager (replaces `workspace:` protocols, updates `packageManager` field, adjusts Dockerfiles).
-9. Copies `.env.example` files to `.env.local` / `.env` with a shared generated `BETTER_AUTH_SECRET`.
-10. Runs the internal-content cleanup guard before writing the project manifest.
-11. Writes a `.stackbase.json` manifest recording the commit SHA, template, project name, and a SHA-256 hash of every tracked file in its final post-mutation state.
-12. Initialises a Git repository and creates the initial commit.
+1. Resolves the latest commit SHA on `main` from the GitHub API - this SHA becomes the baseline for future upgrades.
+2. Downloads the selected template from `templates/<template>` via archive download into a temporary directory (no `.git` history).
+3. Interactively presents template-aware optional feature prompts (Kubernetes and Observability are only offered for templates that contain those resources).
+4. Replaces Stackbase project identifiers with your project name across all relevant files.
+5. Cleans up CLI-specific fields from `package.json` (`bin`, `files`, `homepage`, `repository`, etc.), strips unsupported optional scripts, and resets `version` to `1.0.0`.
+6. Configures the chosen package manager (replaces catalog versions and `workspace:` protocols if needed, updates `packageManager` field, adjusts Dockerfiles).
+7. Copies `.env.example` files to `.env.local` / `.env.production` with a shared generated `BETTER_AUTH_SECRET`.
+8. Deletes internal repository content and unselected optional feature files (e.g. Docker, Kubernetes, Observability, Studio).
+9. Writes a `.stackbase.json` manifest recording the commit SHA, canonical template (`base`, `web`, or `api`), project name, optional feature selections, and a SHA-256 hash of every tracked file in its final post-mutation state.
+10. Initialises a Git repository and creates the initial commit (unless `--no-git` is specified).
 
 #### Examples
 
@@ -78,7 +78,7 @@ pnpm dlx stackbase@latest init [project-name] [options]
 # Interactive - prompts for name, template, package manager, etc.
 pnpm dlx stackbase@latest init
 
-# Non-interactive fullstack project
+# Non-interactive base (full-stack) project
 pnpm dlx stackbase@latest init my-app --yes
 
 # Frontend-only project with bun
@@ -141,13 +141,12 @@ Files that are conflicts are listed with a message directing you to `stackbase d
 
 #### Init-time transforms
 
-Before comparing or writing, `upgrade` applies the same transformations that `init` ran after cloning:
+Before comparing or writing, `upgrade` applies the same transformations that `init` ran after downloading the template:
 
 - Project name replacement (all case formats)
-- `turbo.json` - env vars filtered to your template
-- `package.json` - CLI fields removed, version reset to `1.0.0`
-- `pnpm-workspace.yaml` - `cli:` catalog and irrelevant template catalogs removed
-- `packages/auth/src/index.ts`, `keys.ts`, `package.json` - client exports removed for `api` template
+- Docker Hub registry username cleanup (Kubernetes manifests)
+- `package.json` - CLI fields removed, unselected feature scripts stripped, version reset to `1.0.0`
+- Dockerfiles - package manager adjustments
 
 This ensures that fetched template content is directly comparable to your post-init files, eliminating false conflicts on these files.
 
@@ -160,20 +159,21 @@ The following are always skipped regardless of changes:
 - `README.md` - rewritten by `init` with project-specific content
 - `pnpm-lock.yaml`, `bun.lockb`, `package-lock.json` - regenerated by package manager
 - `.stackbase.json` - the manifest itself
-- Internal repository files outside `templates/base/`
+- Internal repository files outside the template directory
 - Binary and generated files (images, fonts, `.map` files, etc.)
 
 `.env.example` **is** upgraded when the template changes it - it contains no secrets and serves as documentation for required environment variables.
 
 #### Template-aware filtering
 
-Files outside the scope of your original template are never added:
+Upgrade compares files against the exact template recorded in your manifest (`templates/base`, `templates/web`, or `templates/api`). Files belonging to optional features you opted out of (Docker, Kubernetes, Observability, Studio) are never added back:
 
-| Your template | Files never added                                                               |
-| ------------- | ------------------------------------------------------------------------------- |
-| `web`         | `apps/api/**`, `apps/email/**`                                                  |
-| `api`         | `apps/web/**`, `apps/email/**`, `packages/ui/**`, `packages/auth/src/client.ts` |
-| `fullstack`   | Nothing excluded                                                                |
+| Feature       | Excluded when opted out                                            |
+| ------------- | ------------------------------------------------------------------ |
+| Docker        | Production Dockerfiles, `docker-compose.prod.yml`, `.dockerignore` |
+| Observability | `docker-compose.observability.yml`, `deploy/observability/**`      |
+| Kubernetes    | `k8s/**`, `deploy.sh`                                              |
+| Studio        | `apps/studio/**`                                                   |
 
 #### Manifest and conflict tracking
 
@@ -308,10 +308,17 @@ The manifest is written by `init` and read by `upgrade` and `diff`. It is commit
 
 ```json
 {
+  "version": 1,
   "commit": "6669a80f3c2d1a4b5e6f7a8b9c0d1e2f3a4b5c6d",
-  "template": "fullstack",
+  "template": "base",
   "projectName": "my-app",
   "scaffoldedAt": "2026-03-23T10:00:00.000Z",
+  "features": {
+    "docker": true,
+    "kubernetes": true,
+    "studio": true,
+    "observability": true
+  },
   "files": {
     "turbo.json": "a3f8c2d1b4e5",
     "package.json": "b7e4a10912f3",
@@ -323,10 +330,12 @@ The manifest is written by `init` and read by `upgrade` and `diff`. It is commit
 
 | Field          | Description                                                                                                                                                 |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`      | Version of the manifest format.                                                                                                                             |
 | `commit`       | The exact GitHub commit SHA the project was cloned from. Used as the base for all upgrade comparisons.                                                      |
-| `template`     | The template used at scaffold time (`fullstack`, `web`, or `api`). Used by `upgrade` to filter out files not relevant to your template.                     |
+| `template`     | The canonical template used at scaffold time (`base`, `web`, or `api`). Used by `upgrade` and `diff` to resolve the template path.                          |
 | `projectName`  | Your project name in kebab-case. Used by `upgrade` to apply name replacements to fetched template content before comparison.                                |
 | `scaffoldedAt` | ISO timestamp of when `init` was run. Informational only.                                                                                                   |
+| `features`     | The optional feature flags (`docker`, `kubernetes`, `studio`, `observability`) selected during scaffolding.                                                 |
 | `files`        | A map of file paths to their SHA-256 hashes (first 12 characters) at scaffold time, after all init-time mutations. This is what `upgrade` compares against. |
 
 <Callout type="warn">

@@ -143,14 +143,15 @@ See the [Storage Package](../packages/storage) for complete setup guides and COR
 
 Stackbase uses the following `.env` files:
 
-| File                       | Description                                  |
-| -------------------------- | -------------------------------------------- |
-| `apps/web/.env.local`      | Web Application Variables                    |
-| `apps/api/.env.local`      | API Server Variables                         |
-| `packages/db/.env`         | Database connection and Prisma config        |
-| `packages/email/.env`      | React Email templates and Resend integration |
-| `packages/rate-limit/.env` | Upstash Redis config                         |
-| `packages/storage/.env`    | S3, Cloudflare R2, or MinIO storage config   |
+| File                             | Description                                  |
+| -------------------------------- | -------------------------------------------- |
+| `apps/web/.env.local`            | Web Application Variables                    |
+| `apps/api/.env.local`            | API Server Variables                         |
+| `packages/db/.env.local`         | Database connection and Prisma config        |
+| `packages/auth/.env.local`       | Better Auth secret & OAuth credentials       |
+| `packages/email/.env.local`      | React Email templates and Resend integration |
+| `packages/rate-limit/.env.local` | Upstash Redis config                         |
+| `packages/storage/.env.local`    | S3, Cloudflare R2, or MinIO storage config   |
 
 ## Adding New Variables
 

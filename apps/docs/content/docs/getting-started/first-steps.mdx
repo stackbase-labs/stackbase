@@ -40,12 +40,12 @@ cd packages/db
 Create the environment file:
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Edit `packages/db/.env` with your database connection string:
+Edit `packages/db/.env.local` with your database connection string:
 
-```bash title="packages/db/.env"
+```bash title="packages/db/.env.local"
 DATABASE_URL="postgresql://[username]:[password]@[host]:[port]/[database]?schema=public"
 ```
 
@@ -72,7 +72,7 @@ cp .env.example .env.local
 
 Edit `apps/api/.env.local`. You'll need to set:
 
-- `DATABASE_URL` (same as packages/db/.env)
+- `DATABASE_URL` (same as packages/db/.env.local)
 - `BETTER_AUTH_SECRET` - See [Environment Variables Guide](../configuration/environment-variables#quick-start) for generation instructions
 - `BETTER_AUTH_URL=http://localhost:4000`
 - `ALLOWED_ORIGINS=http://localhost:3000`
@@ -99,7 +99,7 @@ cp .env.example .env.local
 
 Edit `apps/web/.env.local`. You'll need to set:
 
-- `DATABASE_URL` (same as packages/db/.env)
+- `DATABASE_URL` (same as packages/db/.env.local)
 - `BETTER_AUTH_SECRET` - Must be **identical** to `apps/api/.env.local` (see [Environment Variables Guide](./configuration/environment-variables#quick-start))
 - `BETTER_AUTH_URL=http://localhost:3000`
 - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` (OAuth credentials)

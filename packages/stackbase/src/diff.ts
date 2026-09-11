@@ -1,19 +1,18 @@
 import { intro, log } from "@clack/prompts";
 import { MANIFEST_FILE, readManifest, manifestExists } from "./manifest.js";
 import { getLatestCommit } from "./upgrade.js";
-import { CLI_NAME, PRODUCT_NAME, REPO, TEMPLATE_PATH } from "./branding.js";
+import { CLI_NAME, PRODUCT_NAME, REPO } from "./branding.js";
+import { getTemplateFilePath } from "./templates.js";
 
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 
-const getTemplateFilePath = (filePath: string): string =>
-  `${TEMPLATE_PATH}/${filePath}`;
-
 const getFileAtCommit = async (
   commit: string,
+  template: string,
   filePath: string,
 ): Promise<string | null> => {
   const res = await fetch(
-    `${RAW_BASE}/${commit}/${getTemplateFilePath(filePath)}`,
+    `${RAW_BASE}/${commit}/${getTemplateFilePath(template, filePath)}`,
   );
   if (res.ok) return res.text();
 
@@ -199,8 +198,8 @@ export const diff = async (filePath: string) => {
 
     // 3. Fetch the file at both commits in parallel
     const [oldContent, newContent] = await Promise.all([
-      getFileAtCommit(fromCommit, normalizedPath),
-      getFileAtCommit(toCommit, normalizedPath),
+      getFileAtCommit(fromCommit, manifest.template, normalizedPath),
+      getFileAtCommit(toCommit, manifest.template, normalizedPath),
     ]);
 
     if (oldContent === null && newContent === null) {

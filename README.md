@@ -61,16 +61,37 @@ Stackbase is built for teams and builders who want a real application foundation
 - pnpm, npm, or Bun
 - Docker Desktop, if you enable Docker-based workflows
 
-### Create a Project
+### 1. Create a Project
 
 ```bash
 pnpm dlx stackbase@latest init my-app
 ```
 
-Then start it:
+### 2. Configure Environment Variables
+
+Navigate into your project and update the generated `.env.local` files with your database credentials and secrets:
 
 ```bash
 cd my-app
+```
+
+Key environment files:
+
+| File                             | Purpose                                |
+| -------------------------------- | -------------------------------------- |
+| `packages/db/.env.local`         | PostgreSQL connection string           |
+| `packages/auth/.env.local`       | Better Auth secret & OAuth credentials |
+| `apps/web/.env.local`            | Web app and auth callback URLs         |
+| `apps/api/.env.local`            | API server, CORS, and auth setup       |
+| `packages/email/.env.local`      | Email provider credentials             |
+| `packages/storage/.env.local`    | S3-compatible storage settings         |
+| `packages/rate-limit/.env.local` | Redis rate-limit settings              |
+
+> The CLI automatically initializes `.env.local` files from `.env.example` templates during project creation.
+
+### 3. Start Development
+
+```bash
 pnpm dev
 ```
 
@@ -83,19 +104,19 @@ Default local services:
 | Email preview | <http://localhost:3002> |
 | Prisma Studio | <http://localhost:5555> |
 
-CLI docs: [stackbase-labs.vercel.app/docs/cli](https://stackbase-labs.vercel.app/docs/cli)
+> For complete CLI commands, flags, and options, see the [CLI Documentation](https://stackbase-labs.vercel.app/docs/cli).
 
 ## Templates
 
-Stackbase uses one canonical source template at [`templates/base`](templates/base/) and prunes it for the template you choose. This keeps presets small without maintaining separate copies of the same application.
+Stackbase provides dedicated standalone templates in [`templates/`](templates/):
 
-Current CLI templates:
+| Template | Best For                     | Includes                                                                      |
+| -------- | ---------------------------- | ----------------------------------------------------------------------------- |
+| `base`   | Complete application starter | Web, API, auth, database, email, storage, Docker, Observability, Kubernetes   |
+| `web`    | Frontend-led products        | Web app, UI, auth, database, email, storage packages, Docker                  |
+| `api`    | Backend services             | API, database, auth, storage, contracts, rate limiting, Docker, Observability |
 
-| Template    | Best For                     | Includes                                      |
-| ----------- | ---------------------------- | --------------------------------------------- |
-| `fullstack` | Complete application starter | Web, API, auth, database, email, storage      |
-| `web`       | Frontend-led products        | Web app, UI, auth, database, email packages   |
-| `api`       | Backend services             | API, database, auth, contracts, rate limiting |
+> `fullstack` is supported as a backwards-compatible alias for `base`.
 
 ## Generated Project
 
@@ -128,7 +149,7 @@ my-app/
 └── package.json
 ```
 
-Some folders are removed depending on the selected template.
+Each template contains only the applications and packages relevant to its target architecture.
 
 ## What's Included
 
@@ -157,14 +178,16 @@ stackbase/
 ├── packages/
 │   └── stackbase/             # Public CLI package
 ├── templates/
-│   └── base/                  # Canonical scaffold source
+│   ├── base/                  # Full-stack application template
+│   ├── web/                   # Web application template
+│   └── api/                   # API application template
 ├── assets/                    # Repository assets
 ├── CHANGELOG.md
 ├── pnpm-workspace.yaml
 └── package.json
 ```
 
-The CLI clones `templates/base` from the repository and then applies project-name replacement, package-manager cleanup, template pruning, environment setup, and manifest generation.
+The CLI downloads the chosen template from `templates/` via the repository archive downloader and applies project-name replacement, package-manager configuration, environment setup, optional feature configuration, and manifest generation.
 
 ## Development
 

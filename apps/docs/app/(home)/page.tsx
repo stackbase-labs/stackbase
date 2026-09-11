@@ -342,13 +342,13 @@ const STEPS = [
     number: "01",
     title: "Install and initialize",
     description:
-      "Run a single command to create your project. The CLI walks you through your package manager and optional Docker, Kubernetes, and Prisma Studio.",
+      "Run a single command to create your project. The CLI walks you through your package manager and template-aware options for Docker, Kubernetes, Observability, and Prisma Studio.",
   },
   {
     number: "02",
     title: "Pick a template",
     description:
-      "Choose fullstack, web-only, or api-only. Everything is pre-configured and only the files your template needs are scaffolded.",
+      "Choose base (full-stack), web, or api. Everything is pre-configured and each template is standalone with dedicated resources.",
   },
   {
     number: "03",

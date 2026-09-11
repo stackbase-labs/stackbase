@@ -24,7 +24,7 @@ program
 program
   .command("init [project-name]")
   .description("Create a new project")
-  .option("-t, --template <type>", "Project type: fullstack, web, or api")
+  .option("-t, --template <type>", "Project type: base, web, or api")
   .option(
     "-p, --package-manager <manager>",
     "Package manager: pnpm, npm, or bun",

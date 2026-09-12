@@ -16,7 +16,7 @@
 **A production-ready full-stack starter for shipping SaaS products faster.**
 
 <p align="center">
-  <img src="assets/og-image.png" alt="Stackbase" />
+  <img src="assets/banner.png" alt="Stackbase Banner" width="100%" />
 </p>
 
 </div>

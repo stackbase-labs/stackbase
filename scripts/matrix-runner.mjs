@@ -7,6 +7,13 @@ const rootDir = resolve(".");
 const testDir = join(rootDir, ".test-scaffolds");
 const cliPath = join(rootDir, "packages/stackbase/dist/index.js");
 
+if (process.env.USERPROFILE) {
+  const bunBin = join(process.env.USERPROFILE, ".bun", "bin");
+  if (!process.env.PATH?.includes(bunBin)) {
+    process.env.PATH = `${bunBin};${process.env.PATH}`;
+  }
+}
+
 function runExec(command, cwd, env = {}) {
   return new Promise((res) => {
     const start = Date.now();
@@ -237,6 +244,24 @@ async function main() {
       name: "app-api-npm-min",
       template: "api",
       pm: "npm",
+      docker: false,
+      k8s: false,
+      obs: false,
+      studio: false,
+    },
+    {
+      name: "app-base-bun-full",
+      template: "base",
+      pm: "bun",
+      docker: true,
+      k8s: true,
+      obs: true,
+      studio: true,
+    },
+    {
+      name: "app-web-bun-min",
+      template: "web",
+      pm: "bun",
       docker: false,
       k8s: false,
       obs: false,

@@ -24,6 +24,10 @@ export const metadata: Metadata = {
   },
   description:
     "A CLI that scaffolds scalable Turborepos with authentication, infrastructure, and best practices built in.",
+  icons: {
+    icon: [{ url: "/favicon.ico" }, { url: "/icon.png", type: "image/png" }],
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "Stackbase — The Open-Source Foundation for Modern Monorepos",
     description:

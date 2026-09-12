@@ -14,9 +14,8 @@ export const siteConfig: Metadata = {
   title: SITE_NAME,
   description: SITE_DESCRIPTION,
   icons: {
-    icon: [{ url: '/favicon.ico' }],
+    icon: [{ url: '/favicon.ico' }, { url: '/icon.png', type: 'image/png' }],
     apple: '/apple-touch-icon.png',
-    shortcut: '/favicon.ico',
   },
   metadataBase: new URL(BASE_URL),
   keywords: SITE_KEYWORDS,

@@ -1,13 +1,20 @@
 import { NPM } from "@/components/icons/npm";
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import { BookIcon, HistoryIcon, Layers } from "lucide-react";
+import { BookIcon, HistoryIcon } from "lucide-react";
+import Image from "next/image";
 
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
       title: (
-        <div className="flex items-center gap-2">
-          <Layers className="h-5 w-5 text-primary" />
+        <div className="flex items-center gap-2.5">
+          <Image
+            src="/logo.png"
+            alt="Stackbase"
+            width={22}
+            height={22}
+            className="rounded"
+          />
           <span className="font-semibold">Stackbase</span>
         </div>
       ),

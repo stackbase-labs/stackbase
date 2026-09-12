@@ -145,7 +145,7 @@ catalogs:
       version: 8.57.1
   prettier:
     prettier:
-      specifier: ^3.8.1
+      specifier: ~3.8.1
       version: 3.8.1
     prettier-plugin-organize-imports:
       specifier: ^4.3.0

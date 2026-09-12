@@ -71,16 +71,19 @@ Packages are internal libraries shared across applications. They provide reusabl
 
 ```
 packages/
-├── auth/                   # Authentication logic
-├── db/                     # Database schema and client
-├── ui/                     # React component library
-├── email/                  # Email templates and utilities
-├── utils/                  # Shared utilities
-├── rate-limit/             # Rate limiting utilities
+├── auth/                   # Authentication logic & Better Auth config
+├── contracts/              # Shared Zod validation contracts
+├── db/                     # Prisma schema, client, and database migrations
+├── email/                  # React Email templates and components
 ├── eslint-config/          # Shared ESLint configuration
+├── logger/                 # Pino structured logger with env configuration
 ├── prettier-config/        # Shared Prettier configuration
+├── rate-limit/             # API rate limiting utilities
+├── storage/                # S3-compatible cloud file storage client
 ├── typescript-config/      # Shared TypeScript configs
-└── vitest-presets/         # Vitest testing configuration
+├── ui/                     # shadcn/ui React component library
+├── utils/                  # Shared utilities and helper functions
+└── vitest-presets/         # Vitest shared testing configuration
 ```
 
 <Callout type="info">

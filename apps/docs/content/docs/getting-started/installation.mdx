@@ -49,41 +49,51 @@ pnpm dlx stackbase@latest init
 You'll be asked:
 
 1. **Project name** - Enter your project name (e.g., `my-saas-app`)
-2. **Package manager** - Choose between pnpm, npm, or bun
-3. **Docker** - Opt to include Docker configuration
-4. **Prisma Studio** - Choose to include Prisma Studio for database management
+2. **Template** - Choose between `base` (full-stack), `web` (frontend-only), or `api` (backend services)
+3. **Package manager** - Choose between `pnpm`, `npm`, or `bun`
+4. **Docker** - Opt to include Dockerfile and Docker Compose configurations
+5. **Kubernetes** - Opt to include production Kubernetes manifests and Ingress rules (Docker required)
+6. **Observability** - Choose to include Prometheus and Grafana metrics monitoring stack
+7. **Prisma Studio** - Choose to include Prisma Studio for database management
 
 <Callout type="success">
-  The CLI will scaffold your entire project structure and install all
-  dependencies. This usually takes 2-3 minutes.
+  The CLI will scaffold your selected template, configure environment files, and
+  install all dependencies. This usually takes under a minute.
 </Callout>
 
 ### Option 2: Direct Installation
 
-You can also specify options directly:
+You can also specify non-interactive flags directly for rapid setups and CI/CD:
 
 ```bash
+# Full-stack default project
 pnpm dlx stackbase@latest init my-project -y
+
+# Explicit feature flags with Bun
+pnpm dlx stackbase@latest init my-app -t base -p bun --docker --obs --studio
 ```
 
 ### What Gets Created?
 
-After running the command, you'll have this structure:
+After scaffolding the `base` template, you'll have this complete structure:
 
 ```
 my-project/
 ├── apps/
 │   ├── web/              # Next.js frontend
 │   ├── api/              # Express backend
-│   ├── email/            # Email templates
-│   └── studio/           # Database UI
+│   ├── email/            # React Email preview server
+│   └── studio/           # Prisma Studio database UI
 ├── packages/
-│   ├── auth/             # Authentication logic
-│   ├── db/               # Prisma & database
-│   ├── ui/               # React components
-│   ├── email/            # Email templates
-│   ├── utils/            # Shared utilities
-│   └── rate-limit/       # API rate limiting
+│   ├── auth/             # Better Auth configuration
+│   ├── contracts/        # Shared Zod validation contracts
+│   ├── db/               # Prisma ORM & database migrations
+│   ├── email/            # React Email components & templates
+│   ├── logger/           # Pino structured logging
+│   ├── rate-limit/       # API rate limiting
+│   ├── storage/          # S3-compatible cloud object storage
+│   ├── ui/               # shadcn/ui React components
+│   └── utils/            # Shared utilities & helpers
 ├── package.json
 ├── turbo.json
 └── pnpm-workspace.yaml

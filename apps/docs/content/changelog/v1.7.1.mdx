@@ -1,0 +1,14 @@
+---
+version: "1.7.1"
+date: "2026-09-11"
+tag: "patch"
+title: "Organization Migration & Web Catalog Resolution"
+summary: "Updates repository routing to the stackbase-labs/stackbase organization on the legacy branch and resolves pnpm catalog dependencies for web-only projects."
+---
+
+### Fixed
+
+- **CLI:** Point template cloning, diffs, upgrades, and latest commit lookups to `stackbase-labs/stackbase#legacy`
+- **Catalog:** Moved `pino`, `pino-http`, and `pino-pretty` to the `core` catalog so `@workspace/logger` resolves dependencies cleanly in `web`-only templates where the `server` catalog is removed
+- **Format:** Added `@workspace/prettier-config` to `api`, `db`, and `ui` devDependencies to resolve Prettier configuration resolution in isolated workspaces
+- **Package:** Updated repository, homepage, and bugs metadata in `package.json` to the new organization

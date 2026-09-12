@@ -35,14 +35,18 @@ pnpm dlx stackbase@latest init [project-name] [options]
 
 #### Options
 
-| Flag                              | Description                                                                                                                   |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `-t, --template <type>`           | Project template: `base`, `web`, or `api` (`fullstack` supported as alias). Defaults to `base` if `--yes` is set.             |
-| `-p, --package-manager <manager>` | Package manager to use: `pnpm`, `npm`, or `bun`. Auto-detected from your environment if omitted.                              |
-| `--no-git`                        | Skip Git repository initialization.                                                                                           |
-| `--skip-install`                  | Skip dependency installation.                                                                                                 |
-| `-y, --yes`                       | Skip all prompts and use defaults (`base` template, best available package manager, Docker included, Prisma Studio included). |
-| `-v, --verbose`                   | Print detailed output for each step.                                                                                          |
+| Flag                                                            | Description                                                                                                                   |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `-t, --template <type>`                                         | Project template: `base`, `web`, or `api` (`fullstack` supported as alias). Defaults to `base` if `--yes` is set.             |
+| `-p, --package-manager <manager>`                               | Package manager to use: `pnpm`, `npm`, or `bun`. Auto-detected from your environment if omitted.                              |
+| `--no-git`                                                      | Skip Git repository initialization.                                                                                           |
+| `--skip-install`                                                | Skip dependency installation.                                                                                                 |
+| `--docker` / `--no-docker`                                      | Explicitly include or skip Docker container setup and Compose files.                                                          |
+| `--k8s`, `--kubernetes` / `--no-k8s`, `--no-kubernetes`         | Explicitly include or skip Kubernetes deployment manifests and Ingress configuration.                                         |
+| `--observability` (`--obs`) / `--no-observability` (`--no-obs`) | Explicitly include or skip Prometheus and Grafana observability stack (`base` and `api`).                                     |
+| `--studio` / `--no-studio`                                      | Explicitly include or skip Prisma Studio GUI for database management.                                                         |
+| `-y, --yes`                                                     | Skip all prompts and use defaults (`base` template, best available package manager, Docker included, Prisma Studio included). |
+| `-v, --verbose`                                                 | Print detailed output for each step.                                                                                          |
 
 #### Templates
 
@@ -78,14 +82,17 @@ pnpm dlx stackbase@latest init [project-name] [options]
 # Interactive - prompts for name, template, package manager, etc.
 pnpm dlx stackbase@latest init
 
-# Non-interactive base (full-stack) project
+# Non-interactive base (full-stack) project with default flags
 pnpm dlx stackbase@latest init my-app --yes
 
-# Frontend-only project with bun
-pnpm dlx stackbase@latest init my-app -t web -p bun
+# Frontend-only project with Bun runtime
+pnpm dlx stackbase@latest init my-web -t web -p bun
 
-# API-only project, skip Git
-pnpm dlx stackbase@latest init my-api -t api --no-git
+# Backend API with observability and no Docker
+pnpm dlx stackbase@latest init my-api -t api --observability --no-docker
+
+# Fully automated CI/CD scaffold with explicit feature flags
+pnpm dlx stackbase@latest init my-app -t base -p pnpm --docker --k8s --obs --studio --no-git
 
 # Scaffold without installing dependencies
 pnpm dlx stackbase@latest init my-app --skip-install

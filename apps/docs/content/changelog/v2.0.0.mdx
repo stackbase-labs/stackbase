@@ -1,0 +1,30 @@
+---
+version: "2.0.0"
+date: "2026-09-12"
+tag: "latest"
+title: "Stackbase v2.0.0 — Standalone Modular Architecture & Multi-PM Automation"
+summary: "Major release introducing standalone templates (base, web, api), complete Bun runtime support alongside pnpm and npm, archive-based degit downloading, and non-interactive CLI flags for automated CI/CD scaffolding."
+---
+
+### Added
+
+- **Standalone Architecture Templates:** Dedicated, self-contained templates (`base`, `web`, `api`) replacing monolithic repository pruning for cleaner scaffolds, faster dependency resolution, and predictable project boundaries
+- **First-Class Bun Support:** Full runtime, dependency management, and script execution support for Bun (`-p bun`) across all templates with 100% test, build, lint, and type check parity
+- **Non-Interactive Scaffolding Flags:** Full suite of command-line flags for zero-prompt automation:
+  - `--docker` / `--no-docker`: Control Docker container setup and Compose files
+  - `--k8s`, `--kubernetes` / `--no-k8s`, `--no-kubernetes`: Toggle Kubernetes deployment manifests and Ingress
+  - `--observability` (`--obs`) / `--no-observability` (`--no-obs`): Toggle Prometheus & Grafana monitoring stack
+  - `--studio` / `--no-studio`: Toggle Prisma Studio database browser
+- **High-Speed Template Delivery:** Archive-based tarball downloads via `degit` replacing full Git clones, retaining commit SHA metadata in `.stackbase.json` for seamless future upgrades
+- **Automated Matrix Runner:** Permutation and combination verification runner validating 5-stage quality gates (`check-types`, `lint`, `format:check`, `test`, `build`) across package managers and templates
+
+### Changed
+
+- **Templates:** Pinned Prettier configuration across all templates to eliminate cross-package-manager AST differences
+- **ESLint Config:** Disabled conflicting `react-hooks/set-state-in-effect` rule from `eslint-plugin-react-hooks@7` across Next.js and React internal configs
+- **TypeScript:** Resolved composite project references across `apps/web` to ensure clean initial type compilation without prior artifact requirements
+
+### Fixed
+
+- **Formatting:** Resolved long-line attribute wrapping for external links in `page.tsx` during project name substitution
+- **Upgrade Tracking:** Corrected template hash baselines in `.stackbase.json` to prevent false conflict warnings on clean scaffolds

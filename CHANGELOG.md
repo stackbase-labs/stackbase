@@ -7,6 +7,44 @@ All changes, fixes and updates to Stackbase.
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 `Latest` is derived from position and is not stored here.
 
+## [2.0.0] - 2026-09-12 [Major] - Standalone Modular Architecture & Multi-PM Automation
+
+Major architectural overhaul replacing monolithic codebase pruning with dedicated standalone templates (`base`, `web`, `api`), full Bun runtime compatibility, non-interactive CI/CD scaffolding flags, and archive-based template delivery.
+
+### Added
+
+- **Templates:** Dedicated, self-contained starter templates (`templates/base`, `templates/web`, `templates/api`) replacing monolithic repo pruning for cleaner scaffolds and faster resolution
+- **Bun Support:** First-class support for Bun (`-p bun`) alongside pnpm and npm across all templates with 100% test, build, lint, and type-check parity
+- **CLI Flags:** Non-interactive command-line options for automated zero-prompt scaffolding:
+  - `--docker` / `--no-docker` for containerization
+  - `--k8s`, `--kubernetes` / `--no-k8s`, `--no-kubernetes` for Kubernetes manifests
+  - `--observability` (`--obs`) / `--no-observability` (`--no-obs`) for Prometheus/Grafana stack
+  - `--studio` / `--no-studio` for Prisma Studio GUI
+- **Template Delivery:** High-speed archive downloading via `degit` with recorded commit SHA tracking in `.stackbase.json` for seamless future upgrades
+- **Test Matrix:** Permutation-and-combination test runner verifying all 5 quality stages across package managers and templates
+
+### Changed
+
+- **Templates:** Pinned Prettier configuration across all templates to eliminate cross-package-manager AST formatting drift
+- **ESLint:** Disabled conflicting `react-hooks/set-state-in-effect` rule across internal Next.js and React ESLint flat configs
+- **TypeScript:** Resolved composite project references across `apps/web` for instant, error-free type compilation
+
+### Fixed
+
+- **Formatting:** Corrected long-line attribute wrapping for external links during project name substitution
+- **Upgrade Tracking:** Fixed template hash baselines in `.stackbase.json` to prevent false conflict warnings on fresh scaffolds
+
+## [1.7.1] - 2026-09-11 [Patch] - Organization Migration & Web Catalog Resolution
+
+Updates repository routing to the `stackbase-labs/stackbase` organization on the `legacy` branch and resolves pnpm catalog dependencies for web-only projects.
+
+### Fixed
+
+- **CLI:** Point template cloning, diffs, upgrades, and latest commit lookups to `stackbase-labs/stackbase#legacy`
+- **Catalog:** Moved `pino`, `pino-http`, and `pino-pretty` to the `core` catalog so `@workspace/logger` resolves dependencies cleanly in `web`-only templates where the `server` catalog is removed
+- **Format:** Added `@workspace/prettier-config` to `api`, `db`, and `ui` devDependencies to resolve Prettier configuration resolution in isolated workspaces
+- **Package:** Updated repository, homepage, and bugs metadata in `package.json` to the new organization
+
 ## [1.7.0] - 2026-09-09 [Minor] - API Observability with Prometheus & Grafana
 
 Adds first-class API observability with Prometheus-compatible metrics, local Prometheus/Grafana infrastructure, and documentation for inspecting request and runtime behavior during development.

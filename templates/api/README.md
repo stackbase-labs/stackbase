@@ -2,7 +2,7 @@
 
 A backend-focused TypeScript monorepo built with Express, Better Auth, Prisma, PostgreSQL, and Turborepo.
 
-Built with [BuildElevate](https://github.com/vijaysingh2219/build-elevate).
+Built with [Stackbase](https://github.com/stackbase-labs/stackbase).
 
 ## Getting Started
 

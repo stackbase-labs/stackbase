@@ -2,7 +2,7 @@
 
 A frontend-focused TypeScript monorepo built with Next.js, Better Auth, Prisma, shared UI packages, and Turborepo.
 
-Built with [BuildElevate](https://github.com/vijaysingh2219/build-elevate).
+Built with [Stackbase](https://github.com/stackbase-labs/stackbase).
 
 ## Getting Started
 

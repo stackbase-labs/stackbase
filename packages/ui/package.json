@@ -20,6 +20,7 @@
   "dependencies": {
     "class-variance-authority": "catalog:web",
     "clsx": "catalog:web",
+    "lucide-react": "catalog:web",
     "radix-ui": "catalog:web",
     "react": "catalog:core",
     "react-dom": "catalog:core",

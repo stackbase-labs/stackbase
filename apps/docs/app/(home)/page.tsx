@@ -23,12 +23,19 @@ import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "./_components/copy-button";
-import { GridGlow } from "./_components/grid-glow";
+import { GridBackground } from "./_components/grid-background";
 import { Reveal } from "./_components/reveal";
 import { AnimatedTerminal } from "./_components/animated-terminal";
 import { TechLogos } from "./_components/tech-logos";
 import { LifecycleSection } from "./_components/lifecycle-section";
 import { TypeFlowSection } from "./_components/typeflow-section";
+import { AnnouncementBanner } from "./_components/announcement-banner";
+import { OpenSourceBadge } from "./_components/open-source-badge";
+import { GitHubStars } from "./_components/github-stars";
+import { NpmDownloads } from "./_components/npm-downloads";
+import { ComparisonSection } from "./_components/comparison-section";
+import { TemplatesSection } from "./_components/templates-section";
+import { FAQSection } from "./_components/faq-section";
 
 const GITHUB_URL = "https://github.com/stackbase-labs/stackbase";
 const INSTALL_COMMAND = "pnpm dlx stackbase@latest init my-saas";
@@ -36,27 +43,36 @@ const INSTALL_COMMAND = "pnpm dlx stackbase@latest init my-saas";
 export default function HomePage() {
   return (
     <div className="min-h-screen">
+      {/* Announcement Banner */}
+      <AnnouncementBanner />
+
       {/* Hero */}
       <section className="relative isolate overflow-hidden">
-        <GridGlow />
+        <GridBackground />
         <div className="mx-auto max-w-5xl px-4 pb-16 pt-20 text-center md:pt-28">
           <Reveal>
-            <Eyebrow>CLI Scaffolding Tool</Eyebrow>
+            <Eyebrow>From Zero to Production</Eyebrow>
           </Reveal>
           <Reveal delay={0.05}>
             <h1 className="mt-6 text-balance text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              The open-source foundation{" "}
+              The production-ready monorepo.{" "}
               <span className="bg-linear-to-r from-primary to-primary/60 bg-clip-text">
-                for modern monorepos
+                One command. Everything wired.
               </span>
             </h1>
           </Reveal>
           <Reveal delay={0.1}>
             <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground sm:text-xl">
-              A CLI that scaffolds scalable Turborepos with authentication,
-              infrastructure, and best practices built in. Stop configuring.
-              Start building.
+              Stop rebuilding auth, databases, Docker configs, and API
+              middleware. Scaffold a complete Turborepo with Better Auth,
+              Prisma, Express, and Kubernetes in minutes.
             </p>
+          </Reveal>
+          <Reveal delay={0.13}>
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <OpenSourceBadge />
+              <NpmDownloads />
+            </div>
           </Reveal>
           <Reveal delay={0.15}>
             <InstallBar className="mt-8" />
@@ -74,9 +90,11 @@ export default function HomePage() {
                   href={GITHUB_URL}
                   target="_blank"
                   rel="noreferrer noopener"
+                  className="inline-flex items-center gap-2"
                 >
-                  <SiGithub className="mr-2 size-4" />
+                  <SiGithub className="size-4" />
                   GitHub
+                  <GitHubStars />
                 </Link>
               </Button>
             </div>
@@ -108,7 +126,7 @@ export default function HomePage() {
               Skip the boilerplate, keep the best practices
             </h2>
             <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-              Get a production-ready foundation in minutes — without giving up
+              Get a production-ready foundation in minutes, without giving up
               control over your stack.
             </p>
           </Reveal>
@@ -122,11 +140,17 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Pain vs. Relief Comparison */}
+      <ComparisonSection />
+
       {/* End-to-End Lifecycle */}
       <LifecycleSection />
 
       {/* End-to-End Type Safety */}
       <TypeFlowSection />
+
+      {/* Template Gallery */}
+      <TemplatesSection />
 
       {/* What you get */}
       <section className="border-t border-border/40 bg-muted/20 py-24">
@@ -177,19 +201,22 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <FAQSection />
+
       {/* CTA */}
-      <section className="px-4 pb-24">
-        <div className="relative isolate mx-auto max-w-5xl overflow-hidden rounded-3xl border border-border/60 bg-muted/30 px-6 py-20 text-center">
-          <GridGlow />
+      <section className="bg-background px-4 py-24">
+        <div className="relative isolate mx-auto max-w-5xl overflow-hidden rounded-3xl border border-border/60 bg-background px-6 py-20 text-center text-foreground">
+          <GridBackground className="opacity-50" />
           <Reveal>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Ready to launch your workflow?
+              Stop configuring. Ship your product today.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-              Stop configuring and start shipping. Spin up a production-ready
-              project with a single command.
+              100% free and open source under the MIT license. Self-host
+              anywhere. No paywalls, no upsells, and zero vendor lock-in.
             </p>
-            <InstallBar className="mt-8" />
+            <InstallBar className="mt-8 text-foreground" />
             <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" asChild>
                 <Link href="/docs">
@@ -202,6 +229,7 @@ export default function HomePage() {
                   href={GITHUB_URL}
                   target="_blank"
                   rel="noreferrer noopener"
+                  className="border-border/60 bg-background text-foreground hover:bg-muted hover:text-foreground"
                 >
                   <SiGithub className="mr-2 size-4" />
                   Star on GitHub
@@ -222,7 +250,7 @@ const WHY = [
     icon: <Terminal className="h-5 w-5" />,
     title: "CLI-first approach",
     description:
-      "Interactive prompts guide you through setup. No configuration files to write — just answer a few questions and go.",
+      "Interactive prompts guide you through setup. No configuration files to write. Just answer a few questions and go.",
   },
   {
     icon: <Layers className="h-5 w-5" />,
@@ -234,25 +262,25 @@ const WHY = [
     icon: <Zap className="h-5 w-5" />,
     title: "Essentials built-in",
     description:
-      "Authentication, environment handling, and tooling configured out of the box.",
+      "Auth, email, rate limiting, and environment handling configured out of the box, saving you 20+ hours of setup.",
   },
   {
     icon: <Box className="h-5 w-5" />,
     title: "Extensible templates",
     description:
-      "Start from a solid foundation and customize freely — without fighting the setup.",
+      "Choose base, web, or api. Start from a solid foundation and customize freely, without fighting the setup.",
   },
   {
     icon: <Code2 className="h-5 w-5" />,
     title: "Modern stack",
     description:
-      "TypeScript, React, Next.js, Tailwind, and more — all on current versions.",
+      "TypeScript, React 19, Next.js 16, Tailwind v4, and Better Auth, all on current versions.",
   },
   {
     icon: <GitBranch className="h-5 w-5" />,
-    title: "CI-ready",
+    title: "CI-ready with upgrades",
     description:
-      "Pre-configured workflows for testing, linting, and deployment from day one.",
+      "Pre-configured CI/CD workflows and stackbase upgrade to keep your project in sync with upstream improvements.",
   },
 ] as const;
 
@@ -263,12 +291,14 @@ const INCLUDED = [
     title: "Turborepo monorepo",
     description:
       "Optimized build system with caching, parallel execution, and task pipelining. Share code across apps and packages.",
+    href: "/docs/getting-started/structure",
   },
   {
     icon: <FileCode className="h-5 w-5" />,
     title: "Type-safe environments",
     description:
       "Validated environment variables with fail-fast startup, and separate local and production configs.",
+    href: "/docs/configuration/environment-variables",
   },
   // Backend core
   {
@@ -276,12 +306,14 @@ const INCLUDED = [
     title: "Authentication & security",
     description:
       "Better Auth with Google OAuth, email verification, TOTP two-factor, and database-backed sessions with protected routes.",
+    href: "/docs/packages/auth",
   },
   {
     icon: <Database className="h-5 w-5" />,
     title: "Prisma + PostgreSQL",
     description:
       "A type-safe database layer with an auto-generated client, migrations, and Prisma Studio for browsing your data.",
+    href: "/docs/packages/db",
   },
   // Services
   {
@@ -289,12 +321,14 @@ const INCLUDED = [
     title: "Transactional email",
     description:
       "React Email templates delivered through Resend, with a local preview server for designing emails.",
+    href: "/docs/packages/email",
   },
   {
     icon: <Gauge className="h-5 w-5" />,
     title: "Rate limiting",
     description:
       "Per-IP sliding-window rate limiting backed by Upstash Redis, wired into the API middleware.",
+    href: "/docs/packages/rate-limit",
   },
   // Frontend
   {
@@ -302,12 +336,14 @@ const INCLUDED = [
     title: "UI component library",
     description:
       "A shared shadcn/ui and Tailwind CSS component package used consistently across every app.",
+    href: "/docs/packages/ui",
   },
   {
     icon: <BookOpen className="h-5 w-5" />,
     title: "Documentation site",
     description:
       "A Fumadocs-powered docs app, ready for your own content out of the box.",
+    href: "/docs/applications",
   },
   // Observability & quality
   {
@@ -315,12 +351,14 @@ const INCLUDED = [
     title: "Structured logging",
     description:
       "A shared pino-based logger with structured, leveled output, adopted across the API for production-ready observability.",
+    href: "/docs/packages/logger",
   },
   {
     icon: <FlaskConical className="h-5 w-5" />,
     title: "Testing, linting & formatting",
     description:
       "Vitest, ESLint, Prettier, and TypeScript strict mode. Catch errors before they ship.",
+    href: "/docs/configuration/formatting",
   },
   // Ship & CI
   {
@@ -328,12 +366,14 @@ const INCLUDED = [
     title: "Docker & Kubernetes",
     description:
       "Compose files for local and production, plus Kubernetes manifests with autoscaling (HPA) and one-command deploy and verify.",
+    href: "/docs/configuration/docker",
   },
   {
     icon: <GitBranch className="h-5 w-5" />,
     title: "GitHub Actions CI",
     description:
       "Pre-configured pipelines for linting, type checking, testing, and build on every push and pull request.",
+    href: "/docs/getting-started/first-steps",
   },
 ] as const;
 
@@ -409,20 +449,37 @@ function IncludedItem({
   icon,
   title,
   description,
+  href,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
+  href?: string;
 }) {
-  return (
-    <div className="flex items-start gap-4">
+  const content = (
+    <>
       <div className="rounded-lg bg-primary/10 p-2 text-primary">{icon}</div>
       <div className="flex-1">
-        <h3 className="font-semibold">{title}</h3>
+        <h3 className="font-semibold group-hover:text-primary transition-colors">
+          {title}
+          {href && (
+            <ArrowRight className="ml-1 inline size-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
+          )}
+        </h3>
         <p className="mt-1 text-sm text-muted-foreground">{description}</p>
       </div>
-    </div>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className="group flex items-start gap-4">
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className="flex items-start gap-4">{content}</div>;
 }
 
 function StepItem({

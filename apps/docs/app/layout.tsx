@@ -20,18 +20,18 @@ export const metadata: Metadata = {
   ),
   title: {
     template: "%s | Stackbase",
-    default: "Stackbase — The Open-Source Foundation for Modern Monorepos",
+    default: "Stackbase | Open-Source Full-Stack Monorepo Framework",
   },
   description:
-    "A CLI that scaffolds scalable Turborepos with authentication, infrastructure, and best practices built in.",
+    "Stop rebuilding auth, databases, and Docker configs. Scaffold a production-ready full-stack Turborepo with one command. Free and open source.",
   icons: {
     icon: [{ url: "/favicon.ico" }, { url: "/icon.png", type: "image/png" }],
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Stackbase — The Open-Source Foundation for Modern Monorepos",
+    title: "Stackbase | Open-Source Full-Stack Monorepo Framework",
     description:
-      "A CLI that scaffolds scalable Turborepos with authentication, infrastructure, and best practices built in.",
+      "Stop rebuilding auth, databases, and Docker configs. Scaffold a production-ready full-stack Turborepo with one command. Free and open source.",
     url:
       process.env.NEXT_PUBLIC_SITE_URL || "https://stackbase-labs.vercel.app",
     siteName: "Stackbase",
@@ -48,9 +48,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Stackbase — The Open-Source Foundation for Modern Monorepos",
+    title: "Stackbase | Open-Source Full-Stack Monorepo Framework",
     description:
-      "A CLI that scaffolds scalable Turborepos with authentication, infrastructure, and best practices built in.",
+      "Stop rebuilding auth, databases, and Docker configs. Scaffold a production-ready full-stack Turborepo with one command. Free and open source.",
     images: ["/og-image.png"],
   },
 };

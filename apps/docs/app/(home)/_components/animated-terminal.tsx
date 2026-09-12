@@ -7,10 +7,17 @@ import { Terminal } from "lucide-react";
 const COMMAND = "pnpm dlx stackbase@latest init my-saas";
 
 const OUTPUT_LINES = [
-  { text: "✓ Initializing project structure...", muted: true },
-  { text: "✓ Setting up monorepo configuration...", muted: true },
-  { text: "✓ Installing dependencies...", muted: true },
-  { text: "✓ Configuring project settings...", muted: true },
+  { text: "✓ Initializing Turborepo monorepo (template: base)", muted: true },
+  {
+    text: "✓ Configuring Better Auth, Prisma ORM, and Express API",
+    muted: true,
+  },
+  {
+    text: "✓ Scaffolded apps/web, apps/api, and 8 shared packages",
+    muted: true,
+  },
+  { text: "✓ Generated .stackbase.json upgrade manifest", muted: true },
+  { text: "✓ Initialized Git repository", muted: true },
   { text: "🎉 Project ready! Run cd my-saas && pnpm dev", muted: false },
 ];
 
@@ -55,12 +62,7 @@ export function AnimatedTerminal() {
 
   return (
     <div className="relative mx-auto w-full max-w-2xl">
-      {/* glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-primary/10 blur-2xl"
-      />
-      <div className="overflow-hidden rounded-xl border border-border/60 bg-card/80 shadow-2xl shadow-primary/5 backdrop-blur">
+      <div className="overflow-hidden rounded-xl border border-border/60 bg-card/80 shadow-2xl backdrop-blur">
         {/* title bar */}
         <div className="flex items-center gap-2 border-b border-border/60 bg-muted/40 px-4 py-3">
           <span className="size-3 rounded-full bg-red-400/80" />

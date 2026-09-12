@@ -317,6 +317,9 @@ importers:
       clsx:
         specifier: catalog:web
         version: 2.1.1
+      lucide-react:
+        specifier: catalog:web
+        version: 1.17.0(react@19.2.7)
       radix-ui:
         specifier: catalog:web
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)

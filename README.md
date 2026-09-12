@@ -4,7 +4,6 @@
 
 <div align="center">
 
-[![Quick Start](https://img.shields.io/badge/Quick_Start-blue?style=for-the-badge)](#quick-start)
 [![CI](https://img.shields.io/github/actions/workflow/status/stackbase-labs/stackbase/ci.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/stackbase-labs/stackbase/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/stackbase?style=for-the-badge&color=CB3837&logo=npm)](https://www.npmjs.com/package/stackbase)
 [![npm downloads](https://img.shields.io/npm/dy/stackbase?style=for-the-badge&color=20c997)](https://www.npmjs.com/package/stackbase)
@@ -13,7 +12,7 @@
 [![Docs](https://img.shields.io/badge/Documentation-Live-6366f1?style=for-the-badge&logo=vercel)](https://stackbase-labs.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-333?style=for-the-badge&logo=github)](https://github.com/stackbase-labs/stackbase)
 
-**A production-ready full-stack starter for shipping SaaS products faster.**
+**The open-source full-stack monorepo framework.**
 
 <p align="center">
   <img src="assets/banner.png" alt="Stackbase Banner" width="100%" />
@@ -26,7 +25,7 @@
 > [!TIP]
 > **Built for SaaS teams, startups, and developers who want a production-ready foundation without rebuilding the same setup.**
 
-Stackbase is a production-ready monorepo starter with authentication, database, email templates, UI components, rate limiting, and deployment configs already wired together.
+Stackbase is an open-source, production-ready full-stack monorepo framework. Stop rebuilding auth, databases, Docker configs, and API middleware. Scaffold a complete Turborepo in minutes with authentication, database, email templates, UI components, rate limiting, and deployment configs already wired together.
 
 Built with **Turborepo**, **Next.js 16**, **Express**, **Better Auth**, **Prisma**, and **shadcn/ui**, it gives you a cohesive base for shipping real products faster.
 

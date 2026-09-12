@@ -181,12 +181,7 @@ export function LifecycleSection() {
         {/* Terminal Output Window */}
         <Reveal delay={0.1}>
           <div className="relative">
-            {/* Ambient subtle glow */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-primary/5 blur-2xl"
-            />
-            <div className="overflow-hidden rounded-xl border border-border/60 bg-card/90 shadow-2xl shadow-primary/5 backdrop-blur font-mono text-xs">
+            <div className="overflow-hidden rounded-xl border border-border/60 bg-card/90 shadow-2xl backdrop-blur font-mono text-xs">
               {/* Window Header Bar */}
               <div className="flex items-center justify-between border-b border-border/60 bg-muted/40 px-4 py-3">
                 <div className="flex items-center gap-2">

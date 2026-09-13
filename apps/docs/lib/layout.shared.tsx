@@ -1,6 +1,6 @@
 import { NPM } from "@/components/icons/npm";
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import { BookIcon, HistoryIcon } from "lucide-react";
+import { BookIcon, HistoryIcon, SquareTerminalIcon } from "lucide-react";
 import Image from "next/image";
 
 export function baseOptions(): BaseLayoutProps {
@@ -24,6 +24,12 @@ export function baseOptions(): BaseLayoutProps {
         icon: <BookIcon />,
         text: "Documentation",
         url: "/docs",
+        secondary: false,
+      },
+      {
+        icon: <SquareTerminalIcon />,
+        text: "Command Builder",
+        url: "/command-builder",
         secondary: false,
       },
       {

@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-14 [Minor] - Build Elevate Migration
+
 ### Added
 
 - **CLI migration:** Added `stackbase migrate` to move Build Elevate projects onto Stackbase while preserving local edits and the original manifest

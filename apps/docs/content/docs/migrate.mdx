@@ -8,11 +8,6 @@ icon: Replace
 
 Stackbase is the successor to Build Elevate. The `stackbase migrate` command converts an existing Build Elevate project to the Stackbase manifest format and updates files that have not been changed locally.
 
-<Callout type="warn" title="Migration is currently in beta">
-  Use the <code>beta</code> npm tag until Stackbase 2.1 is published as the
-  latest stable release.
-</Callout>
-
 ## Who should migrate
 
 Use this guide when the project root contains `.build-elevate.json` and does not contain `.stackbase.json`.
@@ -34,7 +29,7 @@ The migration uses the hashes in `.build-elevate.json` to distinguish unchanged 
 Start with a dry run. It downloads and compares the latest Stackbase template without writing files or converting the manifest.
 
 ```bash
-pnpm dlx stackbase@beta migrate --dry-run
+pnpm dlx stackbase@latest migrate --dry-run
 ```
 
 Review the files that would be updated, added, or reported as conflicts.
@@ -42,7 +37,7 @@ Review the files that would be updated, added, or reported as conflicts.
 ## Run the migration
 
 ```bash
-pnpm dlx stackbase@beta migrate
+pnpm dlx stackbase@latest migrate
 ```
 
 The command asks for confirmation and then:
@@ -57,7 +52,7 @@ The command asks for confirmation and then:
 Use `--yes` to skip the confirmation prompt:
 
 ```bash
-pnpm dlx stackbase@beta migrate --yes
+pnpm dlx stackbase@latest migrate --yes
 ```
 
 ## Understand the result
@@ -76,19 +71,19 @@ Stackbase never overwrites a locally edited conflict file.
 Inspect each reported conflict:
 
 ```bash
-pnpm dlx stackbase@beta diff apps/api/src/config/corsOptions.ts
+pnpm dlx stackbase@latest diff apps/api/src/config/corsOptions.ts
 ```
 
 Apply the template changes you want to keep. Then run the upgrade command again:
 
 ```bash
-pnpm dlx stackbase@beta upgrade
+pnpm dlx stackbase@latest upgrade
 ```
 
 If the file still contains your own changes, it may remain different from the template. After reviewing and merging the upstream changes, use `--force` to record the latest template as the new baseline while keeping your local file:
 
 ```bash
-pnpm dlx stackbase@beta upgrade --force
+pnpm dlx stackbase@latest upgrade --force
 ```
 
 <Callout type="info">
@@ -127,7 +122,7 @@ If the command fails before creating the backup, the original `.build-elevate.js
 The project has already been migrated or was created with Stackbase. Run:
 
 ```bash
-pnpm dlx stackbase@beta upgrade
+pnpm dlx stackbase@latest upgrade
 ```
 
 ### No Build Elevate manifest was found

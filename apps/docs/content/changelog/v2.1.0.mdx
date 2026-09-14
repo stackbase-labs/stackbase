@@ -1,0 +1,22 @@
+---
+version: "2.1.0"
+date: "2026-09-14"
+tag: "latest"
+title: "Stackbase v2.1.0: Build Elevate Migration"
+summary: "Adds a safe migration path from Build Elevate to Stackbase, with legacy manifest conversion, conflict protection, and a complete migration guide."
+---
+
+### Added
+
+- **Build Elevate migration:** Added `stackbase migrate` to convert `.build-elevate.json` into `.stackbase.json`, update unchanged files, and retain local edits as conflicts
+- **Legacy compatibility:** Maps the `fullstack` template to `base`, detects missing feature flags, and reads legacy template files from their original repository paths
+- **Migration guide:** Added a [step-by-step guide](/docs/migrate) covering dry runs, conflict resolution, verification, backup cleanup, and rollback
+
+### Changed
+
+- **Manifest tracking:** Keeps the legacy source and commit until migration conflicts are resolved, then continues with the standard Stackbase upgrade flow
+- **Manifest backup:** Saves the original manifest as `.build-elevate.json.bak` after a successful migration
+
+### Fixed
+
+- **Upgrade safety:** Treats new template files that collide with existing local files as conflicts instead of overwriting them

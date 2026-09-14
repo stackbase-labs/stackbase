@@ -1,6 +1,6 @@
 {
   "name": "stackbase",
-  "version": "2.1.0-beta.0",
+  "version": "2.1.0",
   "description": "Stackbase CLI for scaffolding production-ready full-stack Turborepo applications with Next.js, Express, Better Auth, and Prisma",
   "type": "module",
   "homepage": "https://stackbase-labs.vercel.app/docs/cli",

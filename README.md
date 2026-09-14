@@ -242,8 +242,8 @@ Deployment docs:
 Stackbase is the successor to Build Elevate.
 
 - New projects should use `stackbase`.
-- Existing Build Elevate projects can preview the move with `pnpm dlx stackbase@beta migrate --dry-run`.
-- Run `pnpm dlx stackbase@beta migrate` to convert `.build-elevate.json`, update safe files, and preserve local changes.
+- Existing Build Elevate projects can preview the move with `pnpm dlx stackbase@latest migrate --dry-run`.
+- Run `pnpm dlx stackbase@latest migrate` to convert `.build-elevate.json`, update safe files, and preserve local changes.
 - The original manifest is saved as `.build-elevate.json.bak` and can be deleted after the migrated project passes its checks.
 - See the [migration guide](https://stackbase-labs.vercel.app/docs/migrate) for conflict handling and verification.
 

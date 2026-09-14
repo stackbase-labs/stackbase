@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile, access, readdir } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { MANIFEST_FILE } from "./branding.js";
 import { toKebabCase } from "./utils.js";
 
@@ -8,7 +8,10 @@ export { MANIFEST_FILE };
 
 // Increase this number whenever we change the shape of the manifest, so the
 // upgrade and diff commands can tell which version of the file they're reading.
-export const MANIFEST_VERSION = 1;
+export const MANIFEST_VERSION = 2;
+
+export const LEGACY_MANIFEST_FILE = ".build-elevate.json";
+export const LEGACY_MANIFEST_BACKUP_FILE = ".build-elevate.json.bak";
 
 export interface ManifestFeatures {
   docker: boolean;
@@ -25,6 +28,8 @@ export interface StackbaseManifest {
   scaffoldedAt: string;
   features: ManifestFeatures; // the optional features the user chose to include when the project was created
   files: Record<string, string>; // filePath -> sha256 hash (first 12 chars)
+  // Present until the first Build Elevate migration reaches a Stackbase commit.
+  source?: "build-elevate";
 }
 
 /**
@@ -37,10 +42,11 @@ export interface StackbaseManifest {
  */
 export const resolveFeatures = async (
   manifest: StackbaseManifest,
+  projectRoot: string = process.cwd(),
 ): Promise<ManifestFeatures> => {
   const exists = async (p: string): Promise<boolean> => {
     try {
-      await access(p);
+      await access(join(projectRoot, p));
       return true;
     } catch {
       return false;
@@ -83,9 +89,51 @@ export const hashFile = async (filePath: string): Promise<string | null> => {
   }
 };
 
+export const isSafeManifestFilePath = (filePath: string): boolean => {
+  const normalized = filePath.replace(/\\/g, "/");
+  return (
+    normalized.length > 0 &&
+    !isAbsolute(filePath) &&
+    !normalized.startsWith("/") &&
+    !normalized.split("/").includes("..")
+  );
+};
+
+export const resolveManifestFilePath = (
+  projectRoot: string,
+  filePath: string,
+): string => {
+  if (!isSafeManifestFilePath(filePath)) {
+    throw new Error(`Manifest contains an unsafe file path: ${filePath}`);
+  }
+
+  const root = resolve(projectRoot);
+  const target = resolve(root, filePath);
+  const relativePath = relative(root, target);
+  if (
+    relativePath.length === 0 ||
+    relativePath === ".." ||
+    relativePath.startsWith(`..${sep}`) ||
+    isAbsolute(relativePath)
+  ) {
+    throw new Error(`Manifest contains an unsafe file path: ${filePath}`);
+  }
+
+  return target;
+};
+
 export const manifestExists = async (): Promise<boolean> => {
   try {
     await access(MANIFEST_FILE);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const legacyManifestExists = async (): Promise<boolean> => {
+  try {
+    await access(LEGACY_MANIFEST_FILE);
     return true;
   } catch {
     return false;
@@ -109,8 +157,12 @@ export const readManifest = async (): Promise<StackbaseManifest | null> => {
 
 export const writeManifest = async (
   manifest: StackbaseManifest,
+  projectRoot: string = process.cwd(),
 ): Promise<void> => {
-  await writeFile(MANIFEST_FILE, JSON.stringify(manifest, null, 2) + "\n");
+  await writeFile(
+    join(projectRoot, MANIFEST_FILE),
+    JSON.stringify(manifest, null, 2) + "\n",
+  );
 };
 
 /**
@@ -145,6 +197,8 @@ const SKIP_FILES = new Set([
   "tsconfig.tsbuildinfo",
   // the manifest itself
   ".stackbase.json",
+  LEGACY_MANIFEST_FILE,
+  LEGACY_MANIFEST_BACKUP_FILE,
 ]);
 
 const SKIP_EXTENSIONS = new Set([

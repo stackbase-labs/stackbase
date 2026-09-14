@@ -129,6 +129,24 @@ pnpm dlx stackbase@latest init my-api -t api --no-git
 
 ---
 
+### `stackbase migrate`
+
+Moves an existing Build Elevate project onto the Stackbase release line. The command reads `.build-elevate.json`, updates safe files to the latest Stackbase template, and preserves locally modified files as conflicts.
+
+```bash
+# Preview the migration
+pnpm dlx stackbase@beta migrate --dry-run
+
+# Migrate and keep a backup of the old manifest
+pnpm dlx stackbase@beta migrate
+```
+
+Use `--force` to accept the latest Stackbase template as the new baseline while keeping conflicting local files unchanged. The original manifest is saved as `.build-elevate.json.bak`. Delete the backup after the migrated project passes your checks.
+
+See the [migration guide](https://stackbase-labs.vercel.app/docs/migrate) for the complete workflow.
+
+---
+
 ### `stackbase upgrade`
 
 Safely updates your project with upstream improvements from the Stackbase template using a 3-way commit SHA and file hash strategy.

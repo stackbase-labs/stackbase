@@ -7,10 +7,14 @@ import {
   readManifest,
   writeManifest,
   manifestExists,
+  legacyManifestExists,
+  LEGACY_MANIFEST_FILE,
+  resolveManifestFilePath,
   resolveFeatures,
   MANIFEST_FILE,
   MANIFEST_VERSION,
   type ManifestFeatures,
+  type StackbaseManifest,
 } from "./manifest.js";
 import { CLI_NAME, REPO, PRODUCT_NAME } from "./branding.js";
 import {
@@ -20,7 +24,7 @@ import {
   K8S_DOCKERHUB_FILES,
 } from "./update.js";
 import { applyProjectName } from "./utils.js";
-import { getTemplatePath } from "./templates.js";
+import { getManifestFilePath, getTemplatePath } from "./templates.js";
 
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 const API_BASE = `https://api.github.com/repos/${REPO}`;
@@ -41,6 +45,8 @@ const SKIP_SEGMENTS = new Set([
 
 const SKIP_EXACT = new Set([
   MANIFEST_FILE,
+  ".build-elevate.json",
+  ".build-elevate.json.bak",
   "README.md",
   "LICENSE",
   "pnpm-lock.yaml",
@@ -135,11 +141,10 @@ const getFileAtCommit = async (
   commit: string,
   template: string,
   filePath: string,
+  source?: StackbaseManifest["source"],
 ): Promise<string | null> => {
-  const templatePrefix = getTemplatePath(template);
-  const res = await fetch(
-    `${RAW_BASE}/${commit}/${templatePrefix}/${filePath}`,
-  );
+  const repositoryPath = getManifestFilePath(template, filePath, source);
+  const res = await fetch(`${RAW_BASE}/${commit}/${repositoryPath}`);
   if (res.ok) return res.text();
 
   return null;
@@ -218,33 +223,50 @@ const applyInitTransforms = (
 };
 
 // Main upgrade function — compares manifest commit to latest template commit, identifies which files can be auto-updated, which have conflicts, and which are already in sync. Applies safe updates and reports the rest to the user.
-export const upgrade = async (
-  options: { yes?: boolean; dry?: boolean; force?: boolean } = {},
-) => {
+export interface UpgradeOptions {
+  yes?: boolean;
+  dry?: boolean;
+  force?: boolean;
+  manifest?: StackbaseManifest;
+  persistManifest?: (manifest: StackbaseManifest) => Promise<void>;
+  title?: string;
+  operation?: "upgrade" | "migration";
+  projectRoot?: string;
+}
+
+export const upgrade = async (options: UpgradeOptions = {}) => {
   try {
-    intro(`${CLI_NAME} upgrade`);
+    intro(options.title ?? `${CLI_NAME} upgrade`);
 
     // 1. Check manifest exists
-    if (!(await manifestExists())) {
+    if (!options.manifest && !(await manifestExists())) {
+      if (await legacyManifestExists()) {
+        log.error(
+          `${LEGACY_MANIFEST_FILE} belongs to Build Elevate. Run \`${CLI_NAME} migrate\` to move this project to Stackbase.`,
+        );
+        process.exit(1);
+      }
+
       log.error(
         `No ${MANIFEST_FILE} found.\n\nThis project was either not scaffolded with ${PRODUCT_NAME}, or was created before Stackbase upgrade support was added.\n\nTo manually upgrade, compare your files against the latest template at:\nhttps://github.com/${REPO}/tree/main/templates/base`,
       );
       process.exit(1);
     }
 
-    const manifest = await readManifest();
+    const manifest = options.manifest ?? (await readManifest());
     if (!manifest) {
       log.error(`Failed to read ${MANIFEST_FILE}. It may be corrupted.`);
       process.exit(1);
     }
 
     const baseCommit = manifest.commit;
+    const projectRoot = options.projectRoot ?? process.cwd();
     const templatePrefix = `${getTemplatePath(manifest.template)}/`;
 
     // Find out which optional features this project includes. Older manifests
     // don't store this, so in that case we work it out from the files on disk,
     // which keeps the upgrade from re-adding features the user left out.
-    const features = await resolveFeatures(manifest);
+    const features = await resolveFeatures(manifest, projectRoot);
 
     // 2. Fetch latest commit SHA from GitHub
     const s = spinner();
@@ -300,6 +322,7 @@ export const upgrade = async (
       if (shouldSkip(filePath)) continue;
       // Don't bring back files for optional features the user chose to skip
       if (isExcludedByFeatures(filePath, features)) continue;
+      const localFilePath = resolveManifestFilePath(projectRoot, filePath);
 
       const rawContent = await getFileAtCommit(
         latestCommit,
@@ -322,14 +345,34 @@ export const upgrade = async (
 
       const newHash = hashContent(newContent);
       const savedHash = manifest.files[filePath];
-      const currentHash = await hashFile(filePath);
+      const currentHash = await hashFile(localFilePath);
 
       // New file added to template that wasn't in manifest
       if (!savedHash) {
+        if (currentHash !== null && currentHash !== newHash) {
+          if (options.force) {
+            forced.push(filePath);
+            if (!options.dry) manifest.files[filePath] = newHash;
+          } else {
+            conflicts.push({
+              file: filePath,
+              templateDiff:
+                "(new template file conflicts with an existing local file)",
+            });
+          }
+          continue;
+        }
+
+        if (currentHash === newHash) {
+          alreadySynced.push(filePath);
+          if (!options.dry) manifest.files[filePath] = newHash;
+          continue;
+        }
+
         newFiles.push(filePath);
         if (!options.dry) {
-          await mkdir(dirname(filePath), { recursive: true });
-          await writeFile(filePath, newContent);
+          await mkdir(dirname(localFilePath), { recursive: true });
+          await writeFile(localFilePath, newContent);
           manifest.files[filePath] = newHash;
         }
         continue;
@@ -346,8 +389,8 @@ export const upgrade = async (
       if (currentHash === savedHash) {
         autoUpdated.push(filePath);
         if (!options.dry) {
-          await mkdir(dirname(filePath), { recursive: true });
-          await writeFile(filePath, newContent);
+          await mkdir(dirname(localFilePath), { recursive: true });
+          await writeFile(localFilePath, newContent);
           manifest.files[filePath] = newHash;
         }
         continue;
@@ -374,6 +417,7 @@ export const upgrade = async (
         baseCommit,
         manifest.template,
         filePath,
+        manifest.source,
       );
       const oldContent =
         rawOldContent !== null
@@ -437,22 +481,40 @@ export const upgrade = async (
       // `${CLI_NAME} diff <file>` can still show what needs to be applied.
       if (conflicts.length === 0) {
         manifest.commit = latestCommit;
+        delete manifest.source;
       }
-      await writeManifest(manifest);
+      await (
+        options.persistManifest ??
+        ((updatedManifest) => writeManifest(updatedManifest, projectRoot))
+      )(manifest);
     }
 
     // 6. Done
-    if (conflicts.length === 0) {
+    const operation = options.operation ?? "upgrade";
+
+    if (options.dry) {
+      const conflictNote =
+        conflicts.length > 0
+          ? ` ${conflicts.length} conflict(s) would require manual review.`
+          : " No conflicts found.";
+      outro(`Dry run complete.${conflictNote}`);
+    } else if (conflicts.length === 0) {
       const forcedNote =
         forced.length > 0
           ? `\n${forced.length} file(s) were force-advanced — your local edits were kept; review them with \`git diff\`.`
           : "";
+      const completed =
+        operation === "migration"
+          ? `✓ Migrated to Stackbase at ${latestCommit.slice(0, 7)}.`
+          : `✓ Upgraded to ${latestCommit.slice(0, 7)} successfully!`;
       outro(
-        `✓ Upgraded to ${latestCommit.slice(0, 7)} successfully!${forcedNote}\nRun your package manager install to apply any dependency changes.`,
+        `${completed}${forcedNote}\nRun your package manager install to apply any dependency changes.`,
       );
     } else {
+      const completed =
+        operation === "migration" ? "Migration saved" : "Upgrade completed";
       outro(
-        `Upgraded to ${latestCommit.slice(0, 7)} with ${conflicts.length} conflict(s) to resolve manually.\nSee above for the list of affected files.`,
+        `${completed} with ${conflicts.length} conflict(s) to resolve manually.\nSee above for the list of affected files.`,
       );
     }
   } catch (error) {

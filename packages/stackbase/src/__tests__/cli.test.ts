@@ -3,6 +3,7 @@ import {
   normalizeTemplateName,
   getTemplatePath,
   getTemplateFilePath,
+  getManifestFilePath,
   templateRegistry,
   templateAliases,
   templateNames,
@@ -11,6 +12,7 @@ import { getDescription } from "../utils.js";
 import { applyPackageJsonCleanup } from "../update.js";
 import {
   buildManifest,
+  MANIFEST_VERSION,
   resolveFeatures,
   type StackbaseManifest,
 } from "../manifest.js";
@@ -104,6 +106,19 @@ describe("Upgrade and diff template path resolution", () => {
     );
     expect(getTemplateFilePath("fullstack", "apps\\api\\package.json")).toBe(
       "templates/base/apps/api/package.json",
+    );
+  });
+
+  it("resolves files from the legacy repository root during migration", () => {
+    expect(
+      getManifestFilePath(
+        "fullstack",
+        "apps\\api\\package.json",
+        "build-elevate",
+      ),
+    ).toBe("apps/api/package.json");
+    expect(getManifestFilePath("fullstack", "package.json")).toBe(
+      "templates/base/package.json",
     );
   });
 });
@@ -282,7 +297,7 @@ describe("Canonical template recording and option validation", () => {
 
     expect(manifest.template).toBe("base");
     expect(manifest.projectName).toBe("my-fullstack-app");
-    expect(manifest.version).toBe(1);
+    expect(manifest.version).toBe(MANIFEST_VERSION);
     expect(manifest.features.kubernetes).toBe(true);
   });
 

@@ -1,1 +1,1 @@
-export const APP_TITLE = 'STACKBASE';
+export const APP_TITLE = 'Stackbase';

@@ -7,6 +7,16 @@ All changes, fixes and updates to Stackbase.
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 `Latest` is derived from position and is not stored here.
 
+## [Unreleased]
+
+### Added
+
+- **CLI migration:** Added `stackbase migrate` to move Build Elevate projects onto Stackbase while preserving local edits and the original manifest
+
+### Fixed
+
+- **Upgrade safety:** Treat new template files that collide with existing local files as conflicts instead of overwriting them
+
 ## [2.0.0] - 2026-09-12 [Major] - Standalone Modular Architecture & Multi-PM Automation
 
 Major architectural overhaul replacing monolithic codebase pruning with dedicated standalone templates (`base`, `web`, `api`), full Bun runtime compatibility, non-interactive CI/CD scaffolding flags, and archive-based template delivery.

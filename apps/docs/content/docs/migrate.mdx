@@ -1,0 +1,143 @@
+---
+title: Migrate from Build Elevate
+description: Move an existing Build Elevate project to Stackbase without overwriting local changes
+icon: Replace
+---
+
+# Migrate from Build Elevate
+
+Stackbase is the successor to Build Elevate. The `stackbase migrate` command converts an existing Build Elevate project to the Stackbase manifest format and updates files that have not been changed locally.
+
+<Callout type="warn" title="Migration is currently in beta">
+  Use the <code>beta</code> npm tag until Stackbase 2.1 is published as the
+  latest stable release.
+</Callout>
+
+## Who should migrate
+
+Use this guide when the project root contains `.build-elevate.json` and does not contain `.stackbase.json`.
+
+Projects created with Stackbase already use `.stackbase.json`. Run [`stackbase upgrade`](/docs/cli#upgrade) for those projects.
+
+## Before you start
+
+1. Run the command from the project root.
+2. Commit your current work or create a backup so you can review and reverse the migration changes.
+3. Confirm that `.build-elevate.json` exists.
+4. Move or delete an existing `.build-elevate.json.bak`. The CLI will not overwrite it.
+5. Use Node.js 20 or newer.
+
+The migration uses the hashes in `.build-elevate.json` to distinguish unchanged template files from files you edited.
+
+## Preview the migration
+
+Start with a dry run. It downloads and compares the latest Stackbase template without writing files or converting the manifest.
+
+```bash
+pnpm dlx stackbase@beta migrate --dry-run
+```
+
+Review the files that would be updated, added, or reported as conflicts.
+
+## Run the migration
+
+```bash
+pnpm dlx stackbase@beta migrate
+```
+
+The command asks for confirmation and then:
+
+1. Maps the legacy `fullstack` template to the Stackbase `base` template.
+2. Detects feature flags missing from older manifests.
+3. Updates unchanged files to the latest Stackbase template.
+4. Preserves locally edited files and reports conflicts.
+5. Writes `.stackbase.json`.
+6. Saves the original manifest as `.build-elevate.json.bak`.
+
+Use `--yes` to skip the confirmation prompt:
+
+```bash
+pnpm dlx stackbase@beta migrate --yes
+```
+
+## Understand the result
+
+| Result         | Meaning                                                                      |
+| -------------- | ---------------------------------------------------------------------------- |
+| Auto-updated   | The file still matched its Build Elevate hash, so Stackbase updated it.      |
+| Added          | The latest template contains a new file and no local file occupied its path. |
+| Conflict       | Both the local project and the template changed the file.                    |
+| Already synced | The local file already matched the latest transformed Stackbase template.    |
+
+Stackbase never overwrites a locally edited conflict file.
+
+## Resolve conflicts
+
+Inspect each reported conflict:
+
+```bash
+pnpm dlx stackbase@beta diff apps/api/src/config/corsOptions.ts
+```
+
+Apply the template changes you want to keep. Then run the upgrade command again:
+
+```bash
+pnpm dlx stackbase@beta upgrade
+```
+
+If the file still contains your own changes, it may remain different from the template. After reviewing and merging the upstream changes, use `--force` to record the latest template as the new baseline while keeping your local file:
+
+```bash
+pnpm dlx stackbase@beta upgrade --force
+```
+
+<Callout type="info">
+  The <code>--force</code> option updates conflict hashes in the manifest. It
+  does not overwrite conflicting local files.
+</Callout>
+
+You can also use `migrate --force` during the initial migration after reviewing the dry-run output.
+
+## Verify the project
+
+Install dependency changes with the package manager used by the project:
+
+```bash
+pnpm install
+```
+
+Run the project's type checks, tests, and build. Review `git diff` before committing the migration.
+
+After the project passes its checks, delete `.build-elevate.json.bak`. Keep `.stackbase.json` committed because future `upgrade` and `diff` commands use it.
+
+## Roll back a migration
+
+If the migration finishes but the project does not pass its checks:
+
+1. Use Git or your project backup to restore the files changed by migration.
+2. Delete the generated `.stackbase.json`.
+3. Rename `.build-elevate.json.bak` to `.build-elevate.json`.
+
+If the command fails before creating the backup, the original `.build-elevate.json` remains in place. Review `git diff` for any files written before the failure.
+
+## Common errors
+
+### A Stackbase manifest already exists
+
+The project has already been migrated or was created with Stackbase. Run:
+
+```bash
+pnpm dlx stackbase@beta upgrade
+```
+
+### No Build Elevate manifest was found
+
+Run the command from the directory containing `.build-elevate.json`. Projects created before manifest support cannot use automatic migration.
+
+### The backup manifest already exists
+
+Move or delete `.build-elevate.json.bak`, then run the migration again. Stackbase refuses to replace an existing backup.
+
+### GitHub requests fail
+
+The migration reads the old and latest templates from GitHub. Check the network connection and retry the dry run.

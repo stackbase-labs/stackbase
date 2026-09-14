@@ -1,6 +1,6 @@
 ---
 title: Command Line Interface
-description: Reference for all stackbase CLI commands - init, upgrade, and diff.
+description: Reference for all stackbase CLI commands - init, migrate, upgrade, and diff.
 icon: Terminal
 ---
 
@@ -100,6 +100,26 @@ pnpm dlx stackbase@latest init my-app --skip-install
 
 ---
 
+### `migrate`
+
+Moves a project created with Build Elevate onto the Stackbase release line.
+
+```npm
+pnpm dlx stackbase@beta migrate [options]
+```
+
+Run the command from a project root containing `.build-elevate.json`. It converts the legacy manifest, updates unchanged files, and preserves local edits as conflicts.
+
+| Flag        | Description                                                                            |
+| ----------- | -------------------------------------------------------------------------------------- |
+| `--dry-run` | Preview updates and conflicts without writing files or converting the manifest.        |
+| `--force`   | Use the latest Stackbase hashes as the baseline while keeping conflicting local files. |
+| `-y, --yes` | Skip the confirmation prompt.                                                          |
+
+See [Migrate from Build Elevate](/docs/migrate) for the complete workflow, conflict handling, verification, and backup cleanup.
+
+---
+
 ### `upgrade`
 
 Upgrades your scaffolded project to the latest `Stackbase` template.
@@ -110,9 +130,9 @@ pnpm dlx stackbase@latest upgrade [options]
 
 <Callout type="warn">
   This command must be run from the root of a project that was scaffolded with
-  the Stackbase `init` command. It requires a `.stackbase.json` manifest.
-  `.build-elevate.json` manifests are maintained by the separate Build Elevate
-  release line and are not supported by the Stackbase CLI.
+  Stackbase or migrated from Build Elevate. It requires a `.stackbase.json`
+  manifest. Follow the [migration guide](/docs/migrate) when the project
+  contains only `.build-elevate.json`.
 </Callout>
 
 #### Options
@@ -315,7 +335,7 @@ The manifest is written by `init` and read by `upgrade` and `diff`. It is commit
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "commit": "6669a80f3c2d1a4b5e6f7a8b9c0d1e2f3a4b5c6d",
   "template": "base",
   "projectName": "my-app",
@@ -344,6 +364,8 @@ The manifest is written by `init` and read by `upgrade` and `diff`. It is commit
 | `scaffoldedAt` | ISO timestamp of when `init` was run. Informational only.                                                                                                   |
 | `features`     | The optional feature flags (`docker`, `kubernetes`, `studio`, `observability`) selected during scaffolding.                                                 |
 | `files`        | A map of file paths to their SHA-256 hashes (first 12 characters) at scaffold time, after all init-time mutations. This is what `upgrade` compares against. |
+
+During an incomplete Build Elevate migration, the manifest also contains `"source": "build-elevate"`. Stackbase removes this field after the commit pointer reaches a Stackbase commit.
 
 <Callout type="warn">
   If your manifest is missing the `projectName` field (projects scaffolded

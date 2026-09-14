@@ -1,8 +1,13 @@
 import { intro, log } from "@clack/prompts";
-import { MANIFEST_FILE, readManifest, manifestExists } from "./manifest.js";
+import {
+  MANIFEST_FILE,
+  readManifest,
+  manifestExists,
+  type StackbaseManifest,
+} from "./manifest.js";
 import { getLatestCommit } from "./upgrade.js";
 import { CLI_NAME, PRODUCT_NAME, REPO } from "./branding.js";
-import { getTemplateFilePath } from "./templates.js";
+import { getManifestFilePath } from "./templates.js";
 
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 
@@ -10,10 +15,10 @@ const getFileAtCommit = async (
   commit: string,
   template: string,
   filePath: string,
+  source?: StackbaseManifest["source"],
 ): Promise<string | null> => {
-  const res = await fetch(
-    `${RAW_BASE}/${commit}/${getTemplateFilePath(template, filePath)}`,
-  );
+  const repositoryPath = getManifestFilePath(template, filePath, source);
+  const res = await fetch(`${RAW_BASE}/${commit}/${repositoryPath}`);
   if (res.ok) return res.text();
 
   return null;
@@ -198,7 +203,12 @@ export const diff = async (filePath: string) => {
 
     // 3. Fetch the file at both commits in parallel
     const [oldContent, newContent] = await Promise.all([
-      getFileAtCommit(fromCommit, manifest.template, normalizedPath),
+      getFileAtCommit(
+        fromCommit,
+        manifest.template,
+        normalizedPath,
+        manifest.source,
+      ),
       getFileAtCommit(toCommit, manifest.template, normalizedPath),
     ]);
 

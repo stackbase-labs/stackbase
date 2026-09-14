@@ -1,4 +1,4 @@
 {
-  "pages": ["index", "cli", "getting-started", "configuration", "applications", "packages", "deployment",  "troubleshooting"],
+  "pages": ["index", "cli", "getting-started", "configuration", "applications", "packages", "deployment", "migrate", "troubleshooting"],
   "defaultOpen": true
 }

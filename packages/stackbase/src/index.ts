@@ -5,6 +5,7 @@ import { dirname, join } from "path";
 import { initialize } from "./initialize.js";
 import { upgrade } from "./upgrade.js";
 import { diff } from "./diff.js";
+import { migrate } from "./migrate.js";
 import { CLI_NAME, PRODUCT_NAME } from "./branding.js";
 
 // Get package.json version
@@ -42,6 +43,25 @@ program
   .option("-y, --yes", "Skip prompts and use defaults")
   .option("-v, --verbose", "Show detailed output")
   .action(initialize);
+
+program
+  .command("migrate")
+  .description(
+    "Migrate a Build Elevate project to Stackbase while preserving local changes.",
+  )
+  .option("-y, --yes", "Skip the confirmation prompt")
+  .option("--dry-run", "Preview the migration without writing files")
+  .option(
+    "--force",
+    "Advance past conflicts while keeping existing local files",
+  )
+  .action((options) =>
+    migrate({
+      yes: options.yes,
+      dry: options.dryRun,
+      force: options.force,
+    }),
+  );
 
 program
   .command("upgrade")

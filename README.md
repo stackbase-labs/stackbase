@@ -152,19 +152,19 @@ Each template contains only the applications and packages relevant to its target
 
 ## What's Included
 
-| Area          | Stackbase Includes                                             |
-| ------------- | -------------------------------------------------------------- |
-| Frontend      | Next.js 16, React, Tailwind CSS, shadcn/ui, dashboard patterns |
-| API           | Express, typed middleware, CORS, errors, health checks         |
-| Auth          | Better Auth, sessions, OAuth-ready structure, 2FA flows        |
-| Database      | Prisma, PostgreSQL, generated client, Studio workflow          |
-| Email         | React Email templates with Resend integration                  |
-| Storage       | S3-compatible upload and delete helpers                        |
-| Rate limiting | Upstash Redis limiters for API and auth flows                  |
-| Observability | Prometheus metrics and Grafana dashboard provisioning          |
-| Deployment    | Docker Compose, production Dockerfiles, Kubernetes manifests   |
-| Quality       | TypeScript, ESLint, Prettier, Vitest, shared workspace config  |
-| Updates       | `.stackbase.json`, `stackbase upgrade`, conflict diffs         |
+| Area          | Stackbase Includes                                               |
+| ------------- | ---------------------------------------------------------------- |
+| Frontend      | Next.js 16, React, Tailwind CSS, shadcn/ui, dashboard patterns   |
+| API           | Express, typed middleware, CORS, errors, health checks           |
+| Auth          | Better Auth, sessions, OAuth-ready structure, 2FA flows          |
+| Database      | Prisma, PostgreSQL, generated client, Studio workflow            |
+| Email         | React Email templates with Resend integration                    |
+| Storage       | S3-compatible upload and delete helpers                          |
+| Rate limiting | Upstash Redis limiters for API and auth flows                    |
+| Observability | Prometheus metrics and Grafana dashboard provisioning            |
+| Deployment    | Docker Compose, production Dockerfiles, Kubernetes manifests     |
+| Quality       | TypeScript, ESLint, Prettier, Vitest, shared workspace config    |
+| Updates       | `.stackbase.json`, `stackbase migrate`, upgrades, conflict diffs |
 
 ## Repository Layout
 
@@ -239,12 +239,13 @@ Deployment docs:
 
 ## Build Elevate
 
-Stackbase is the successor to Build Elevate, with a separate package, repository identity, and release line.
+Stackbase is the successor to Build Elevate.
 
 - New projects should use `stackbase`.
-- Existing Build Elevate projects should stay on the `build-elevate` package and separate maintenance branch.
-- Stackbase projects use `.stackbase.json`; `.build-elevate.json` is not supported by the Stackbase CLI.
-- Move old projects to Stackbase manually when you want the new template architecture.
+- Existing Build Elevate projects can preview the move with `pnpm dlx stackbase@beta migrate --dry-run`.
+- Run `pnpm dlx stackbase@beta migrate` to convert `.build-elevate.json`, update safe files, and preserve local changes.
+- The original manifest is saved as `.build-elevate.json.bak` and can be deleted after the migrated project passes its checks.
+- See the [migration guide](https://stackbase-labs.vercel.app/docs/migrate) for conflict handling and verification.
 
 ## Contributing
 

@@ -82,3 +82,14 @@ export const getTemplateFilePath = (
   const normalized = filePath.replace(/\\/g, "/");
   return `${getTemplatePath(template)}/${normalized}`;
 };
+
+export const getManifestFilePath = (
+  template: string,
+  filePath: string,
+  source?: "build-elevate",
+): string => {
+  const normalized = filePath.replace(/\\/g, "/");
+  return source === "build-elevate"
+    ? normalized
+    : getTemplateFilePath(template, normalized);
+};

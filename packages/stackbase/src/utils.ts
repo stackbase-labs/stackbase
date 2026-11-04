@@ -145,6 +145,7 @@ export const getFilesToReplaceProjectName = (): string[] => {
     "packages/db/.env.example",
     "packages/auth/.env.example",
     "packages/storage/.env.example",
+    "packages/rate-limit/.env.example",
     "packages/auth/src/server.ts",
     "packages/email/src/branding.ts",
     "packages/rate-limit/src/create.ts",

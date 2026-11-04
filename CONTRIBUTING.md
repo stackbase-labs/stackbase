@@ -15,7 +15,7 @@ Be respectful and constructive. We're all here to build something useful togethe
    git checkout -b feat/my-change
    ```
 
-3. Install dependencies (Node.js 20+ and pnpm 10.32+ required):
+3. Install dependencies (Node.js 24+ and pnpm 10.32+ required):
 
    ```bash
    pnpm install

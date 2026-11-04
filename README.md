@@ -56,7 +56,7 @@ Stackbase is built for teams and builders who want a real application foundation
 
 ### Requirements
 
-- Node.js 20+
+- Node.js 24+
 - pnpm, npm, or Bun
 - Docker Desktop, if you enable Docker-based workflows
 

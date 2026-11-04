@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { loadEmailConfig } from './config';
+import { isDevPlaceholderToken, loadEmailConfig } from './config';
 import { keys } from './keys';
 import { resendEmailSchema } from './schemas';
 import { EmailContent } from './types';
@@ -50,7 +50,6 @@ function getEmailConfig() {
 }
 
 export const sendEmail = async (email: EmailContent) => {
-  const client = getResendClient();
   const config = getEmailConfig();
 
   const { from } = email;
@@ -79,6 +78,29 @@ export const sendEmail = async (email: EmailContent) => {
     html: data.html ?? '',
   };
 
+  // Local development fallback: log email to console if placeholder or dev token is used
+  if (config.isDevelopment && isDevPlaceholderToken(config.resendToken)) {
+    console.log('\n✉️  [Local Dev Email Captured]');
+    console.log(`To:      ${Array.isArray(payload.to) ? payload.to.join(', ') : payload.to}`);
+    console.log(`From:    ${payload.from}`);
+    console.log(`Subject: ${payload.subject}`);
+    if (payload.text) {
+      console.log(`Text:    ${payload.text}`);
+    }
+    if (payload.html) {
+      const linkMatch = payload.html.match(/href="([^"]+)"/);
+      if (linkMatch && linkMatch[1]) {
+        console.log(`Action Link: ${linkMatch[1]}`);
+      }
+    }
+    console.log('--------------------------------------------------\n');
+    return {
+      data: { id: `dev-${Date.now()}` },
+      error: null,
+    };
+  }
+
+  const client = getResendClient();
   try {
     resendEmailSchema.parse(payload);
     const emailResponse = await client.emails.send(payload);

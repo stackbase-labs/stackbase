@@ -9,6 +9,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-04 [Minor] - Zero-Config Local Development & Node 24 Upgrade
+
+### Added
+
+- **Local Upstash Redis Proxy:** Added `hiett/serverless-redis-http` paired with `redis:7-alpine` in `docker-compose.yml` to emulate the Upstash REST API locally on port `8079`. `@upstash/ratelimit` works out-of-the-box without cloud credentials.
+- **Local MinIO S3 Storage:** Added `minio/minio` to `docker-compose.yml` with S3 API on port `9000` and Web Console on port `9001`, enabling local file uploads without AWS or Cloudflare keys.
+- **Email Console Fallback:** In development mode, transactional auth emails (verification links, password resets) are captured and printed directly to the terminal when no Resend token is provided, preventing signup crashes.
+- **Conditional Google OAuth:** Better Auth registers Google OAuth conditionally when credentials are present, allowing immediate email/password local development.
+
+### Changed
+
+- **Node.js 24 Upgrade:** Upgraded minimum Node.js requirement to v24+ across the monorepo, starter templates, Dockerfiles (`node:24-alpine`), and documentation.
+- **Environment Defaults:** Updated starter template `.env.example` files to point directly to local Docker services by default.
+
+### Fixed
+
+- **CLI Project Name Replacement:** Added `packages/rate-limit/.env.example` to the project name replacement list so local Redis tokens match between `docker-compose.yml` and environment configs on newly scaffolded projects.
+
 ## [2.1.0] - 2026-09-14 [Minor] - Build Elevate Migration
 
 ### Added

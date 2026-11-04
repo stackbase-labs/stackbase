@@ -78,14 +78,19 @@ packages/rate-limit/
 Create `.env.local` and configure:
 
 ```bash
-# Upstash Redis (get from https://upstash.com/redis)
-UPSTASH_REDIS_REST_URL=https://YOUR_ENDPOINT.upstash.io
-UPSTASH_REDIS_REST_TOKEN=AXXXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# Local development (via docker-compose up)
+UPSTASH_REDIS_REST_URL="http://127.0.0.1:8079"
+UPSTASH_REDIS_REST_TOKEN="stackbase-local-redis"
+
+# Production Upstash Redis (get from https://upstash.com/redis)
+# UPSTASH_REDIS_REST_URL=https://YOUR_ENDPOINT.upstash.io
+# UPSTASH_REDIS_REST_TOKEN=AXXXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 <Callout type="info">
-  Get free Upstash Redis at [https://upstash.com](https://upstash.com). The free
-  tier includes 500,000 commands/month, sufficient for development.
+  For local development, `docker-compose up -d` runs a local Upstash REST proxy
+  (via Serverless Redis HTTP) so no cloud keys are needed. For production,
+  create a free database at [https://upstash.com](https://upstash.com).
 </Callout>
 
 ## Usage

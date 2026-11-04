@@ -112,6 +112,13 @@ pnpm --filter @workspace/db studio
 pnpm docker:dev
 ```
 
+This starts the local development infrastructure:
+
+- **PostgreSQL**: `localhost:5432`
+- **Redis (TCP)**: `localhost:6379`
+- **Upstash REST Proxy**: `http://localhost:8079`
+- **MinIO (S3 API & Console)**: `http://localhost:9000` & `http://localhost:9001`
+
 ### 2. Start the production Docker stack
 
 ```bash

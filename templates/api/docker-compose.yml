@@ -17,5 +17,44 @@ services:
       retries: 5
     restart: unless-stopped
 
+  redis:
+    image: redis:7-alpine
+    container_name: api-redis-dev
+    command:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--appendfsync',
+        'always',
+        '--maxmemory-policy',
+        'noeviction',
+      ]
+    ports:
+      - '127.0.0.1:6379:6379'
+    volumes:
+      - api-app_redis_data_dev:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  upstash-redis-http:
+    image: hiett/serverless-redis-http:latest
+    container_name: api-upstash-redis-http-dev
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: api-local-redis
+      SRH_CONNECTION_STRING: redis://redis:6379
+    ports:
+      - '127.0.0.1:8079:80'
+    restart: unless-stopped
+
 volumes:
   api-app_postgres_data_dev:
+  api-app_redis_data_dev:

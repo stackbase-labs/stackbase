@@ -56,7 +56,7 @@ services:
     restart: unless-stopped
 
   minio:
-    image: minio/minio:latest
+    image: cgr.dev/chainguard/minio:latest
     container_name: api-minio-dev
     command: server /data --console-address ":9001"
     environment:
@@ -67,11 +67,6 @@ services:
       - '127.0.0.1:9001:9001'
     volumes:
       - api-app_minio_data_dev:/data
-    healthcheck:
-      test: ['CMD', 'mc', 'ready', 'local']
-      interval: 5s
-      timeout: 3s
-      retries: 5
     restart: unless-stopped
 
 volumes:

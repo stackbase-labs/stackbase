@@ -45,7 +45,7 @@ S3_SECRET_ACCESS_KEY=your-secret-access-key
 
 # Optional: Custom endpoint for Cloudflare R2, MinIO, or LocalStack
 # For Cloudflare R2: https://<accountid>.r2.cloudflarestorage.com
-# For MinIO / Local: http://localhost:9000
+# For MinIO / Local: http://127.0.0.1:9000
 # S3_ENDPOINT=
 
 # Optional: Custom CDN or public URL for assets (e.g., https://cdn.yourdomain.com)
@@ -92,7 +92,10 @@ S3_FORCE_PATH_STYLE=true
 ```
 
 <Callout type="info" title="Automatic Bucket Provisioning">
-  In local development (when `S3_ENDPOINT` points to a local MinIO instance), `@workspace/storage` automatically checks for and provisions the target bucket with a public read policy (`s3:GetObject`) on the fly. You do not need to manually create the bucket in the MinIO console.
+  In local development (when `S3_ENDPOINT` points to a local MinIO instance),
+  `@workspace/storage` automatically checks for and provisions the target bucket
+  with a public read policy (`s3:GetObject`) on the fly. You do not need to
+  manually create the bucket in the MinIO console.
 </Callout>
 
 ## Bucket CORS Configuration

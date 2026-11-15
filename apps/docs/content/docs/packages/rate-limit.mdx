@@ -78,7 +78,7 @@ packages/rate-limit/
 Create `.env.local` and configure:
 
 ```bash
-# Local development (via docker-compose up)
+# Local development (via pnpm docker:dev or docker compose up -d)
 UPSTASH_REDIS_REST_URL="http://127.0.0.1:8079"
 UPSTASH_REDIS_REST_TOKEN="stackbase-local-redis"
 
@@ -88,9 +88,10 @@ UPSTASH_REDIS_REST_TOKEN="stackbase-local-redis"
 ```
 
 <Callout type="info">
-  For local development, `docker-compose up -d` runs a local Upstash REST proxy
-  (via Serverless Redis HTTP) so no cloud keys are needed. For production,
-  create a free database at [https://upstash.com](https://upstash.com).
+  For local development, `pnpm docker:dev` (or `docker compose up -d`) runs a
+  local Upstash REST proxy (via Serverless Redis HTTP) so no cloud keys are
+  needed. For production, create a free database at
+  [https://upstash.com](https://upstash.com).
 </Callout>
 
 ## Usage

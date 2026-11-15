@@ -40,17 +40,19 @@ packages/db/
 │   ├── env.ts               # Environment variable validation
 │   └── types.ts             # Re-exported Prisma types
 ├── .env.example             # Environment variables template
+├── .env.local               # Local environment variables (DATABASE_URL)
+├── prisma.config.ts         # Prisma 7 CLI configuration
 ├── package.json             # Dependencies and scripts
 └── README.md                # Package documentation
 ```
 
-## Environment Variables
+## Configuration & Environment Variables
 
-For complete environment variable setup and configuration, see the [Environment Variables Guide](../configuration/environment-variables).
+Prisma 7 uses `prisma.config.ts` to configure CLI commands such as `prisma migrate dev`. It automatically loads environment variables from `packages/db/.env.local`.
 
 This package requires:
 
-- `DATABASE_URL` - PostgreSQL connection string
+- `DATABASE_URL` - PostgreSQL connection string (defaults to `postgresql://postgres:password@127.0.0.1:5432/stackbase-app` in local Docker development).
 
 For production deployments with connection pooling, also set:
 
@@ -428,7 +430,7 @@ echo $DATABASE_URL
 psql $DATABASE_URL -c "SELECT 1"
 
 # Check PostgreSQL is running
-docker-compose -f docker-compose.prod.yml ps postgres
+docker compose -f docker-compose.prod.yml ps postgres
 ```
 
 ### Timeout Errors

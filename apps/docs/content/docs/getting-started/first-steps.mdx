@@ -109,26 +109,33 @@ For complete setup instructions and all available variables, see the [Environmen
 
 ## Step 2: Set Up the Database
 
-Now that environment variables are configured, let's set up the database.
+Now that environment variables are configured, let's start your local services and initialize the database.
 
-### Create the Database
+### Start Local Services (Docker)
 
-We recommend [Supabase](https://supabase.com/) for a managed PostgreSQL database. Set up a free project and get the connection string.
+If developing locally, start the local PostgreSQL, Redis, and MinIO storage services using the included compose file:
+
+```bash
+cd ../..  # Back to project root
+
+# Start PostgreSQL, Redis, and MinIO in the background
+pnpm docker:dev
+# or: docker compose up -d
+```
 
 <Callout type="info">
-  If you're using Docker, the database will be created automatically on first
-  run.
+  For managed cloud databases (such as [Supabase](https://supabase.com/) or
+  [Neon](https://neon.tech/)), you can skip `pnpm docker:dev` and set your
+  remote `DATABASE_URL` directly in `packages/db/.env.local`.
 </Callout>
 
 ### Run Migrations
 
-Navigate back to the root directory and run migrations:
+Run Prisma migrations from the project root:
 
-```npm
-cd ../..  # Back to project root
-
+```bash
 # Run Prisma migrations
-npm run db:migrate
+pnpm db:migrate
 ```
 
 This command will:

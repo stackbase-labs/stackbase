@@ -82,29 +82,93 @@ taskkill /PID <PID> /F
 
 ## Database Connection Errors
 
-If you encounter database connection issues:
+### Can't reach database server (`P1001`)
 
 ```bash
-# 1. Verify DATABASE_URL is set correctly
-echo $DATABASE_URL
-
-# 2. Check PostgreSQL is running
-# For local PostgreSQL:
-psql postgres://user:password@localhost:5432/dbname
-
-# 3. Test Prisma connection
-pnpm db:migrate
-
-# 4. View databases and tables in Prisma Studio
-pnpm db:studio
+Error: P1001: Can't reach database server at `127.0.0.1:5432`
 ```
+
+1. **Ensure Docker dev services are running:**
+   ```bash
+   pnpm docker:dev
+   # or: docker compose up -d
+   ```
+2. **Use `127.0.0.1` instead of `localhost` or `postgres`:**
+   In Node.js 20+, `localhost` resolves to IPv6 `::1` first, which can cause connection refusal (`ECONNREFUSED ::1:5432`) against Docker containers bound to IPv4. Internal hostnames like `postgres` only work inside container networks, not from your host machine.
+   ```bash
+   DATABASE_URL=postgresql://postgres:password@127.0.0.1:5432/stackbase-app
+   ```
+3. **Verify PostgreSQL container health:**
+   ```bash
+   docker compose ps postgres
+   ```
+
+### Prisma `datasource.url property is required`
+
+```bash
+The datasource.url property is required in your Prisma config file when using prisma migrate dev.
+```
+
+Prisma 7 loads configuration via `packages/db/prisma.config.ts`, which reads from `.env.local`:
+
+1. Make sure `packages/db/.env.local` exists:
+   ```bash
+   cp packages/db/.env.example packages/db/.env.local
+   ```
+2. Verify that `DATABASE_URL` is defined inside `packages/db/.env.local`.
+
+---
+
+## Docker Issues
+
+### Container Name Conflict
+
+```bash
+Error: Conflict. The container name "/stackbase-postgres-dev" is already in use.
+```
+
+This happens if an old container is still running or wasn't cleanly stopped:
+
+```bash
+# Stop and remove conflicting containers
+docker rm -f stackbase-postgres-dev stackbase-redis-dev stackbase-upstash-redis-http-dev stackbase-minio-dev
+
+# Or restart cleanly with pnpm
+pnpm docker:dev:down
+pnpm docker:dev
+```
+
+---
+
+## Storage & File Upload Errors
+
+### Missing Bucket / `NoSuchBucket`
+
+```bash
+NoSuchBucket: The specified bucket does not exist
+```
+
+- When using local MinIO (`S3_ENDPOINT=http://127.0.0.1:9000`), `@workspace/storage` automatically checks for and provisions the bucket on the first upload with public read access.
+- If you are running against AWS S3 or Cloudflare R2 in production, ensure your target bucket (`S3_BUCKET`) is manually created in the cloud provider console.
+
+### Upload Fails with `401 Authentication required`
+
+If avatar or file upload fails with a 401 unauthorized error:
+
+1. Verify that `apps/api/.env.local` exists and contains:
+   ```bash
+   BETTER_AUTH_SECRET=your-shared-secret-must-match-web
+   ```
+2. Verify that `apps/api` is running on port `4000` (`pnpm dev` from project root starts both web and API).
+
+---
 
 ## Authentication Not Working
 
 If you can't sign in:
 
 1. **Verify `BETTER_AUTH_SECRET` is identical** in both `apps/api/.env.local` and `apps/web/.env.local`. See [Environment Variables Guide](./configuration/environment-variables#quick-start) for generation and setup instructions.
-2. **Check `ALLOWED_ORIGINS`** in `apps/api/.env.local` matches your web app URL
+2. **Check `ALLOWED_ORIGINS`** in `apps/api/.env.local` matches your web app URL (`http://localhost:3000`)
 3. **Clear cookies** and try again
 
 For app-specific authentication issues:

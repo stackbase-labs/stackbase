@@ -20,19 +20,21 @@ The Docker setup provides a robust, secure foundation for both development and p
 
 ## Development Setup
 
-For local development, use the `docker-compose.yml` file in the repository root:
+For local development, use the `docker-compose.yml` file in your scaffolded project root:
 
 ```bash
-docker-compose up -d
+docker compose up -d
+# or via pnpm script
+pnpm docker:dev
 ```
 
 This starts all local development services:
 
-- **PostgreSQL** — `localhost:5432` (database: `stackbase-app`, user: `postgres`, password: `password`)
-- **Redis (TCP)** — `localhost:6379` (standard RESP protocol for caching and queues)
-- **Upstash REST Proxy** — `http://localhost:8079` (local HTTP REST emulator for `@upstash/ratelimit`, token: `stackbase-local-redis`)
-- **MinIO (S3 API)** — `http://localhost:9000` (local S3 storage, credentials: `minioadmin` / `minioadmin`)
-- **MinIO Console** — `http://localhost:9001` (web dashboard to inspect buckets and files)
+- **PostgreSQL** — `127.0.0.1:5432` (database: `stackbase-app`, user: `postgres`, password: `password`)
+- **Redis (TCP)** — `127.0.0.1:6379` (standard RESP protocol for caching and queues)
+- **Upstash REST Proxy** — `http://127.0.0.1:8079` (local HTTP REST emulator for `@upstash/ratelimit`, token: `stackbase-local-redis`)
+- **MinIO (S3 API)** — `http://127.0.0.1:9000` (local S3 storage, credentials: `minioadmin` / `minioadmin`)
+- **MinIO Console** — `http://127.0.0.1:9001` (web dashboard to inspect buckets and files)
 
 ### Development Docker Compose Structure
 
@@ -48,7 +50,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
-      - 5432:5432
+      - '127.0.0.1:5432:5432'
     volumes:
       - stackbase-app_postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
@@ -62,7 +64,7 @@ services:
     image: redis:7-alpine
     container_name: stackbase-redis-dev
     ports:
-      - "127.0.0.1:6379:6379"
+      - '127.0.0.1:6379:6379'
     volumes:
       - stackbase-app_redis_data_dev:/data
     restart: unless-stopped
@@ -78,19 +80,19 @@ services:
       SRH_TOKEN: stackbase-local-redis
       SRH_CONNECTION_STRING: redis://redis:6379
     ports:
-      - "127.0.0.1:8079:80"
+      - '127.0.0.1:8079:80'
     restart: unless-stopped
 
   minio:
-    image: minio/minio:latest
+    image: cgr.dev/chainguard/minio:latest
     container_name: stackbase-minio-dev
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9001:9001"
+      - '127.0.0.1:9000:9000'
+      - '127.0.0.1:9001:9001'
     volumes:
       - stackbase-app_minio_data_dev:/data
     restart: unless-stopped
@@ -132,7 +134,7 @@ This will start:
 
 - **Web** - http://localhost:3000
 - **API** - http://localhost:4000
-- **PostgreSQL** - localhost:5432
+- **PostgreSQL** - 127.0.0.1:5432
 
 ## Local Observability
 

@@ -83,13 +83,17 @@ S3_PUBLIC_URL=https://pub-<hash>.r2.dev # or custom domain
 #### MinIO (Local Development)
 
 ```bash
-S3_BUCKET=local-bucket
+S3_BUCKET=my-app-bucket
 S3_REGION=us-east-1
-S3_ENDPOINT=http://localhost:9000
+S3_ENDPOINT=http://127.0.0.1:9000
 S3_ACCESS_KEY_ID=minioadmin
 S3_SECRET_ACCESS_KEY=minioadmin
 S3_FORCE_PATH_STYLE=true
 ```
+
+<Callout type="info" title="Automatic Bucket Provisioning">
+  In local development (when `S3_ENDPOINT` points to a local MinIO instance), `@workspace/storage` automatically checks for and provisions the target bucket with a public read policy (`s3:GetObject`) on the fly. You do not need to manually create the bucket in the MinIO console.
+</Callout>
 
 ## Bucket CORS Configuration
 

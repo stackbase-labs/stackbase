@@ -9,6 +9,7 @@ Production-ready, vendor-agnostic file storage for **build-elevate**. Built with
 - **Secure File Key Generation**: Prevents filename collisions and organizes uploads by folder and user.
 - **Metadata & Deletion**: Helpers for head-object metadata queries and deleting files.
 - **Type-Safe**: Full TypeScript types and Zod contract validation.
+- **Auto-Provisioning**: In local development with MinIO or local emulators, target buckets are automatically created on the fly with a public read policy for browser assets.
 
 ## Quick Start
 

@@ -9,6 +9,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+### Added
+
+- **Auto-Provisioning S3 Bucket:** `@workspace/storage` automatically provisions missing buckets and applies a public read policy on local endpoints (MinIO/emulators), removing manual bucket setup.
+
+### Changed
+
+- **Chainguard MinIO Image:** Switched local MinIO Docker service to `cgr.dev/chainguard/minio:latest` and removed deprecated `mc` healthcheck.
+- **Strict Localhost Bindings:** Bound Docker Compose database and service ports to `127.0.0.1` (`'127.0.0.1:5432:5432'`) to prevent LAN exposure.
+- **Environment Defaults:** Updated starter template `.env.example` files to point `DATABASE_URL` to `127.0.0.1:5432` and `API_INTERNAL_URL` to `localhost:4000`, removing obsolete hostname replacement comments.
+- **Compose Cleanup:** Removed redundant root `compose.yaml` to prevent container name collisions with template environments.
+
 ## [2.2.0] - 2026-11-04 [Minor] - Zero-Config Local Development & Node 24 Upgrade
 
 ### Added

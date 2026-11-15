@@ -122,10 +122,10 @@ pnpm docker:dev
 
 This starts the local development infrastructure:
 
-- **PostgreSQL**: `localhost:5432`
-- **Redis (TCP)**: `localhost:6379`
-- **Upstash REST Proxy**: `http://localhost:8079`
-- **MinIO (S3 API & Console)**: `http://localhost:9000` & `http://localhost:9001`
+- **PostgreSQL**: `127.0.0.1:5432`
+- **Redis (TCP)**: `127.0.0.1:6379`
+- **Upstash REST Proxy**: `http://127.0.0.1:8079`
+- **MinIO (S3 API & Console)**: `http://127.0.0.1:9000` & `http://127.0.0.1:9001`
 
 ### 2. Start Prometheus and Grafana
 

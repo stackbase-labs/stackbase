@@ -1,7 +1,10 @@
 import {
+  CreateBucketCommand,
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadBucketCommand,
   HeadObjectCommand,
+  PutBucketPolicyCommand,
   PutObjectCommand,
   type PutObjectCommandInput,
   S3Client,
@@ -54,6 +57,37 @@ export class StorageService {
     return this.clientInstance;
   }
 
+  async ensureBucketExists(): Promise<void> {
+    const config = this.getConfig();
+    if (!config.bucket) return;
+
+    const client = this.getClient();
+    try {
+      await client.send(new HeadBucketCommand({ Bucket: config.bucket }));
+    } catch {
+      try {
+        await client.send(new CreateBucketCommand({ Bucket: config.bucket }));
+        const policy = JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Sid: 'PublicRead',
+              Effect: 'Allow',
+              Principal: '*',
+              Action: ['s3:GetObject'],
+              Resource: [`arn:aws:s3:::${config.bucket}/*`],
+            },
+          ],
+        });
+        await client
+          .send(new PutBucketPolicyCommand({ Bucket: config.bucket, Policy: policy }))
+          .catch(() => {});
+      } catch {
+        // Ignore if bucket already exists or permissions restrict creation
+      }
+    }
+  }
+
   getPublicUrl(key: string): string {
     const config = this.getConfig();
     const cleanKey = key.replace(/^\/+/, '');
@@ -78,6 +112,10 @@ export class StorageService {
       throw new Error(
         'S3_BUCKET is not configured. Please set S3_BUCKET in your environment variables.',
       );
+    }
+
+    if (config.endpoint) {
+      await this.ensureBucketExists().catch(() => {});
     }
 
     const expiresIn = options.expiresIn ?? 300; // 5 minutes default
@@ -166,6 +204,11 @@ export class StorageService {
 
   async uploadFile(options: DirectUploadOptions): Promise<{ key: string; publicUrl: string }> {
     const config = this.getConfig();
+
+    if (config.endpoint) {
+      await this.ensureBucketExists().catch(() => {});
+    }
+
     const cleanKey = options.key.replace(/^\/+/, '');
 
     const command = new PutObjectCommand({

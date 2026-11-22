@@ -110,20 +110,20 @@ pnpm dlx stackbase@latest add [module] [options]
 
 #### Arguments
 
-| Argument | Description |
-| -------- | ----------- |
+| Argument | Description                                                                                                                                               |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `module` | Optional. The name of the module to add (e.g. `queue`, `storage`, `email`, `rate-limit`, `auth`). If omitted, an interactive selection menu is presented. |
 
 #### Options
 
-| Flag | Description |
-| ---- | ----------- |
+| Flag              | Description                                                                     |
+| ----------------- | ------------------------------------------------------------------------------- |
 | `-a, --app <app>` | Target application under `apps/*` to link the package into (e.g. `api`, `web`). |
-| `--list` | List available modules and their current installation status in this workspace. |
-| `--allow-dirty` | Allow running even if the git working tree has uncommitted modifications. |
-| `--skip-install` | Skip automatic package manager dependency installation. |
-| `--dry-run` | Preview what files and configurations would be created without writing to disk. |
-| `-y, --yes` | Skip interactive prompts and accept default selections. |
+| `--list`          | List available modules and their current installation status in this workspace. |
+| `--allow-dirty`   | Allow running even if the git working tree has uncommitted modifications.       |
+| `--skip-install`  | Skip automatic package manager dependency installation.                         |
+| `--dry-run`       | Preview what files and configurations would be created without writing to disk. |
+| `-y, --yes`       | Skip interactive prompts and accept default selections.                         |
 
 #### What `add` does internally
 

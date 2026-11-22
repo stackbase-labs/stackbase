@@ -1,0 +1,9 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "lint": {
+      "env": ["LOG_LEVEL"]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["db:generate"],
+      "outputs": ["dist/**", "generated/**/*"]
+    },
+    "check-types": {
+      "dependsOn": ["db:generate"]
+    },
+    "lint": {
+      "env": ["DATABASE_URL"]
+    }
+  }
+}

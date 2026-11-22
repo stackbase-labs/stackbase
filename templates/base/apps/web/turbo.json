@@ -1,0 +1,32 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "@workspace/db#db:generate"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "NEXT_PUBLIC_BASE_URL",
+        "NEXT_PUBLIC_DOMAIN",
+        "NEXT_PUBLIC_API_URL",
+        "API_INTERNAL_URL",
+        "NODE_ENV"
+      ]
+    },
+    "dev": {
+      "dependsOn": ["@workspace/db#db:generate"],
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "env": [
+        "NEXT_PUBLIC_BASE_URL",
+        "NEXT_PUBLIC_DOMAIN",
+        "NEXT_PUBLIC_API_URL",
+        "API_INTERNAL_URL",
+        "NODE_ENV"
+      ]
+    }
+  }
+}

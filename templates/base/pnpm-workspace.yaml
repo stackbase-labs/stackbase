@@ -5,6 +5,7 @@ packages:
 allowBuilds:
   '@prisma/engines': true
   esbuild: true
+  msgpackr-extract: true
   prisma: true
   sharp: true
   unrs-resolver: true
@@ -66,6 +67,8 @@ catalogs:
     resend: 6.9.4
     '@aws-sdk/client-s3': ^3.758.0
     '@aws-sdk/s3-request-presigner': ^3.758.0
+    bullmq: ^5.41.0
+    ioredis: ^5.5.0
 
   dev:
     typescript: ^5.9.3

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "lint": {
+      "env": ["REDIS_URL", "REDIS_HOST", "REDIS_PORT", "REDIS_PASSWORD"]
+    }
+  }
+}

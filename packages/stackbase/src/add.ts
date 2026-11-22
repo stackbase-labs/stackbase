@@ -47,6 +47,7 @@ const branch = process.env.STACKBASE_BRANCH ?? "main";
 export interface AddOptions {
   app?: string;
   skipInstall?: boolean;
+  verbose?: boolean;
   dryRun?: boolean;
   yes?: boolean;
   allowDirty?: boolean;
@@ -422,10 +423,42 @@ export const add = async (
     const installSpinner = spinner();
     installSpinner.start(`Installing dependencies with ${pm}...`);
     try {
-      await exec(`${pm} install`, { ...execSyncOpts, cwd: projectRoot });
+      await exec(`${pm} install`, { cwd: projectRoot, encoding: "utf8" });
       installSpinner.stop("Dependencies installed successfully.");
-    } catch {
+    } catch (error: unknown) {
       installSpinner.stop("Automatic dependency installation failed.");
+      const err = error as {
+        stderr?: string;
+        stdout?: string;
+        message?: string;
+      };
+      const rawOutput = (
+        err.stderr ||
+        err.stdout ||
+        err.message ||
+        ""
+      ).toString();
+      const meaningfulLines = rawOutput
+        .split("\n")
+        .map((line: string) => line.trim())
+        .filter(
+          (line: string) =>
+            line.includes("ERR_") ||
+            line.startsWith("error") ||
+            line.startsWith("npm error") ||
+            line.includes("failed"),
+        );
+
+      if (meaningfulLines.length > 0) {
+        log.warn(
+          `${pm} error:\n    ${meaningfulLines.slice(0, 3).join("\n    ")}`,
+        );
+      }
+
+      if (options.verbose && rawOutput) {
+        log.error(rawOutput);
+      }
+
       log.warn(`Please run "${pm} install" manually to finish linking.`);
     }
   }

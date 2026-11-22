@@ -52,6 +52,7 @@ program
     "Add a production-ready package to your Turborepo workspace (e.g. queue, storage, email, rate-limit, auth)",
   )
   .option("-a, --app <app>", "Target application to link the package into")
+  .option("-v, --verbose", "Display verbose debug and installation output")
   .option("--list", "List available modules and their installation status")
   .option("--allow-dirty", "Allow running with uncommitted git changes")
   .option("--skip-install", "Skip dependency installation")

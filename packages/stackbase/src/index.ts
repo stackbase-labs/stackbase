@@ -3,6 +3,8 @@ import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { initialize } from "./initialize.js";
+import { add } from "./add.js";
+import { list } from "./list.js";
 import { upgrade } from "./upgrade.js";
 import { diff } from "./diff.js";
 import { migrate } from "./migrate.js";
@@ -43,6 +45,38 @@ program
   .option("-y, --yes", "Skip prompts and use defaults")
   .option("-v, --verbose", "Show detailed output")
   .action(initialize);
+
+program
+  .command("add [module]")
+  .description(
+    "Add a production-ready package to your Turborepo workspace (e.g. queue, storage, email, rate-limit, auth)",
+  )
+  .option("-a, --app <app>", "Target application to link the package into")
+  .option("--list", "List available modules and their installation status")
+  .option("--allow-dirty", "Allow running with uncommitted git changes")
+  .option("--skip-install", "Skip dependency installation")
+  .option(
+    "--dry-run",
+    "Preview what files would be created without writing to disk",
+  )
+  .option("-y, --yes", "Skip prompts and use defaults")
+  .action((moduleName, options) =>
+    add(moduleName, {
+      app: options.app,
+      list: options.list,
+      allowDirty: options.allowDirty,
+      skipInstall: options.skipInstall,
+      dryRun: options.dryRun,
+      yes: options.yes,
+    }),
+  );
+
+program
+  .command("list")
+  .description(
+    "List all official Stackbase modules and their installation status",
+  )
+  .action(() => list());
 
 program
   .command("migrate")

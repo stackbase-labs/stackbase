@@ -1,0 +1,143 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import yaml from "yaml";
+
+export const DEFAULT_CATALOGS: Record<string, Record<string, string>> = {
+  core: {
+    turbo: "^2.9.14",
+    react: "^19.2.4",
+    "react-dom": "^19.2.4",
+    "@types/react-dom": "^19.2.3",
+    "@types/react": "^19.2.7",
+    zod: "^4.3.6",
+    "@t3-oss/env-nextjs": "^0.13.11",
+    dotenv: "^17.4.2",
+    "better-auth": "~1.6.11",
+    prisma: "^7.8.0",
+    pg: "^8.20.0",
+    "@types/pg": "^8.20.0",
+    "@prisma/client": "^7.8.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client-runtime-utils": "^7.8.0",
+    "date-fns": "^4.1.0",
+    "@upstash/ratelimit": "^2.0.6",
+    "@upstash/redis": "^1.35.5",
+    "@react-email/ui": "^6.1.4",
+    "react-email": "^6.1.4",
+    resend: "6.9.4",
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/s3-request-presigner": "^3.758.0",
+    bullmq: "^5.41.0",
+    ioredis: "^5.5.0",
+  },
+  dev: {
+    typescript: "^5.9.3",
+    husky: "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "@types/node": "^25.8.0",
+    tsx: "^4.22.1",
+    "@turbo/gen": "^2.9.14",
+    vitest: "^4.1.7",
+    "@vitest/coverage-v8": "4.1.7",
+    "@vitejs/plugin-react": "6.0.2",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    jsdom: "^29.0.1",
+    supertest: "^7.1.4",
+    "@types/supertest": "^6.0.3",
+  },
+  eslint: {
+    eslint: "^9.39.1",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-only-warn": "^1.2.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-turbo": "^2.8.20",
+    "typescript-eslint": "^8.57.1",
+    globals: "^17.4.0",
+    "@eslint/js": "^9.39.1",
+    "@next/eslint-plugin-next": "^16.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.3",
+    "@typescript-eslint/parser": "^8.59.3",
+  },
+  prettier: {
+    prettier: "~3.8.1",
+  },
+};
+
+/**
+ * Checks if target workspace supports and defines the requested catalog.
+ */
+export const getTargetWorkspaceCatalogs = async (
+  projectRoot: string = process.cwd(),
+): Promise<Record<string, Record<string, string>> | null> => {
+  const workspacePath = join(projectRoot, "pnpm-workspace.yaml");
+  try {
+    const content = await readFile(workspacePath, "utf8");
+    const doc = yaml.parse(content) as {
+      catalogs?: Record<string, Record<string, string>>;
+    };
+    return doc?.catalogs ?? null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Resolves catalog versions in a package.json dependency map if the target
+ * workspace cannot support them (e.g. npm, bun, or pnpm without that catalog).
+ */
+export const adaptPackageDependencies = (
+  packageJson: Record<string, unknown>,
+  targetCatalogs: Record<string, Record<string, string>> | null,
+  packageManager: string,
+): Record<string, unknown> => {
+  const result = JSON.parse(JSON.stringify(packageJson)) as Record<
+    string,
+    unknown
+  >;
+  const depFields = [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "optionalDependencies",
+  ] as const;
+
+  for (const field of depFields) {
+    const deps = result[field];
+    if (!deps || typeof deps !== "object") continue;
+
+    const mutableDeps = deps as Record<string, string>;
+    for (const [name, version] of Object.entries(mutableDeps)) {
+      if (typeof version !== "string") continue;
+
+      // Handle workspace protocol conversion for npm
+      if (packageManager === "npm" && version.startsWith("workspace:")) {
+        mutableDeps[name] = "*";
+        continue;
+      }
+
+      // Handle catalog resolution
+      if (version.startsWith("catalog:")) {
+        const catalogName = version.replace("catalog:", "");
+        const targetCatalog = targetCatalogs?.[catalogName];
+
+        // If target workspace is pnpm and has this catalog & package, keep catalog:
+        if (packageManager === "pnpm" && targetCatalog && targetCatalog[name]) {
+          continue;
+        }
+
+        // Otherwise resolve to concrete semver
+        const resolvedVersion =
+          targetCatalog?.[name] ?? DEFAULT_CATALOGS[catalogName]?.[name];
+
+        if (resolvedVersion) {
+          mutableDeps[name] = resolvedVersion;
+        }
+      }
+    }
+  }
+
+  return result;
+};

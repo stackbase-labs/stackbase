@@ -129,6 +129,50 @@ pnpm dlx stackbase@latest init my-api -t api --no-git
 
 ---
 
+### `stackbase add`
+
+Incrementally injects production-ready packages and infrastructure modules into an existing Turborepo workspace.
+
+```bash
+pnpm dlx stackbase@latest add [module] [options]
+```
+
+#### Flags & Options
+
+| Option             | Description                                                    | Default |
+| ------------------ | -------------------------------------------------------------- | ------- |
+| `-a, --app <name>` | Target application to link the package into (`api`, `web`)     | Prompt  |
+| `--list`           | List available modules and their current workspace status      | `false` |
+| `--dry-run`        | Preview files and configuration changes without modifying disk | `false` |
+| `--allow-dirty`    | Bypass the uncommitted git working tree check                  | `false` |
+| `--skip-install`   | Skip package manager dependency installation                   | `false` |
+| `-y, --yes`        | Skip interactive prompts and accept defaults                   | `false` |
+
+#### Examples
+
+```bash
+# Interactive module selection
+pnpm dlx stackbase@latest add
+
+# Add BullMQ + Redis queue package and link into apps/api
+pnpm dlx stackbase@latest add queue --app api
+
+# Preview file injection without modifying disk
+pnpm dlx stackbase@latest add storage --dry-run
+```
+
+---
+
+### `stackbase list`
+
+Displays all official Stackbase modules, their descriptions, and their current installation status in the workspace.
+
+```bash
+pnpm dlx stackbase@latest list
+```
+
+---
+
 ### `stackbase migrate`
 
 Moves an existing Build Elevate project onto the Stackbase release line. The command reads `.build-elevate.json`, updates safe files to the latest Stackbase template, and preserves locally modified files as conflicts.

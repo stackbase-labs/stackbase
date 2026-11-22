@@ -1,6 +1,6 @@
 ---
 title: Command Line Interface
-description: Reference for all stackbase CLI commands - init, migrate, upgrade, and diff.
+description: Reference for all stackbase CLI commands - init, add, list, migrate, upgrade, and diff.
 icon: Terminal
 ---
 
@@ -96,6 +96,70 @@ pnpm dlx stackbase@latest init my-app -t base -p pnpm --docker --k8s --obs --stu
 
 # Scaffold without installing dependencies
 pnpm dlx stackbase@latest init my-app --skip-install
+```
+
+---
+
+### `add`
+
+Incrementally injects production-ready packages and infrastructure modules into an existing Turborepo workspace.
+
+```npm
+pnpm dlx stackbase@latest add [module] [options]
+```
+
+#### Arguments
+
+| Argument | Description |
+| -------- | ----------- |
+| `module` | Optional. The name of the module to add (e.g. `queue`, `storage`, `email`, `rate-limit`, `auth`). If omitted, an interactive selection menu is presented. |
+
+#### Options
+
+| Flag | Description |
+| ---- | ----------- |
+| `-a, --app <app>` | Target application under `apps/*` to link the package into (e.g. `api`, `web`). |
+| `--list` | List available modules and their current installation status in this workspace. |
+| `--allow-dirty` | Allow running even if the git working tree has uncommitted modifications. |
+| `--skip-install` | Skip automatic package manager dependency installation. |
+| `--dry-run` | Preview what files and configurations would be created without writing to disk. |
+| `-y, --yes` | Skip interactive prompts and accept default selections. |
+
+#### What `add` does internally
+
+1. Verifies the current directory is a Turborepo workspace root (`turbo.json` or `package.json`).
+2. Checks git status to protect uncommitted developer work (prompts if the working tree is dirty unless `--allow-dirty` or `--yes` is passed).
+3. Automatically detects the active package manager (`pnpm`, `npm`, `bun`) and monorepo package scope prefix (`@workspace`, `@repo`, or custom).
+4. Verifies `packages/<module>` does not already exist, preventing clobbering existing code.
+5. Injects the package directory into `packages/<module>` and rewrites package references to match your workspace scope prefix.
+6. Auto-resolves catalog dependencies if the target workspace does not use pnpm catalogs or uses npm/bun.
+7. Appends required environment variables from the module's `.env.example` into the workspace root `.env.example`.
+8. Merges backing services (e.g. Redis for `queue`, MinIO for `storage`) into `docker-compose.yml` if present.
+9. Optionally links the new package into your chosen application (e.g. `apps/api/package.json`).
+10. Updates `.stackbase.json` manifest file hashes so future `stackbase upgrade` and `diff` commands seamlessly track the new package.
+11. Runs your package manager's install command to link the new workspace package.
+
+#### Examples
+
+```bash
+# Interactive selection
+pnpm dlx stackbase@latest add
+
+# Add BullMQ + Redis queue package directly into packages/queue and link to apps/api
+pnpm dlx stackbase@latest add queue --app api
+
+# Preview file creation without touching disk
+pnpm dlx stackbase@latest add storage --dry-run
+```
+
+---
+
+### `list`
+
+Displays all official Stackbase modules, their descriptions, and their current installation status in the workspace.
+
+```npm
+pnpm dlx stackbase@latest list
 ```
 
 ---

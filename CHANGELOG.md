@@ -11,15 +11,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ### Added
 
-- **Auto-Provisioning S3 Bucket:** `@workspace/storage` automatically provisions missing buckets and applies a public read policy on local endpoints (MinIO/emulators), removing manual bucket setup.
+- **CLI (`stackbase add [module]`):** Incremental package and infrastructure injection for existing Turborepo workspaces. Injects standalone packages (`queue`, `storage`, `email`, `rate-limit`, `auth`), adapts workspace scope (`@workspace`, `@repo`, `@acme`), auto-resolves catalog dependencies for npm/bun, non-destructively merges `.env.example` and `docker-compose.yml`, tracks file hashes in `.stackbase.json`, and includes git dirty-tree safety checks (`--allow-dirty`).
+- **CLI (`stackbase list`):** Lists all official Stackbase modules with their descriptions and installation status in the current workspace (also accessible via `stackbase add --list`).
+- **Templates (`@workspace/queue`):** Production-ready background job queues and worker pipelines powered by BullMQ and Redis. Includes connection pooling, worker factories, graceful shutdown hooks, and Zod-validated environment schema (`REDIS_URL`, `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`).
+- **Templates (`@workspace/storage`):** Automatically provisions missing buckets and applies a public read policy on local endpoints (MinIO/emulators), removing manual bucket setup.
 
 ### Changed
 
-- **Chainguard MinIO Image:** Switched local MinIO Docker service to `cgr.dev/chainguard/minio:latest` and removed deprecated `mc` healthcheck.
-- **Strict Localhost Bindings:** Bound Docker Compose database and service ports to `127.0.0.1` (`'127.0.0.1:5432:5432'`) to prevent LAN exposure.
-- **Environment Defaults:** Updated starter template `.env.example` files to point `DATABASE_URL` to `127.0.0.1:5432` and `API_INTERNAL_URL` to `localhost:4000`, removing obsolete hostname replacement comments.
-- **Compose Cleanup:** Removed redundant root `compose.yaml` to prevent container name collisions with template environments.
-- **Documentation Refresh:** Comprehensive updates across docs (Troubleshooting, First Steps, DB, Storage, Rate Limit, Docker) standardizing on `127.0.0.1`, Prisma 7 config, modern `docker compose` syntax, and solutions for common local setup errors.
+- **Turborepo 2 Scoping:** Refactored `templates/base`, `templates/web`, and `templates/api` to use workspace-level `turbo.json` with `"extends": ["//"]`, scoping environment variables and task outputs directly to their owning packages.
+- **Docker Compose & Networking:** Hardened local dev services by binding ports strictly to `127.0.0.1` (`'127.0.0.1:5432:5432'`), updated MinIO to `cgr.dev/chainguard/minio:latest`, removed deprecated healthchecks, and removed the redundant root `compose.yaml`.
+- **Environment & Documentation:** Standardized `.env.example` defaults to `127.0.0.1:5432` and `localhost:4000`, refreshed documentation across DB, Storage, Rate Limit, and Docker guides, and updated Prisma 7 configurations.
 
 ## [2.2.0] - 2026-11-04 [Minor] - Zero-Config Local Development & Node 24 Upgrade
 

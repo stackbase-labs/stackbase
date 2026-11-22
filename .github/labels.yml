@@ -1,0 +1,77 @@
+# .github/labels.yml - Repository Label Definitions
+
+# Status & Triage
+- name: "needs-triage"
+  color: "fbca04"
+  description: "New issue awaiting maintainer review"
+
+- name: "status:accepted"
+  color: "0e8a16"
+  description: "Issue or proposal approved and ready for implementation"
+
+- name: "status:in-progress"
+  color: "1d76db"
+  description: "Currently being worked on"
+
+- name: "status:blocked"
+  color: "000000"
+  description: "Blocked by an upstream dependency or design decision"
+
+# Workspace & Architecture
+- name: "area:cli"
+  color: "5319e7"
+  description: "Stackbase CLI commands (add, init, list, upgrade)"
+
+- name: "area:templates"
+  color: "006b75"
+  description: "Starter templates (base, web, api)"
+
+- name: "area:queue"
+  color: "c5def5"
+  description: "Background job queue package (@workspace/queue / BullMQ / Redis)"
+
+- name: "area:storage"
+  color: "bfdadc"
+  description: "S3 / MinIO storage package (@workspace/storage)"
+
+- name: "area:auth"
+  color: "d4c5f9"
+  description: "Better Auth package and session management"
+
+- name: "area:docker"
+  color: "0db7ed"
+  description: "Local Docker Compose, container images, or networking (127.0.0.1)"
+
+- name: "area:docs"
+  color: "0075ca"
+  description: "Documentation site (apps/docs), guides, or API reference"
+
+# Change Type
+- name: "bug"
+  color: "d73a4a"
+  description: "Something isn't working as expected"
+
+- name: "enhancement"
+  color: "a2eeef"
+  description: "New feature or module proposal"
+
+- name: "type:dx"
+  color: "d4c5f9"
+  description: "Developer experience improvement, tooling, or ergonomics"
+
+- name: "type:refactor"
+  color: "e99695"
+  description: "Internal architectural restructuring without behavior change"
+
+# Community
+- name: "rfc"
+  color: "7057ff"
+  description: "Request for Comments / architectural proposal open for feedback"
+
+- name: "good first issue"
+  color: "7057ff"
+  description: "Well-scoped task suitable for new contributors"
+
+- name: "help wanted"
+  color: "008672"
+  description: "Maintainer-approved feature or fix open for community PRs"

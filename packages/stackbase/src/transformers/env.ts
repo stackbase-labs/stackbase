@@ -1,0 +1,93 @@
+import { readFile, writeFile } from "node:fs/promises";
+import { access } from "node:fs/promises";
+
+const fileExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Parses variable keys present in an .env file.
+ */
+export const extractEnvKeys = (envContent: string): Set<string> => {
+  const keys = new Set<string>();
+  const lines = envContent.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)=/);
+    if (match?.[1]) {
+      keys.add(match[1]);
+    }
+  }
+  return keys;
+};
+
+/**
+ * Merges missing environment variables from a module's .env.example into the target .env.example.
+ * Only appends missing keys. Does not modify existing keys.
+ */
+export const mergeEnvExample = async (
+  moduleEnvExampleContent: string,
+  targetEnvExamplePath: string,
+): Promise<{ changed: boolean; addedKeys: string[] }> => {
+  const targetExists = await fileExists(targetEnvExamplePath);
+  let targetContent = "";
+
+  if (targetExists) {
+    targetContent = await readFile(targetEnvExamplePath, "utf8");
+  }
+
+  const existingKeys = extractEnvKeys(targetContent);
+  const moduleLines = moduleEnvExampleContent.split(/\r?\n/);
+  const linesToAdd: string[] = [];
+  const addedKeys: string[] = [];
+
+  let currentCommentBlock: string[] = [];
+
+  for (const line of moduleLines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      currentCommentBlock = [];
+      continue;
+    }
+
+    if (trimmed.startsWith("#")) {
+      currentCommentBlock.push(line);
+      continue;
+    }
+
+    const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)=/);
+    if (match?.[1]) {
+      const key = match[1];
+      if (!existingKeys.has(key)) {
+        if (currentCommentBlock.length > 0) {
+          linesToAdd.push(...currentCommentBlock);
+          currentCommentBlock = [];
+        }
+        linesToAdd.push(line);
+        addedKeys.push(key);
+      }
+    }
+    currentCommentBlock = [];
+  }
+
+  if (linesToAdd.length === 0) {
+    return { changed: false, addedKeys: [] };
+  }
+
+  let newContent = targetContent;
+  if (newContent.length > 0 && !newContent.endsWith("\n")) {
+    newContent += "\n";
+  }
+
+  newContent += `\n# --- Added by Stackbase (${addedKeys.join(", ")}) ---\n`;
+  newContent += linesToAdd.join("\n") + "\n";
+
+  await writeFile(targetEnvExamplePath, newContent);
+  return { changed: true, addedKeys };
+};

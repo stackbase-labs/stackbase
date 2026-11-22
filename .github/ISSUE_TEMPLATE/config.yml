@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Stackbase Documentation
+    url: https://stackbase.dev/docs
+    about: Read our comprehensive guides, CLI reference, and architecture docs.
+  - name: 💬 GitHub Discussions
+    url: https://github.com/stackbase-labs/stackbase/discussions
+    about: Ask questions, share feedback, and discuss with the community.

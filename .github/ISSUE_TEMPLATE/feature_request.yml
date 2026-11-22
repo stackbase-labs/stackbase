@@ -1,0 +1,56 @@
+name: 💡 Feature Request
+description: Suggest an idea, new module, or improvement for Stackbase.
+title: "feat: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an idea! Please share what problem you want solved and how you envision it working.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which area does this feature relate to?
+      options:
+        - CLI (packages/stackbase)
+        - New Module for `stackbase add`
+        - Base Template (templates/base)
+        - Web Template (templates/web)
+        - API Template (templates/api)
+        - Documentation (apps/docs)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem or limitation? A clear description of what the problem is.
+      placeholder: "I'm always frustrated when [...]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution or API Design
+      description: Describe your proposed solution, CLI command syntax, or package structure.
+      placeholder: "Add `stackbase add <new-module>` which configures [...]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: A clear description of any alternative solutions or workarounds you've considered.
+
+  - type: checkboxes
+    id: willingness
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be interested in submitting a PR for this feature.

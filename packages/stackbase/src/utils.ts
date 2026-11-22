@@ -66,6 +66,21 @@ export const isCommandAvailable = async (command: string): Promise<boolean> => {
   }
 };
 
+export const isGitClean = async (
+  cwd: string = process.cwd(),
+): Promise<boolean> => {
+  try {
+    const { stdout } = await exec("git status --porcelain", {
+      cwd,
+      encoding: "utf8",
+    });
+    return stdout.trim().length === 0;
+  } catch {
+    // If not a git repo or git isn't available, don't block
+    return true;
+  }
+};
+
 // Case conversion utilities
 export const toKebabCase = (str: string): string => {
   return str

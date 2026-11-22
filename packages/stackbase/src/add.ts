@@ -1,5 +1,6 @@
 import {
   cancel,
+  confirm,
   intro,
   isCancel,
   log,
@@ -27,6 +28,7 @@ import {
   writeManifest,
 } from "./manifest.js";
 import { getAvailableModules, getModule } from "./modules.js";
+import { getModulesStatus, list } from "./list.js";
 import { findAvailableApps, linkPackageToApp } from "./transformers/appLink.js";
 import {
   adaptPackageDependencies,
@@ -35,7 +37,7 @@ import {
 import { mergeDockerComposeService } from "./transformers/dockerCompose.js";
 import { mergeEnvExample } from "./transformers/env.js";
 import { adaptScope, detectWorkspaceScope } from "./transformers/scope.js";
-import { directoryExists, exec, execSyncOpts } from "./utils.js";
+import { directoryExists, exec, execSyncOpts, isGitClean } from "./utils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -47,6 +49,8 @@ export interface AddOptions {
   skipInstall?: boolean;
   dryRun?: boolean;
   yes?: boolean;
+  allowDirty?: boolean;
+  list?: boolean;
 }
 
 const detectPackageManager = async (projectRoot: string): Promise<string> => {
@@ -128,6 +132,12 @@ export const add = async (
 ): Promise<void> => {
   const projectRoot = process.cwd();
 
+  // If --list flag is provided, display available modules and exit
+  if (options.list) {
+    await list(projectRoot);
+    return;
+  }
+
   intro(`${PRODUCT_NAME} Add Module`);
 
   // 1. Verify we are in a Turborepo workspace
@@ -145,21 +155,51 @@ export const add = async (
     process.exit(1);
   }
 
+  // 2. Git Working Tree Protection
+  if (!options.allowDirty && !options.yes) {
+    const clean = await isGitClean(projectRoot);
+    if (!clean) {
+      log.warn("Your git working tree has uncommitted changes.");
+      const proceed = await confirm({
+        message:
+          "Proceed anyway? (Uncommitted changes may make it harder to review or revert)",
+        initialValue: false,
+      });
+
+      if (isCancel(proceed) || !proceed) {
+        cancel(
+          "Operation cancelled. Please commit or stash your changes before adding modules.",
+        );
+        process.exit(0);
+      }
+    }
+  }
+
   const pm = await detectPackageManager(projectRoot);
   const scope = await detectWorkspaceScope(projectRoot);
 
   log.info(`Workspace detected: Package Manager = ${pm}, Scope = ${scope}`);
 
-  // 2. Resolve module to add
+  // 3. Resolve module to add
   let selectedModuleName = moduleArg;
   if (!selectedModuleName) {
-    const available = getAvailableModules();
+    const statuses = await getModulesStatus(projectRoot);
+    const uninstalled = statuses.filter((s) => !s.installed);
+
+    if (uninstalled.length === 0) {
+      log.info("All official modules are already installed in this workspace.");
+      outro("Nothing to add.");
+      return;
+    }
+
     const selection = await select({
       message: "Select a module to add to your workspace:",
-      options: available.map((mod) => ({
+      options: statuses.map((mod) => ({
         value: mod.name,
-        label: mod.label,
-        hint: mod.description,
+        label: mod.installed ? `${mod.name} (installed)` : mod.name,
+        hint: mod.installed
+          ? "Already installed in packages/"
+          : mod.description,
       })),
     });
 

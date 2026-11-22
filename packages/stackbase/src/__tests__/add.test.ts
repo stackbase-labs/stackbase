@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getAvailableModules, getModule, MODULE_REGISTRY } from "../modules.js";
+import { getModulesStatus } from "../list.js";
+import { isGitClean } from "../utils.js";
 import { adaptScope } from "../transformers/scope.js";
 import { extractEnvKeys, mergeEnvExample } from "../transformers/env.js";
 import { mergeDockerComposeService } from "../transformers/dockerCompose.js";
@@ -212,5 +214,31 @@ describe("App Linking", () => {
     } finally {
       await rm(tempDir, { recursive: true, force: true });
     }
+  });
+});
+
+describe("Module Status & Listing", () => {
+  it("detects installed packages in workspace", async () => {
+    const tempDir = await mkdtemp(join(tmpdir(), "stackbase-test-list-"));
+    try {
+      const { mkdir } = await import("node:fs/promises");
+      await mkdir(join(tempDir, "packages/queue"), { recursive: true });
+
+      const statuses = await getModulesStatus(tempDir);
+      const queueStatus = statuses.find((s) => s.name === "queue");
+      const storageStatus = statuses.find((s) => s.name === "storage");
+
+      expect(queueStatus?.installed).toBe(true);
+      expect(storageStatus?.installed).toBe(false);
+    } finally {
+      await rm(tempDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("Git Status Check", () => {
+  it("returns a boolean for git status", async () => {
+    const clean = await isGitClean();
+    expect(typeof clean).toBe("boolean");
   });
 });

@@ -1,0 +1,27 @@
+---
+version: "2.3.0"
+date: "2026-11-23"
+tag: "minor"
+title: "Stackbase v2.3.0: Modular Package Injection & Turborepo 2 Workspace Scoping"
+summary: "Introduces 'stackbase add' and 'stackbase list' for modular package injection, background queue package with BullMQ and Redis, Turborepo 2 workspace-level configs, and sanitized CLI error diagnostics."
+---
+
+### Added
+
+- **CLI Package Injection (`stackbase add [module]`):** Incrementally injects standalone production-ready packages (`queue`, `storage`, `email`, `rate-limit`, `auth`) into existing Turborepo workspaces.
+  - Automatically adapts monorepo package scope (`@workspace`, `@repo`, or custom scopes).
+  - Resolves catalog dependencies to concrete versions or preserves `catalog:` in `pnpm-workspace.yaml`.
+  - Non-destructively merges required services into `docker-compose.yml` (e.g. Redis for queue, MinIO for storage).
+  - Merges environment variable templates into `.env.example` without duplicating existing keys.
+  - Automatically links the package into the target app (`apps/api` or `apps/web`).
+  - Protects uncommitted developer work with git working tree cleanliness checks (`--allow-dirty` bypass).
+  - Added `-v, --verbose` flag to display full installation debug logs.
+- **CLI Module Discovery (`stackbase list`):** Inspects the workspace and displays a formatted status table of official installed and available modules. Also accessible via `stackbase add --list`.
+- **Background Queue Package (`@workspace/queue`):** Production-ready job queues and worker pipelines powered by BullMQ and Redis, featuring connection pooling, worker factories, graceful shutdown hooks, and Zod-validated environment schema.
+- **Storage Auto-Provisioning (`@workspace/storage`):** Automatically provisions missing buckets and applies public read policies on local emulator endpoints.
+
+### Changed
+
+- **Turborepo 2 Workspace Scoping:** Refactored starter templates (`templates/base`, `templates/web`, `templates/api`) to use workspace-level `turbo.json` configs extending from the root (`"extends": ["//"]`).
+- **Hardened Local Networking:** Bound local Docker dev service ports strictly to `127.0.0.1` (`127.0.0.1:5432:5432`, `127.0.0.1:6379:6379`) and updated MinIO to `cgr.dev/chainguard/minio:latest`.
+- **CLI Error Diagnostics:** When package manager installation fails during `stackbase add`, the CLI isolates and displays the concise root-cause error lines (e.g. `ERR_PNPM_*`, `npm error`) instead of failing silently.

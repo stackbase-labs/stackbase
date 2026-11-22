@@ -142,6 +142,7 @@ pnpm dlx stackbase@latest add [module] [options]
 | Option             | Description                                                    | Default |
 | ------------------ | -------------------------------------------------------------- | ------- |
 | `-a, --app <name>` | Target application to link the package into (`api`, `web`)     | Prompt  |
+| `-v, --verbose`    | Display verbose installation and debug output                  | `false` |
 | `--list`           | List available modules and their current workspace status      | `false` |
 | `--dry-run`        | Preview files and configuration changes without modifying disk | `false` |
 | `--allow-dirty`    | Bypass the uncommitted git working tree check                  | `false` |

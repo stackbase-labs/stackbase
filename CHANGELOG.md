@@ -7,7 +7,7 @@ All changes, fixes and updates to Stackbase.
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 `Latest` is derived from position and is not stored here.
 
-## [Unreleased]
+## [2.3.0] - 2026-11-23 [Minor] - Modular Package Injection & Turborepo 2 Workspace Scoping
 
 ### Added
 

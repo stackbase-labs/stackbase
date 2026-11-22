@@ -20,7 +20,12 @@
     },
     "lint": {
       "dependsOn": ["^build"],
-      "env": ["NODE_ENV", "NEXT_PUBLIC_SITE_URL", "STACKBASE_BRANCH"]
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_SITE_URL",
+        "STACKBASE_BRANCH",
+        "STACKBASE_LOCAL_TEMPLATES_DIR"
+      ]
     },
     "lint:fix": {
       "outputs": [],

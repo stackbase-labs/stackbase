@@ -1,0 +1,9 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "lint": {
+      "env": ["RESEND_TOKEN", "RESEND_EMAIL_FROM", "NODE_ENV"]
+    }
+  }
+}

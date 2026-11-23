@@ -4,6 +4,7 @@ packages:
 
 allowBuilds:
   '@prisma/engines': true
+  core-js: false
   esbuild: true
   msgpackr-extract: true
   prisma: true
@@ -73,6 +74,8 @@ catalogs:
     ai: ^7.0.179
     '@ai-sdk/openai': ^4.0.122
     '@ai-sdk/anthropic': ^4.0.107
+    posthog-js: ^1.453.3
+    posthog-node: ^6.0.6
 
   dev:
     typescript: ^5.9.3

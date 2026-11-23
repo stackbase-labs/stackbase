@@ -8,6 +8,7 @@ import { list } from "./list.js";
 import { upgrade } from "./upgrade.js";
 import { diff } from "./diff.js";
 import { migrate } from "./migrate.js";
+import { doctor } from "./doctor.js";
 import { CLI_NAME, PRODUCT_NAME } from "./branding.js";
 
 // Get package.json version
@@ -78,6 +79,25 @@ program
     "List all official Stackbase modules and their installation status",
   )
   .action(() => list());
+
+program
+  .command("doctor")
+  .description(
+    "Diagnose local monorepo setup issues (Node.js, Docker ports, .env sync, and catalog consistency)",
+  )
+  .option(
+    "--fix",
+    "Automatically fix resolvable environment and catalog issues",
+  )
+  .option("--json", "Output diagnostic report as JSON")
+  .option("-v, --verbose", "Show detailed check diagnostics")
+  .action((options) =>
+    doctor({
+      fix: options.fix,
+      json: options.json,
+      verbose: options.verbose,
+    }),
+  );
 
 program
   .command("migrate")

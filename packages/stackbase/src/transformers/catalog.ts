@@ -3,6 +3,38 @@ import { join } from "node:path";
 import yaml from "yaml";
 
 export const DEFAULT_CATALOGS: Record<string, Record<string, string>> = {
+  web: {
+    next: "^16.2.6",
+    "next-themes": "^0.4.6",
+    tailwindcss: "^4.3.0",
+    "@tailwindcss/postcss": "^4.3.0",
+    "radix-ui": "^1.4.3",
+    "input-otp": "^1.4.2",
+    "lucide-react": "^1.8.0",
+    "class-variance-authority": "^0.7.1",
+    clsx: "^2.1.1",
+    "tailwind-merge": "^3.3.1",
+    "tw-animate-css": "^1.3.6",
+    sonner: "^2.0.7",
+    "react-hook-form": "^7.62.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@tanstack/react-query": "^5.87.4",
+    qrcode: "^1.5.4",
+    "@types/qrcode": "^1.5.5",
+  },
+  server: {
+    express: "^5.2.1",
+    "@types/express": "^5.0.6",
+    cors: "^2.8.6",
+    "@types/cors": "^2.8.19",
+    helmet: "^8.1.0",
+    morgan: "^1.10.1",
+    "@types/morgan": "^1.9.10",
+    pino: "^9.5.0",
+    "pino-http": "^10.3.0",
+    "pino-pretty": "^13.0.0",
+    "prom-client": "^15.1.3",
+  },
   core: {
     turbo: "^2.9.14",
     react: "^19.2.4",

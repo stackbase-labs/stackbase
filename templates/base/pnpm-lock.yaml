@@ -75,6 +75,9 @@ catalogs:
     resend:
       specifier: 6.9.4
       version: 6.9.4
+    stripe:
+      specifier: ^23.2.0
+      version: 23.2.0
     turbo:
       specifier: ^2.9.14
       version: 2.9.14
@@ -726,6 +729,43 @@ importers:
       typescript:
         specifier: catalog:dev
         version: 5.9.3
+
+  packages/payments:
+    dependencies:
+      '@t3-oss/env-nextjs':
+        specifier: catalog:core
+        version: 0.13.11(typescript@5.9.3)(valibot@1.2.0(typescript@5.9.3))(zod@4.4.3)
+      dotenv:
+        specifier: catalog:core
+        version: 17.4.2
+      stripe:
+        specifier: catalog:core
+        version: 23.2.0(@types/node@25.8.0)
+      zod:
+        specifier: catalog:core
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: catalog:dev
+        version: 25.8.0
+      '@workspace/eslint-config':
+        specifier: workspace:^
+        version: link:../eslint-config
+      '@workspace/prettier-config':
+        specifier: workspace:*
+        version: link:../prettier-config
+      '@workspace/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@workspace/vitest-presets':
+        specifier: workspace:*
+        version: link:../vitest-presets
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
+      vitest:
+        specifier: catalog:dev
+        version: 4.1.7(@opentelemetry/api@1.9.1)(@types/node@25.8.0)(@vitest/coverage-v8@4.1.7)(jsdom@29.0.1(@noble/hashes@2.0.1))(vite@8.0.3(@emnapi/core@1.5.0)(@emnapi/runtime@1.9.1)(@types/node@25.8.0)(jiti@2.6.1)(tsx@4.22.1)(yaml@2.8.2))
 
   packages/prettier-config:
     dependencies:
@@ -5628,6 +5668,15 @@ packages:
   strip-json-comments@5.0.3:
     resolution: {integrity: sha512-1tB5mhVo7U+ETBKNf92xT4hrQa3pm0MZ0PQvuDnWgAAGHDsfp4lPSpiS6psrSiet87wyGPh9ft6wmhOMQ0hDiw==}
     engines: {node: '>=14.16'}
+
+  stripe@23.2.0:
+    resolution: {integrity: sha512-0W0J4yA9qFO2rnF61v8Y62OiO2SmAR+Cv04VJaFUMpCxiq8lG5bxEYbeSMSpMDR9ofFZGd+Z/iUIgSFbOolmUw==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@types/node': '>=20'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   stubborn-fs@2.0.0:
     resolution: {integrity: sha512-Y0AvSwDw8y+nlSNFXMm2g6L51rBGdAQT20J3YSOqxC53Lo3bjWRtr2BKcfYoAf352WYpsZSTURrA0tqhfgudPA==}
@@ -10971,6 +11020,10 @@ snapshots:
   strip-json-comments@3.1.1: {}
 
   strip-json-comments@5.0.3: {}
+
+  stripe@23.2.0(@types/node@25.8.0):
+    optionalDependencies:
+      '@types/node': 25.8.0
 
   stubborn-fs@2.0.0:
     dependencies:

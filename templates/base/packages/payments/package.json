@@ -1,0 +1,43 @@
+{
+  "name": "@workspace/payments",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./stripe": {
+      "types": "./src/stripe.ts",
+      "import": "./src/stripe.ts",
+      "default": "./dist/stripe.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist generated .turbo node_modules",
+    "dev": "tsc --build --watch",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "@t3-oss/env-nextjs": "catalog:core",
+    "dotenv": "catalog:core",
+    "stripe": "catalog:core",
+    "zod": "catalog:core"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "@workspace/eslint-config": "workspace:^",
+    "@workspace/prettier-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "@workspace/vitest-presets": "workspace:*",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
+  }
+}

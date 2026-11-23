@@ -69,6 +69,7 @@ catalogs:
     '@aws-sdk/s3-request-presigner': ^3.758.0
     bullmq: ^5.41.0
     ioredis: ^5.5.0
+    stripe: ^23.2.0
 
   dev:
     typescript: ^5.9.3

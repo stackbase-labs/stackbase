@@ -1,6 +1,6 @@
 ---
 title: Command Line Interface
-description: Reference for all stackbase CLI commands - init, add, list, migrate, upgrade, and diff.
+description: Reference for all stackbase CLI commands - init, add, list, doctor, migrate, upgrade, and diff.
 icon: Terminal
 ---
 
@@ -161,6 +161,44 @@ Displays all official Stackbase modules, their descriptions, and their current i
 
 ```npm
 pnpm dlx stackbase@latest list
+```
+
+---
+
+### `doctor`
+
+Diagnoses local monorepo setup issues before developers run into runtime or build friction.
+
+```npm
+pnpm dlx stackbase@latest doctor [options]
+```
+
+#### Options
+
+| Flag            | Description                                                                                                      |
+| --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `--fix`         | Automatically resolve fixable issues (create/sync `.env` files, generate `BETTER_AUTH_SECRET`, repair catalogs). |
+| `--json`        | Output diagnostic report as machine-readable JSON for CI and scripts.                                            |
+| `-v, --verbose` | Display detailed diagnostic breakdowns for every individual check.                                               |
+
+#### What `doctor` checks
+
+1. **Runtime & Package Manager**: Verifies Node.js version ($\ge$ 24) against `engines.node` and ensures the active package manager (`pnpm`, `npm`, `bun`) is installed and major-version compatible with `packageManager`.
+2. **Docker & Local Container Ports**: Checks whether the Docker daemon is running and probes local TCP ports for configured Stackbase services (`5432` PostgreSQL, `6379` Redis, `9000` MinIO S3, `8079` Upstash Redis HTTP proxy). Automatically recognizes remote cloud URLs in `.env` files.
+3. **Environment Variables (`.env.example` vs `.env`)**: Scans root, `apps/*`, and `packages/*` to flag missing `.env` files, unsynced keys, empty values, or placeholder secrets (`BETTER_AUTH_SECRET`).
+4. **Catalog & Workspace Consistency**: Validates that all `workspace:*` dependencies point to existing local packages and that every `catalog:*` specifier resolves in `pnpm-workspace.yaml`.
+
+#### Examples
+
+```bash
+# Run full diagnostic health check
+pnpm dlx stackbase@latest doctor
+
+# Auto-fix missing .env variables, secrets, and catalog entries
+pnpm dlx stackbase@latest doctor --fix
+
+# Output JSON for CI pipelines
+pnpm dlx stackbase@latest doctor --json
 ```
 
 ---

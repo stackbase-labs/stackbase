@@ -1,0 +1,159 @@
+---
+title: Payments
+description: Stripe billing, checkout sessions, customer portal links, and webhook signature verification
+---
+
+# Payments Package
+
+The `@workspace/payments` package provides Stripe billing utilities for subscription and one-time Checkout sessions, self-serve customer Billing Portal links, raw-body webhook signature verification, and typed webhook event routing.
+
+## Overview
+
+- **Package:** `@workspace/payments`
+- **Location:** `packages/payments`
+- **Install via CLI:** `pnpm dlx stackbase@latest add payments`
+- **Provider:** Stripe (`stripe` SDK)
+- **Entrypoints:** `@workspace/payments` and `@workspace/payments/stripe`
+
+## Project Structure
+
+```txt
+packages/payments/
+├── src/
+│   ├── stripe.ts                # Stripe client, Checkout, Billing Portal, and webhook verification
+│   ├── client.ts                # Primary billing helper aliases
+│   ├── keys.ts                  # Zod environment variable schema
+│   ├── types.ts                 # Shared checkout, portal, and webhook types
+│   ├── index.ts                 # Package entry point
+│   └── __tests__/
+│       └── payments.test.ts     # Unit test suite
+├── .env.example                 # Environment variables template
+├── package.json                 # Dependencies and subpath exports
+├── turbo.json                   # Scoped Turborepo lint environment config
+└── tsconfig.json                # TypeScript configuration
+```
+
+## Environment Variables
+
+Configure your Stripe credentials in `packages/payments/.env.local` or your app `.env.local`:
+
+```bash
+# Stripe Billing
+STRIPE_SECRET_KEY=your-stripe-secret-key
+STRIPE_WEBHOOK_SECRET=your-stripe-webhook-secret
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key
+```
+
+<Callout type="info">
+  All environment variables in `@workspace/payments` are marked optional at boot
+  so importing the package in local development or CI tests does not throw when
+  Stripe keys are unset. `getStripeClient()` and `verifyWebhookSignature()`
+  validate that `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are present when
+  called.
+</Callout>
+
+## Usage
+
+### Checkout Sessions
+
+Use `createCheckoutSession` to create a subscription (`mode: 'subscription'`, the default) or one-time payment (`mode: 'payment'`) session and redirect the user to `session.url`:
+
+```typescript
+import { createCheckoutSession } from "@workspace/payments";
+
+const session = await createCheckoutSession({
+  priceId: "price_1ProMonthly",
+  customerEmail: "founder@example.com",
+  successUrl: "http://localhost:3000/settings/billing?success=true",
+  cancelUrl: "http://localhost:3000/settings/billing?canceled=true",
+  metadata: {
+    userId: "usr_123",
+    plan: "pro",
+  },
+});
+
+// Redirect user to session.url
+```
+
+If the user already has a Stripe customer record in your database, pass `customerId` instead of `customerEmail`:
+
+```typescript
+const session = await createCheckoutSession({
+  priceId: "price_1ProMonthly",
+  customerId: "cus_NffrFeUfNV2Hib",
+  successUrl: "http://localhost:3000/settings/billing?success=true",
+});
+```
+
+### Customer Billing Portal
+
+Let existing subscribers manage payment methods, download invoices, or cancel plans through Stripe's hosted Billing Portal:
+
+```typescript
+import { createCustomerPortalSession } from "@workspace/payments";
+
+const portal = await createCustomerPortalSession({
+  customerId: "cus_NffrFeUfNV2Hib",
+  returnUrl: "http://localhost:3000/settings/billing",
+});
+
+// Redirect user to portal.url
+```
+
+### Webhook Verification in Express
+
+Stripe webhook verification requires the **raw request body buffer** (`express.raw({ type: 'application/json' })`). Mount the webhook route before `express.json()`:
+
+```typescript
+import express from "express";
+import {
+  dispatchWebhookEvent,
+  verifyWebhookSignature,
+} from "@workspace/payments";
+
+const router = express.Router();
+
+router.post(
+  "/webhooks/stripe",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const signature = req.headers["stripe-signature"];
+    if (typeof signature !== "string") {
+      res.status(400).json({ error: "Missing stripe-signature header" });
+      return;
+    }
+
+    try {
+      const event = verifyWebhookSignature(req.body as Buffer, signature);
+
+      await dispatchWebhookEvent(event, {
+        "checkout.session.completed": async (evt) => {
+          // Activate subscription in database
+          console.log("Checkout completed:", evt.id);
+        },
+        "customer.subscription.deleted": async (evt) => {
+          // Downgrade subscription in database
+          console.log("Subscription canceled:", evt.id);
+        },
+      });
+
+      res.json({ received: true });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Webhook verification failed";
+      res.status(400).json({ error: message });
+    }
+  },
+);
+```
+
+## API Reference
+
+| Export                                                        | Description                                                                                               |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `getStripeClient(apiKey?)`                                    | Returns the shared Stripe SDK client instance (or creates one for an explicit `apiKey`).                  |
+| `createCheckoutSession(params, client?)`                      | Creates a Stripe Checkout session and returns `{ id, url }`.                                              |
+| `createCustomerPortalSession(params, client?)`                | Creates a Stripe Billing Portal session and returns `{ url }`.                                            |
+| `verifyWebhookSignature(payload, signature, secret?, client)` | Validates raw webhook payload via `stripe.webhooks.constructEvent` and returns `{ id, type, data, raw }`. |
+| `dispatchWebhookEvent(event, handlers)`                       | Invokes the matching handler from `handlers[event.type]` and returns `true` if handled.                   |
+| `keys()`                                                      | Returns validated `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`. |

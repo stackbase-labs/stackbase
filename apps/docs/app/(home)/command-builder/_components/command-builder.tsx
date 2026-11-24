@@ -1,63 +1,83 @@
 "use client";
 
-import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import { motion } from "framer-motion";
 import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldLabel,
-  FieldTitle,
-} from "@workspace/ui/components/field";
-import { Input } from "@workspace/ui/components/input";
-import { Label } from "@workspace/ui/components/label";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@workspace/ui/components/radio-group";
+  BarChart3,
+  Bot,
+  CreditCard,
+  FileJson,
+  GitCommit,
+  Globe,
+  RefreshCw,
+  Rocket,
+  Search,
+  Server,
+  Sparkles,
+  Wrench,
+  Zap,
+} from "lucide-react";
+import { useMemo, useState } from "react";
+
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@workspace/ui/components/select";
-import { Switch } from "@workspace/ui/components/switch";
-import { Check, Copy, Info } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
-
 import { cn } from "@/lib/cn";
 import {
   buildCommand,
-  getResultSummary,
+  commandModes,
+  getInitialModeState,
+  getWorkspaceTree,
   initialBuilderState,
   normalizeBuilderState,
-  packageManagers,
-  runners,
-  templateNames,
-  templates,
+  presetsByMode,
   validateProjectName,
   type BuilderState,
-  type PackageManager,
-  type Runner,
-  type TemplateName,
 } from "../command-builder";
+import { AddControls } from "./mode-add";
+import { DoctorControls } from "./mode-doctor";
+import { InitControls } from "./mode-init";
+import { UpgradeControls } from "./mode-upgrade";
+import { TerminalCard } from "./terminal-card";
+import { WorkspaceTreeView } from "./workspace-tree";
 
-const runnerLabels: Record<Runner, string> = {
-  pnpm: "pnpm dlx",
-  npm: "npx",
-  bun: "bunx",
+const presetIcons: Record<string, typeof Sparkles> = {
+  Rocket,
+  Globe,
+  Server,
+  CreditCard,
+  Bot,
+  Zap,
+  BarChart3,
+  Wrench,
+  Search,
+  FileJson,
+  GitCommit,
+  RefreshCw,
+  Sparkles,
 };
 
 export function CommandBuilder() {
-  const [state, setState] = useState(initialBuilderState);
+  const [state, setState] = useState<BuilderState>(initialBuilderState);
   const [copied, setCopied] = useState(false);
-  const projectNameError = validateProjectName(state.projectName);
-  const command = useMemo(() => buildCommand(state), [state]);
-  const summary = useMemo(() => getResultSummary(state), [state]);
+  const [multiLine, setMultiLine] = useState(false);
+
+  const projectNameError =
+    state.mode === "init" ? validateProjectName(state.projectName) : undefined;
+  const command = useMemo(
+    () => buildCommand(state, { multiLine }),
+    [state, multiLine],
+  );
+  const workspaceTree = useMemo(() => getWorkspaceTree(state), [state]);
 
   function update(patch: Partial<BuilderState>) {
     setState((current) => normalizeBuilderState({ ...current, ...patch }));
+  }
+
+  function resetCurrentMode() {
+    update(getInitialModeState(state.mode));
   }
 
   async function copyCommand() {
@@ -68,390 +88,188 @@ export function CommandBuilder() {
     window.setTimeout(() => setCopied(false), 1500);
   }
 
+  const activePresets = presetsByMode[state.mode];
+
   return (
-    <main className="bg-background text-foreground min-h-[calc(100vh-3.5rem)] px-4 py-16 sm:px-6">
-      <div className="mx-auto max-w-248">
-        <header className="max-w-2xl">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+    <main className="bg-background text-foreground min-h-[calc(100vh-3.5rem)] py-10 pb-28 lg:pb-16">
+      <div className="mx-auto max-w-5xl px-4">
+        {/* Streamlined Header */}
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Build your command
           </h1>
-          <p className="text-muted-foreground mt-4">
-            Configure a project and copy the matching Stackbase command.
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base">
+            Configure project scaffolding, modules, and monorepo maintenance.
           </p>
-        </header>
+        </div>
 
-        <div className="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_23rem]">
-          <div>
-            <BuilderSection title="Project">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Field>
-                  <FieldLabel htmlFor="project-name">Project name</FieldLabel>
-                  <Input
-                    id="project-name"
-                    value={state.projectName}
-                    onChange={(event) =>
-                      update({ projectName: event.target.value })
-                    }
-                    aria-invalid={Boolean(projectNameError)}
-                    aria-describedby={
-                      projectNameError ? "project-name-error" : undefined
-                    }
-                    autoComplete="off"
-                    spellCheck={false}
-                  />
-                  {projectNameError ? (
-                    <p
-                      id="project-name-error"
-                      role="alert"
-                      className="text-destructive text-xs"
-                    >
-                      {projectNameError}
-                    </p>
-                  ) : null}
-                </Field>
-
-                <SelectField
-                  id="runner"
-                  label="Run with"
-                  value={state.runner}
-                  onValueChange={(runner) =>
-                    update({ runner: runner as Runner })
-                  }
-                  options={runners.map((runner) => ({
-                    value: runner,
-                    label: runnerLabels[runner],
-                  }))}
-                />
-              </div>
-            </BuilderSection>
-
-            <BuilderSection title="Template">
-              <RadioGroup
-                value={state.template}
-                onValueChange={(template) =>
-                  update({ template: template as TemplateName })
-                }
-                aria-label="Project template"
-              >
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {templateNames.map((template) => {
-                    const definition = templates[template];
-                    const selected = state.template === template;
-                    const id = "template-" + template;
-
-                    return (
-                      <FieldLabel
-                        key={template}
-                        htmlFor={id}
-                        className="w-full cursor-pointer"
-                      >
-                        <Card
-                          size="sm"
-                          className={cn(
-                            "w-full",
-                            selected ? "ring-foreground" : "ring-transparent",
-                          )}
-                        >
-                          <CardContent>
-                            <Field orientation="horizontal">
-                              <FieldContent>
-                                <FieldTitle>{definition.label}</FieldTitle>
-                                <FieldDescription>
-                                  {definition.hint}
-                                </FieldDescription>
-                              </FieldContent>
-                              <RadioGroupItem value={template} id={id} />
-                            </Field>
-                          </CardContent>
-                        </Card>
-                      </FieldLabel>
-                    );
-                  })}
-                </div>
-              </RadioGroup>
-            </BuilderSection>
-
-            <BuilderSection title="Runtime and features">
-              <SelectField
-                id="package-manager"
-                label="Package manager"
-                value={state.packageManager}
-                onValueChange={(packageManager) =>
-                  update({ packageManager: packageManager as PackageManager })
-                }
-                options={packageManagers.map((packageManager) => ({
-                  value: packageManager,
-                  label: packageManager,
-                }))}
-              />
-
-              <FeatureControls state={state} update={update} />
-            </BuilderSection>
+        {/* Toolbar: Mode Tabs (Left) + Presets (Right) */}
+        <div className="mt-8 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          <div
+            role="tablist"
+            aria-label="Command Mode"
+            className="bg-muted p-1 rounded-lg w-full md:w-auto grid grid-cols-4 gap-1 relative"
+          >
+            {commandModes.map((mode) => {
+              const active = state.mode === mode;
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => update({ mode })}
+                  className={cn(
+                    "relative min-w-0 px-1.5 sm:px-4 py-1.5 text-[11px] sm:text-xs font-mono rounded-md transition-colors cursor-pointer z-10 text-center flex items-center justify-center",
+                    active
+                      ? "text-foreground font-semibold"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {active && (
+                    <motion.div
+                      layoutId="active-command-mode"
+                      className="absolute inset-0 bg-background rounded-md shadow-xs -z-10"
+                      transition={{
+                        type: "spring",
+                        bounce: 0.15,
+                        duration: 0.35,
+                      }}
+                    />
+                  )}
+                  <span className="truncate">{mode}</span>
+                </button>
+              );
+            })}
           </div>
 
-          <aside className="lg:sticky lg:top-20">
-            <section>
-              <h2 className="text-sm font-medium">Command</h2>
-              <div className="bg-card mt-4 border rounded-lg">
-                <div className="flex h-11 items-center justify-between border-b px-3">
-                  <span className="text-muted-foreground text-sm">
-                    Terminal
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={copied ? "Command copied" : "Copy command"}
-                    disabled={Boolean(projectNameError)}
-                    onClick={() => void copyCommand()}
-                  >
-                    {copied ? <Check /> : <Copy />}
-                  </Button>
-                </div>
-                <pre
-                  className="min-h-36 p-4 font-mono text-sm leading-7 wrap-break-words whitespace-pre-wrap"
-                  aria-live="polite"
+          {/* Mode-Scoped Presets Dropdown */}
+          {activePresets && activePresets.length > 0 && (
+            <div className="w-40 sm:w-48 shrink-0 self-end md:self-auto">
+              <label htmlFor="preset-select" className="sr-only">
+                Presets
+              </label>
+              <Select
+                value=""
+                onValueChange={(presetId) => {
+                  const found = activePresets.find((p) => p.id === presetId);
+                  if (found) update(found.patch);
+                }}
+              >
+                <SelectTrigger
+                  id="preset-select"
+                  aria-label="Presets"
+                  className="w-full h-8 text-xs bg-muted/60 hover:bg-muted border-border/60 transition-colors"
                 >
-                  <span className="text-muted-foreground select-none">$ </span>
-                  {command}
-                </pre>
-              </div>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-medium">Result</h2>
-              <dl className="mt-3 text-sm">
-                <SummaryRow label="Template" value={summary.template} />
-                <SummaryRow label="Apps" value={summary.apps.join(", ")} />
-                <SummaryRow
-                  label="Operations"
-                  value={summary.operations.join(", ") || "None"}
-                />
-              </dl>
-            </section>
-
-            <div className="text-muted-foreground mt-6 flex gap-2 text-xs leading-5">
-              <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-              <p>
-                The command includes every supported feature choice. No hidden
-                defaults.
-              </p>
+                  <span className="flex items-center gap-1.5 text-muted-foreground truncate font-medium">
+                    <Sparkles className="size-3.5 text-primary shrink-0" />
+                    <span>Presets</span>
+                  </span>
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  align="end"
+                  className="w-72 sm:w-80 p-1.5 shadow-lg"
+                >
+                  {activePresets.map((preset) => {
+                    const Icon =
+                      presetIcons[preset.icon ?? "Sparkles"] ?? Sparkles;
+                    return (
+                      <SelectItem
+                        key={preset.id}
+                        value={preset.id}
+                        className="text-xs p-2 pr-2.5 pl-2.5 rounded-md cursor-pointer transition-colors my-0.5"
+                      >
+                        <div className="flex items-start gap-2.5 w-full">
+                          <div className="size-7 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5 border border-border/50 text-foreground/80">
+                            <Icon className="size-3.5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-1.5">
+                              <span className="font-semibold text-foreground text-xs truncate">
+                                {preset.label}
+                              </span>
+                              {preset.tag && (
+                                <span className="text-[10px] font-mono font-medium px-1.5 py-px rounded bg-muted text-muted-foreground border border-border/60 shrink-0">
+                                  {preset.tag}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">
+                              {preset.description}
+                            </p>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
             </div>
+          )}
+        </div>
+
+        {/* Studio Grid: Configurator (Left) + Architecture & Terminal (Right) */}
+        <div className="mt-8 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_26rem]">
+          <div className="space-y-8">
+            {state.mode === "init" && (
+              <InitControls
+                state={state}
+                update={update}
+                projectNameError={projectNameError}
+              />
+            )}
+
+            {state.mode === "add" && (
+              <AddControls state={state} update={update} />
+            )}
+
+            {state.mode === "doctor" && (
+              <DoctorControls state={state} update={update} />
+            )}
+
+            {state.mode === "upgrade" && (
+              <UpgradeControls state={state} update={update} />
+            )}
+          </div>
+
+          {/* Sticky Sidebar: Command Terminal (Top) + Workspace Architecture (Bottom) */}
+          <aside className="space-y-6 lg:sticky lg:top-20">
+            {/* Live Terminal Command Block */}
+            <section>
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold tracking-tight">
+                  Command
+                </h2>
+                {copied && (
+                  <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                    Copied to clipboard
+                  </span>
+                )}
+              </div>
+              <TerminalCard
+                command={command}
+                runner={state.runner}
+                onRunnerChange={(runner) => update({ runner })}
+                multiLine={multiLine}
+                onToggleMultiLine={() => setMultiLine((prev) => !prev)}
+                onReset={resetCurrentMode}
+                onCopy={() => void copyCommand()}
+                copied={copied}
+                disableCopy={Boolean(projectNameError)}
+              />
+            </section>
+
+            {/* Live Workspace Architecture Tree */}
+            <section>
+              <h2 className="text-sm font-semibold tracking-tight mb-2">
+                Workspace architecture
+              </h2>
+              <WorkspaceTreeView node={workspaceTree} />
+            </section>
           </aside>
         </div>
       </div>
     </main>
-  );
-}
-
-function FeatureControls({
-  state,
-  update,
-}: {
-  state: BuilderState;
-  update: (patch: Partial<BuilderState>) => void;
-}) {
-  const capabilities = templates[state.template].capabilities;
-  const templateLabel = templates[state.template].label;
-  const options = [
-    {
-      id: "docker",
-      label: "Docker",
-      description: "Container configuration",
-      checked: state.docker,
-      onCheckedChange: (docker: boolean) => update({ docker }),
-    },
-    {
-      id: "observability",
-      label: "Observability",
-      description: "Metrics and tracing",
-      checked: state.observability,
-      disabled: !state.docker || !capabilities.observability,
-      disabledReason: !capabilities.observability
-        ? templateLabel + " does not include observability."
-        : "Requires Docker.",
-      onCheckedChange: (observability: boolean) => update({ observability }),
-    },
-    {
-      id: "kubernetes",
-      label: "Kubernetes",
-      description: "Deployment manifests",
-      checked: state.kubernetes,
-      disabled: !state.docker || !capabilities.kubernetes,
-      disabledReason: !capabilities.kubernetes
-        ? templateLabel + " does not include Kubernetes."
-        : "Requires Docker.",
-      onCheckedChange: (kubernetes: boolean) => update({ kubernetes }),
-    },
-    {
-      id: "studio",
-      label: "Prisma Studio",
-      description: "Database browser",
-      checked: state.studio,
-      onCheckedChange: (studio: boolean) => update({ studio }),
-    },
-    {
-      id: "git",
-      label: "Initialize Git",
-      description: "Create a repository",
-      checked: state.git,
-      onCheckedChange: (git: boolean) => update({ git }),
-    },
-    {
-      id: "install",
-      label: "Install dependencies",
-      description: "Run package install",
-      checked: state.install,
-      onCheckedChange: (install: boolean) => update({ install }),
-    },
-    {
-      id: "verbose",
-      label: "Verbose output",
-      description: "Show detailed logs",
-      checked: state.verbose,
-      onCheckedChange: (verbose: boolean) => update({ verbose }),
-    },
-  ];
-
-  function renderOption(option: (typeof options)[number]) {
-    return (
-      <FeatureSwitch
-        key={option.id}
-        id={option.id}
-        label={option.label}
-        description={option.description}
-        checked={option.checked}
-        disabled={option.disabled}
-        disabledReason={option.disabledReason}
-        onCheckedChange={option.onCheckedChange}
-      />
-    );
-  }
-
-  const deploymentOptions = options.slice(0, 3);
-  const workflowOptions = options.slice(3);
-
-  return (
-    <div className="mt-6 space-y-5">
-      <FeatureGroup title="Deployment">
-        {deploymentOptions.map(renderOption)}
-      </FeatureGroup>
-      <FeatureGroup title="Developer workflow">
-        {workflowOptions.map(renderOption)}
-      </FeatureGroup>
-    </div>
-  );
-}
-
-function FeatureGroup({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section>
-      <h3 className="text-muted-foreground mb-2 text-xs font-medium uppercase">
-        {title}
-      </h3>
-      <div className="grid border-t sm:grid-cols-2 sm:gap-x-7">{children}</div>
-    </section>
-  );
-}
-
-function BuilderSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="border-b py-7 first:pt-0 last:border-b-0 last:pb-0">
-      <h2 className="mb-5 text-sm font-medium">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function SelectField({
-  id,
-  label,
-  value,
-  options,
-  onValueChange,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  options: readonly { value: string; label: string }[];
-  onValueChange: (value: string) => void;
-}) {
-  return (
-    <Field>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger id={id} className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent
-          position="popper"
-          className="min-w-(--radix-select-trigger-width)"
-        >
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </Field>
-  );
-}
-
-function FeatureSwitch({
-  id,
-  label,
-  description,
-  checked,
-  disabled = false,
-  disabledReason,
-  onCheckedChange,
-}: {
-  id: string;
-  label: string;
-  description?: string;
-  checked: boolean;
-  disabled?: boolean;
-  disabledReason?: string;
-  onCheckedChange: (checked: boolean) => void;
-}) {
-  return (
-    <div className="flex min-h-12 items-center justify-between gap-4 border-b">
-      <div>
-        <Label htmlFor={id}>{label}</Label>
-        {disabledReason || description ? (
-          <p className="text-muted-foreground mt-1 text-xs">
-            {disabled ? disabledReason : description}
-          </p>
-        ) : null}
-      </div>
-      <Switch
-        id={id}
-        checked={checked}
-        disabled={disabled}
-        onCheckedChange={onCheckedChange}
-      />
-    </div>
-  );
-}
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="grid min-h-10 grid-cols-[7rem_1fr] items-center border-b">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd>{value}</dd>
-    </div>
   );
 }

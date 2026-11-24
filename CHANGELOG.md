@@ -7,6 +7,22 @@ All changes, fixes and updates to Stackbase.
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 `Latest` is derived from position and is not stored here.
 
+## [2.4.0] - 2026-11-24 [Minor] - Diagnostic Health Engine, Opt-in Modules Suite & Command Builder
+
+### Added
+
+- **CLI Diagnostics (`stackbase doctor`):** Built-in workspace health inspection command that validates required tooling (Node.js, Git, package managers, Docker), detects conflicting ports (5432, 6379, 9000, 9001, etc.), verifies module `.env*` variables against templates, and offers interactive or automatic remediation with `--fix`.
+- **Payments Package (`@workspace/payments`):** Production-ready Stripe integration featuring subscription management, webhook handling with signature verification, customer portal session creation, and Zod-validated environment schema (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`).
+- **AI Package (`@workspace/ai`):** Model-agnostic AI infrastructure powered by the Vercel AI SDK (`ai`), supporting OpenAI and Anthropic provider resolution with caching, fallback providers (`withFallback`, `generateTextWithFallback`, `streamTextWithFallback`), and schema-validated tool definitions (`defineTool`).
+- **Analytics Package (`@workspace/analytics`):** Product analytics integration powered by PostHog with dual `@workspace/analytics/client` and `@workspace/analytics/server` entrypoints, user identification, event capture, feature flag evaluation, and zero-config local development no-op fallbacks.
+- **CLI Opt-in Module Registration (`stackbase add`):** Registered `payments`, `ai`, and `analytics` as opt-in modules with multi-app dependency linking (`--app api,web`), automated `packages/<module>/.env.local` creation from `.env.example`, and cross-workspace `BETTER_AUTH_SECRET` synchronization.
+- **Interactive Command Builder:** Added interactive CLI command configurator to documentation supporting all 4 CLI modes (`init`, `add`, `doctor`, `upgrade`), live syntax-highlighted terminal tokens, package runner tabs (`pnpm`, `npm`, `bun`), dynamic workspace directory tree preview, and responsive quick presets.
+- **Documentation:** Added comprehensive package guides for AI, Payments, Analytics, and Queue modules.
+
+### Fixed
+
+- **UI Contrast:** Fixed Radix UI radio group indicator styling in `@workspace/ui` to ensure consistent contrast when selected.
+
 ## [2.3.0] - 2026-11-23 [Minor] - Modular Package Injection & Turborepo 2 Workspace Scoping
 
 ### Added

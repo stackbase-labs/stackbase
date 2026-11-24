@@ -1,0 +1,21 @@
+---
+version: "2.4.0"
+date: "2026-11-24"
+tag: "latest"
+title: "Stackbase v2.4.0: Diagnostic Health Engine, Opt-in Modules Suite & Command Builder"
+summary: "Introduces 'stackbase doctor' diagnostics, three new official modules (@workspace/payments, @workspace/ai, @workspace/analytics), multi-app linking and auto env initialization in 'stackbase add', and an interactive CLI Command Builder suite."
+---
+
+### Added
+
+- **CLI Diagnostics (`stackbase doctor`):** Built-in workspace health inspection command that validates required tooling (Node.js, Git, package managers, Docker), detects conflicting ports (5432, 6379, 9000, 9001), verifies module `.env*` variables against templates, and offers automated remediation with `--fix`.
+- **Payments Package (`@workspace/payments`):** Production-ready Stripe integration featuring subscription management, webhook handling with signature verification, customer portal session creation, and Zod-validated environment schema.
+- **AI Package (`@workspace/ai`):** Model-agnostic AI infrastructure powered by the Vercel AI SDK (`ai`), supporting OpenAI and Anthropic provider resolution with caching, fallback providers (`withFallback`, `generateTextWithFallback`, `streamTextWithFallback`), and schema-validated tool definitions (`defineTool`).
+- **Analytics Package (`@workspace/analytics`):** Product analytics integration powered by PostHog with dual `@workspace/analytics/client` and `@workspace/analytics/server` entrypoints, user identification, event capture, feature flag evaluation, and zero-config local development no-op fallbacks.
+- **CLI Opt-in Module Registration (`stackbase add`):** Registered `payments`, `ai`, and `analytics` as opt-in modules with multi-app dependency linking (`--app api,web`), automated `packages/<module>/.env.local` creation from `.env.example`, and cross-workspace `BETTER_AUTH_SECRET` synchronization.
+- **Interactive Command Builder:** Interactive CLI configurator in documentation supporting all 4 commands (`init`, `add`, `doctor`, `upgrade`), live syntax-highlighted terminal output, runner switcher (`pnpm`, `npm`, `bun`), and dynamic workspace architecture tree preview.
+- **Documentation:** Added comprehensive package guides for AI, Payments, Analytics, and Queue modules.
+
+### Fixed
+
+- **UI Contrast:** Fixed Radix UI radio group indicator styling in `@workspace/ui` to guarantee high contrast when selected.

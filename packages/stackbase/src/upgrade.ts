@@ -25,6 +25,7 @@ import {
 } from "./update.js";
 import { applyProjectName } from "./utils.js";
 import { getManifestFilePath, getTemplatePath } from "./templates.js";
+import { OPTIONAL_MODULE_NAMES } from "./modules.js";
 
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
 const API_BASE = `https://api.github.com/repos/${REPO}`;
@@ -123,6 +124,34 @@ const isExcludedByFeatures = (
         (p) => filePath === p || filePath.startsWith(p + "/"),
       ),
   );
+};
+
+/**
+ * Returns true when a file belongs to an opt-in (`optional: true`) module that
+ * is not currently tracked in `.stackbase.json`. This prevents `stackbase upgrade`
+ * from auto-installing opt-in modules unless the user previously added them via
+ * `stackbase add`.
+ */
+export const isExcludedByOptionalModules = (
+  filePath: string,
+  manifestFileSet: Set<string>,
+): boolean => {
+  if (!filePath.startsWith("packages/")) return false;
+
+  const rest = filePath.slice("packages/".length);
+  const slashIdx = rest.indexOf("/");
+  const modName = slashIdx === -1 ? rest : rest.slice(0, slashIdx);
+
+  if (!OPTIONAL_MODULE_NAMES.has(modName)) return false;
+  if (manifestFileSet.has(filePath)) return false;
+
+  const prefix = `packages/${modName}`;
+  for (const tracked of manifestFileSet) {
+    if (tracked === prefix || tracked.startsWith(`${prefix}/`)) {
+      return false;
+    }
+  }
+  return true;
 };
 
 export const getLatestCommit = async (): Promise<string> => {
@@ -322,6 +351,8 @@ export const upgrade = async (options: UpgradeOptions = {}) => {
       if (shouldSkip(filePath)) continue;
       // Don't bring back files for optional features the user chose to skip
       if (isExcludedByFeatures(filePath, features)) continue;
+      // Don't install opt-in modules unless they are already tracked in .stackbase.json
+      if (isExcludedByOptionalModules(filePath, manifestFileSet)) continue;
       const localFilePath = resolveManifestFilePath(projectRoot, filePath);
 
       const rawContent = await getFileAtCommit(

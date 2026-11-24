@@ -61,6 +61,12 @@ export const DEFAULT_CATALOGS: Record<string, Record<string, string>> = {
     "@aws-sdk/s3-request-presigner": "^3.758.0",
     bullmq: "^5.41.0",
     ioredis: "^5.5.0",
+    stripe: "^23.2.0",
+    ai: "^7.0.179",
+    "@ai-sdk/openai": "^4.0.122",
+    "@ai-sdk/anthropic": "^4.0.107",
+    "posthog-js": "^1.453.3",
+    "posthog-node": "^6.0.6",
   },
   dev: {
     typescript: "^5.9.3",

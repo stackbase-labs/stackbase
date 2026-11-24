@@ -131,7 +131,7 @@ pnpm dlx stackbase@latest init my-api -t api --no-git
 
 ### `stackbase add`
 
-Incrementally injects production-ready packages and infrastructure modules into an existing Turborepo workspace.
+Incrementally injects production-ready packages and infrastructure modules (`queue`, `storage`, `email`, `rate-limit`, `auth`, `payments`, `ai`, `analytics`) into an existing Turborepo workspace.
 
 ```bash
 pnpm dlx stackbase@latest add [module] [options]
@@ -139,15 +139,15 @@ pnpm dlx stackbase@latest add [module] [options]
 
 #### Flags & Options
 
-| Option             | Description                                                    | Default |
-| ------------------ | -------------------------------------------------------------- | ------- |
-| `-a, --app <name>` | Target application to link the package into (`api`, `web`)     | Prompt  |
-| `-v, --verbose`    | Display verbose installation and debug output                  | `false` |
-| `--list`           | List available modules and their current workspace status      | `false` |
-| `--dry-run`        | Preview files and configuration changes without modifying disk | `false` |
-| `--allow-dirty`    | Bypass the uncommitted git working tree check                  | `false` |
-| `--skip-install`   | Skip package manager dependency installation                   | `false` |
-| `-y, --yes`        | Skip interactive prompts and accept defaults                   | `false` |
+| Option             | Description                                                              | Default |
+| ------------------ | ------------------------------------------------------------------------ | ------- |
+| `-a, --app <name>` | Target application(s) to link the package into (`api`, `web`, `api,web`) | Prompt  |
+| `-v, --verbose`    | Display verbose installation and debug output                            | `false` |
+| `--list`           | List available modules and their current workspace status                | `false` |
+| `--dry-run`        | Preview files and configuration changes without modifying disk           | `false` |
+| `--allow-dirty`    | Bypass the uncommitted git working tree check                            | `false` |
+| `--skip-install`   | Skip package manager dependency installation                             | `false` |
+| `-y, --yes`        | Skip interactive prompts and accept defaults                             | `false` |
 
 #### Examples
 
@@ -157,6 +157,11 @@ pnpm dlx stackbase@latest add
 
 # Add BullMQ + Redis queue package and link into apps/api
 pnpm dlx stackbase@latest add queue --app api
+
+# Add Stripe payments, Vercel AI SDK, or PostHog analytics across apps/api and apps/web
+pnpm dlx stackbase@latest add payments --app api,web
+pnpm dlx stackbase@latest add ai --yes
+pnpm dlx stackbase@latest add analytics --yes
 
 # Preview file injection without modifying disk
 pnpm dlx stackbase@latest add storage --dry-run

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { getAvailableModules, getModule, MODULE_REGISTRY } from "../modules.js";
+import {
+  getAvailableModules,
+  getModule,
+  getOptionalModules,
+  MODULE_REGISTRY,
+} from "../modules.js";
 import { getModulesStatus } from "../list.js";
+import { isExcludedByOptionalModules } from "../upgrade.js";
 import { isGitClean } from "../utils.js";
 import { adaptScope } from "../transformers/scope.js";
 import { extractEnvKeys, mergeEnvExample } from "../transformers/env.js";
@@ -23,16 +29,95 @@ describe("Module Registry", () => {
     expect(MODULE_REGISTRY.auth).toBeDefined();
   });
 
+  it("registers opt-in payments, ai, and analytics modules", () => {
+    expect(MODULE_REGISTRY.payments).toBeDefined();
+    expect(MODULE_REGISTRY.payments?.optional).toBe(true);
+    expect(MODULE_REGISTRY.payments?.recommendedApp).toBe("api");
+    expect(MODULE_REGISTRY.payments?.recommendedApps).toEqual(["api", "web"]);
+
+    expect(MODULE_REGISTRY.ai).toBeDefined();
+    expect(MODULE_REGISTRY.ai?.optional).toBe(true);
+    expect(MODULE_REGISTRY.ai?.recommendedApp).toBe("api");
+    expect(MODULE_REGISTRY.ai?.recommendedApps).toEqual(["api", "web"]);
+
+    expect(MODULE_REGISTRY.analytics).toBeDefined();
+    expect(MODULE_REGISTRY.analytics?.optional).toBe(true);
+    expect(MODULE_REGISTRY.analytics?.recommendedApp).toBe("web");
+    expect(MODULE_REGISTRY.analytics?.recommendedApps).toEqual(["web", "api"]);
+  });
+
+  it("returns only opt-in modules from getOptionalModules()", () => {
+    const optional = getOptionalModules();
+    const names = optional.map((m) => m.name);
+    expect(names).toEqual(
+      expect.arrayContaining(["payments", "ai", "analytics"]),
+    );
+    expect(names).not.toContain("queue");
+    expect(names).not.toContain("auth");
+  });
+
   it("retrieves module by name case-insensitively", () => {
     expect(getModule("QUEUE")).toBeDefined();
     expect(getModule("queue")?.name).toBe("queue");
+    expect(getModule("PAYMENTS")?.name).toBe("payments");
+    expect(getModule("AI")?.name).toBe("ai");
+    expect(getModule("ANALYTICS")?.name).toBe("analytics");
     expect(getModule("nonexistent")).toBeUndefined();
   });
 
   it("lists all available modules", () => {
     const all = getAvailableModules();
-    expect(all.length).toBeGreaterThanOrEqual(5);
+    expect(all.length).toBeGreaterThanOrEqual(8);
     expect(all.some((m) => m.name === "queue")).toBe(true);
+    expect(all.some((m) => m.name === "payments")).toBe(true);
+    expect(all.some((m) => m.name === "ai")).toBe(true);
+    expect(all.some((m) => m.name === "analytics")).toBe(true);
+  });
+});
+
+describe("Optional Module Upgrade Filtering", () => {
+  it("excludes opt-in modules that are not tracked in the manifest", () => {
+    const manifestFiles = new Set(["package.json", "packages/db/package.json"]);
+    expect(
+      isExcludedByOptionalModules(
+        "packages/payments/package.json",
+        manifestFiles,
+      ),
+    ).toBe(true);
+    expect(
+      isExcludedByOptionalModules("packages/ai/src/index.ts", manifestFiles),
+    ).toBe(true);
+    expect(
+      isExcludedByOptionalModules(
+        "packages/analytics/src/index.ts",
+        manifestFiles,
+      ),
+    ).toBe(true);
+    expect(
+      isExcludedByOptionalModules("packages/db/package.json", manifestFiles),
+    ).toBe(false);
+  });
+
+  it("includes opt-in modules when already tracked in the manifest", () => {
+    const manifestFiles = new Set([
+      "package.json",
+      "packages/payments/package.json",
+    ]);
+    expect(
+      isExcludedByOptionalModules(
+        "packages/payments/package.json",
+        manifestFiles,
+      ),
+    ).toBe(false);
+    expect(
+      isExcludedByOptionalModules(
+        "packages/payments/src/new-file.ts",
+        manifestFiles,
+      ),
+    ).toBe(false);
+    expect(
+      isExcludedByOptionalModules("packages/ai/package.json", manifestFiles),
+    ).toBe(true);
   });
 });
 
@@ -155,6 +240,12 @@ describe("Catalog Adaptation", () => {
       dependencies: {
         bullmq: "catalog:core",
         zod: "catalog:core",
+        stripe: "catalog:core",
+        ai: "catalog:core",
+        "@ai-sdk/openai": "catalog:core",
+        "@ai-sdk/anthropic": "catalog:core",
+        "posthog-js": "catalog:core",
+        "posthog-node": "catalog:core",
       },
     };
 
@@ -162,6 +253,12 @@ describe("Catalog Adaptation", () => {
     const deps = adapted.dependencies as Record<string, string>;
     expect(deps.bullmq).toBe(DEFAULT_CATALOGS.core.bullmq);
     expect(deps.zod).toBe(DEFAULT_CATALOGS.core.zod);
+    expect(deps.stripe).toBe("^23.2.0");
+    expect(deps.ai).toBe("^7.0.179");
+    expect(deps["@ai-sdk/openai"]).toBe("^4.0.122");
+    expect(deps["@ai-sdk/anthropic"]).toBe("^4.0.107");
+    expect(deps["posthog-js"]).toBe("^1.453.3");
+    expect(deps["posthog-node"]).toBe("^6.0.6");
   });
 
   it("converts workspace:* to * for npm workspaces", () => {

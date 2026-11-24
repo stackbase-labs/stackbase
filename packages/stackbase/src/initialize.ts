@@ -13,6 +13,7 @@ import { tmpdir } from "node:os";
 import degit from "degit";
 import { buildManifest, writeManifest } from "./manifest.js";
 import { MANIFEST_FILE, PRODUCT_NAME, REPO } from "./branding.js";
+import { getOptionalModules } from "./modules.js";
 import {
   cancel,
   intro,
@@ -134,6 +135,19 @@ const removeObservabilityFiles = async () => {
       `Some Observability files could not be deleted: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
+};
+
+const removeOptionalModules = async () => {
+  const optionalModules = getOptionalModules();
+  await Promise.all(
+    optionalModules.map(async (mod) => {
+      try {
+        await rm(join("packages", mod.name), { recursive: true, force: true });
+      } catch {
+        // Ignore if module directory is not present in the selected template
+      }
+    }),
+  );
 };
 
 const removeDockerFiles = async () => {
@@ -1015,6 +1029,7 @@ export const initialize = async (
 
     s.message("Preparing project directory...");
     process.chdir(projectDir);
+    await removeOptionalModules();
     if (options.verbose) log.info(`✓ Changed directory to ${projectDir}`);
 
     s.message("Replacing project name...");

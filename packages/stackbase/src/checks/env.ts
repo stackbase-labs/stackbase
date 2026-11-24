@@ -36,6 +36,13 @@ const PLACEHOLDER_PATTERNS: Record<string, RegExp[]> = {
   GOOGLE_CLIENT_ID: [/^your-google-client-id/i],
   GOOGLE_CLIENT_SECRET: [/^GOCSPX-x+$/i, /^your-google-client-secret/i],
   RESEND_TOKEN: [/^re_x+$/i, /^your-resend/i],
+  STRIPE_SECRET_KEY: [/^your-/i],
+  STRIPE_WEBHOOK_SECRET: [/^your-/i],
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: [/^your-/i],
+  OPENAI_API_KEY: [/^your-/i],
+  ANTHROPIC_API_KEY: [/^your-/i],
+  POSTHOG_API_KEY: [/^your-/i],
+  NEXT_PUBLIC_POSTHOG_KEY: [/^your-/i],
 };
 
 /**

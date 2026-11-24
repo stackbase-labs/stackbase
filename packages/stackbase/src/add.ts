@@ -37,7 +37,7 @@ import {
 import { mergeDockerComposeService } from "./transformers/dockerCompose.js";
 import { mergeEnvExample } from "./transformers/env.js";
 import { adaptScope, detectWorkspaceScope } from "./transformers/scope.js";
-import { directoryExists, exec, execSyncOpts, isGitClean } from "./utils.js";
+import { directoryExists, exec, isGitClean } from "./utils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -347,22 +347,50 @@ export const add = async (
 
   // 9. App Linking
   const availableApps = await findAvailableApps(projectRoot);
-  let appToLink: string | undefined = options.app;
+  const availableAppMap = new Map(availableApps.map((a) => [a.name, a]));
+  let appsToLink: string[] = options.app
+    ? [
+        ...new Set(
+          options.app
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0 && s !== "none"),
+        ),
+      ]
+    : [];
 
-  if (!appToLink && availableApps.length > 0) {
+  if (!options.app && availableApps.length > 0) {
+    const matchingRecommendedApps = (
+      moduleDef.recommendedApps ??
+      (moduleDef.recommendedApp ? [moduleDef.recommendedApp] : [])
+    ).filter((appName) => availableAppMap.has(appName));
+
     if (options.yes) {
-      if (
-        moduleDef.recommendedApp &&
-        availableApps.some((a) => a.name === moduleDef.recommendedApp)
-      ) {
-        appToLink = moduleDef.recommendedApp;
-      }
+      appsToLink = matchingRecommendedApps;
     } else {
+      const hasMultiRecommendation = matchingRecommendedApps.length > 1;
+      const combinedValue = matchingRecommendedApps.join(",");
+      const combinedLabel = matchingRecommendedApps
+        .map((name) => `apps/${name}`)
+        .join(" + ");
+
       const choices = [
+        ...(hasMultiRecommendation
+          ? [
+              {
+                value: combinedValue,
+                label: combinedLabel,
+                hint: "Recommended",
+              },
+            ]
+          : []),
         ...availableApps.map((a) => ({
           value: a.name,
           label: `apps/${a.name}`,
-          hint: a.name === moduleDef.recommendedApp ? "Recommended" : undefined,
+          hint:
+            !hasMultiRecommendation && a.name === moduleDef.recommendedApp
+              ? "Recommended"
+              : undefined,
         })),
         {
           value: "none",
@@ -373,17 +401,26 @@ export const add = async (
       const chosen = await select({
         message: `Which app should consume ${scope}/${moduleDef.name}?`,
         options: choices,
-        initialValue: moduleDef.recommendedApp ?? availableApps[0]?.name,
+        initialValue: hasMultiRecommendation
+          ? combinedValue
+          : (moduleDef.recommendedApp ?? availableApps[0]?.name),
       });
 
       if (!isCancel(chosen) && chosen !== "none") {
-        appToLink = chosen as string;
+        appsToLink = [
+          ...new Set(
+            (chosen as string)
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean),
+          ),
+        ];
       }
     }
   }
 
-  if (appToLink && appToLink !== "none") {
-    const targetApp = availableApps.find((a) => a.name === appToLink);
+  for (const appName of appsToLink) {
+    const targetApp = availableAppMap.get(appName);
     if (targetApp) {
       const linked = await linkPackageToApp(
         targetApp.packageJsonPath,
@@ -392,7 +429,7 @@ export const add = async (
       );
       if (linked) {
         log.success(
-          `Added ${scope}/${moduleDef.name} to apps/${appToLink}/package.json`,
+          `Added ${scope}/${moduleDef.name} to apps/${appName}/package.json`,
         );
       }
     }

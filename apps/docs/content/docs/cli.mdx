@@ -110,21 +110,21 @@ pnpm dlx stackbase@latest add [module] [options]
 
 #### Arguments
 
-| Argument | Description                                                                                                                                               |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `module` | Optional. The name of the module to add (e.g. `queue`, `storage`, `email`, `rate-limit`, `auth`). If omitted, an interactive selection menu is presented. |
+| Argument | Description                                                                                                                                                                              |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `module` | Optional. The name of the module to add (e.g. `queue`, `storage`, `email`, `rate-limit`, `auth`, `payments`, `ai`, `analytics`). If omitted, an interactive selection menu is presented. |
 
 #### Options
 
-| Flag              | Description                                                                     |
-| ----------------- | ------------------------------------------------------------------------------- |
-| `-a, --app <app>` | Target application under `apps/*` to link the package into (e.g. `api`, `web`). |
-| `-v, --verbose`   | Display verbose installation and debug output.                                  |
-| `--list`          | List available modules and their current installation status in this workspace. |
-| `--allow-dirty`   | Allow running even if the git working tree has uncommitted modifications.       |
-| `--skip-install`  | Skip automatic package manager dependency installation.                         |
-| `--dry-run`       | Preview what files and configurations would be created without writing to disk. |
-| `-y, --yes`       | Skip interactive prompts and accept default selections.                         |
+| Flag              | Description                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
+| `-a, --app <app>` | Target application(s) under `apps/*` to link the package into (e.g. `api`, `web`, or `api,web`). |
+| `-v, --verbose`   | Display verbose installation and debug output.                                                   |
+| `--list`          | List available modules and their current installation status in this workspace.                  |
+| `--allow-dirty`   | Allow running even if the git working tree has uncommitted modifications.                        |
+| `--skip-install`  | Skip automatic package manager dependency installation.                                          |
+| `--dry-run`       | Preview what files and configurations would be created without writing to disk.                  |
+| `-y, --yes`       | Skip interactive prompts and accept default selections.                                          |
 
 #### What `add` does internally
 
@@ -148,6 +148,13 @@ pnpm dlx stackbase@latest add
 
 # Add BullMQ + Redis queue package directly into packages/queue and link to apps/api
 pnpm dlx stackbase@latest add queue --app api
+
+# Add Stripe payments package and link to both apps/api and apps/web
+pnpm dlx stackbase@latest add payments --app api,web
+
+# Add Vercel AI SDK or PostHog analytics modules with default recommended apps
+pnpm dlx stackbase@latest add ai --yes
+pnpm dlx stackbase@latest add analytics --yes
 
 # Preview file creation without touching disk
 pnpm dlx stackbase@latest add storage --dry-run

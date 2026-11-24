@@ -50,9 +50,12 @@ program
 program
   .command("add [module]")
   .description(
-    "Add a production-ready package to your Turborepo workspace (e.g. queue, storage, email, rate-limit, auth)",
+    "Add a production-ready package to your Turborepo workspace (e.g. queue, storage, email, rate-limit, auth, payments, ai, analytics)",
   )
-  .option("-a, --app <app>", "Target application to link the package into")
+  .option(
+    "-a, --app <app>",
+    "Target application(s) to link the package into (e.g. api, web, or api,web)",
+  )
   .option("-v, --verbose", "Display verbose debug and installation output")
   .option("--list", "List available modules and their installation status")
   .option("--allow-dirty", "Allow running with uncommitted git changes")

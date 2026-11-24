@@ -1,0 +1,141 @@
+---
+title: Queue
+description: Distributed background job queues and worker pipelines powered by BullMQ and Redis
+---
+
+# Queue Package
+
+The `@workspace/queue` package provides background job queues and worker pipelines built on **BullMQ** and **ioredis**. It handles Redis connection resolution, exponential backoff retries, job retention limits, and graceful worker shutdown.
+
+## Overview
+
+- **Package:** `@workspace/queue`
+- **Location:** `packages/queue`
+- **Install via CLI:** `pnpm dlx stackbase@latest add queue`
+- **Engine:** BullMQ (`bullmq`, `ioredis`)
+- **Backing Service:** Redis (`127.0.0.1:6379` in `docker-compose.yml`)
+
+## Project Structure
+
+```txt
+packages/queue/
+├── src/
+│   ├── client.ts                # Queue & Worker factories, Redis connection, closeAll
+│   ├── keys.ts                  # Zod environment variable schema
+│   ├── types.ts                 # TypeScript types and BullMQ re-exports
+│   ├── index.ts                 # Package entry point
+│   └── __tests__/
+│       └── queue.test.ts        # Unit test suite
+├── .env.example                 # Environment variables template
+├── package.json                 # Dependencies and scripts
+├── turbo.json                   # Scoped Turborepo lint environment config
+└── tsconfig.json                # TypeScript configuration
+```
+
+## Environment Variables
+
+Configure Redis in `packages/queue/.env.local` or your application `.env.local`:
+
+```bash
+# Redis Connection for BullMQ Job Queues
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=
+# Optional full connection URL (overrides host/port when set)
+# REDIS_URL=redis://127.0.0.1:6379
+```
+
+<Callout type="info">
+  For local development, `docker-compose.yml` runs `redis:7-alpine` bound to
+  `127.0.0.1:6379`, so `@workspace/queue` connects locally without extra setup.
+</Callout>
+
+## Usage
+
+### Define a Queue and Enqueue Jobs
+
+`createQueue` applies sensible production defaults out of the box: 3 attempts with exponential backoff (`1000ms` base delay), keeping the latest 1,000 completed jobs and 5,000 failed jobs.
+
+```typescript
+import { createQueue } from "@workspace/queue";
+
+export interface WelcomeEmailJob {
+  userId: string;
+  email: string;
+  name: string;
+}
+
+export const emailQueue = createQueue<WelcomeEmailJob>("email-delivery");
+
+// Enqueue a job from an API route or controller
+await emailQueue.add("send-welcome", {
+  userId: "usr_123",
+  email: "founder@example.com",
+  name: "Alex",
+});
+```
+
+### Process Jobs with a Worker
+
+```typescript
+import { createWorker } from "@workspace/queue";
+import type { WelcomeEmailJob } from "./queues";
+
+export const emailWorker = createWorker<WelcomeEmailJob>(
+  "email-delivery",
+  async (job) => {
+    const { email, name } = job.data;
+    // Perform background delivery work
+    return { deliveredTo: email, recipient: name };
+  },
+  {
+    concurrency: 5,
+  },
+);
+
+emailWorker.on("failed", (job, err) => {
+  console.error(`Job ${job?.id} failed:`, err.message);
+});
+```
+
+### Custom Redis Connection
+
+If a queue needs a separate Redis instance, pass custom configuration to `getRedisConnection`:
+
+```typescript
+import { createQueue, getRedisConnection } from "@workspace/queue";
+
+const customQueue = createQueue("analytics-ingest", {
+  connection: getRedisConnection({
+    host: "redis.internal",
+    port: 6380,
+    password: process.env.INTERNAL_REDIS_PASSWORD,
+  }),
+});
+```
+
+### Graceful Shutdown
+
+Call `closeAll()` when your Node.js or Express process receives `SIGTERM` or `SIGINT` so active workers finish in-flight jobs before exiting:
+
+```typescript
+import { closeAll } from "@workspace/queue";
+
+const shutdown = async () => {
+  await closeAll();
+  process.exit(0);
+};
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
+```
+
+## API Reference
+
+| Export                         | Description                                                                                |
+| ------------------------------ | ------------------------------------------------------------------------------------------ |
+| `createQueue(name, options?)`  | Creates and tracks a BullMQ `Queue` with default exponential retry and retention policies. |
+| `createWorker(name, fn, opts)` | Creates and tracks a BullMQ `Worker` bound to the workspace Redis connection.              |
+| `getRedisConnection(config?)`  | Builds a BullMQ-compatible Redis connection (`maxRetriesPerRequest: null`).                |
+| `closeAll()`                   | Closes all active queues and workers registered in the current process.                    |
+| `keys()`                       | Returns validated `REDIS_URL`, `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD` values.    |

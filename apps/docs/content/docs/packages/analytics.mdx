@@ -1,0 +1,151 @@
+---
+title: Analytics
+description: Client and server event tracking and feature flag evaluation powered by PostHog
+---
+
+# Analytics Package
+
+The `@workspace/analytics` package provides product analytics, user identification, and feature flag evaluation across both browser clients (`posthog-js`) and Node.js backend services (`posthog-node`).
+
+## Overview
+
+- **Package:** `@workspace/analytics`
+- **Location:** `packages/analytics`
+- **Install via CLI:** `pnpm dlx stackbase@latest add analytics`
+- **Engine:** PostHog (`posthog-js` for browser, `posthog-node` for server)
+- **Entrypoints:** `@workspace/analytics`, `@workspace/analytics/client`, and `@workspace/analytics/server`
+
+## Project Structure
+
+```txt
+packages/analytics/
+├── src/
+│   ├── client.ts                # Browser PostHog initializer, event capture, and client feature flags
+│   ├── server.ts                # Node PostHog singleton, event capture, fail-open flags, shutdown
+│   ├── keys.ts                  # Zod environment schema and placeholder key detection
+│   ├── types.ts                 # Shared config, event, and feature flag types
+│   ├── index.ts                 # Package entry point
+│   └── __tests__/
+│       └── analytics.test.ts    # Unit test suite
+├── .env.example                 # Environment variables template
+├── package.json                 # Dependencies and subpath exports
+├── turbo.json                   # Scoped Turborepo lint environment config
+└── tsconfig.json                # TypeScript configuration
+```
+
+## Environment Variables
+
+Configure PostHog in `packages/analytics/.env.local`, `apps/web/.env.local`, and `apps/api/.env.local`:
+
+```bash
+# PostHog Analytics & Feature Flags
+POSTHOG_API_KEY=your-posthog-api-key
+POSTHOG_HOST=https://us.i.posthog.com
+NEXT_PUBLIC_POSTHOG_KEY=your-posthog-public-key
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+```
+
+<Callout type="info" title="Zero-Config Local Development">
+  When `POSTHOG_API_KEY` or `NEXT_PUBLIC_POSTHOG_KEY` is omitted or still set to
+  the template placeholder (`your-posthog-*`), all client and server helpers
+  automatically no-op and return your fallback `defaultValue` for feature flags.
+  You can run the entire stack locally without creating a PostHog project first.
+</Callout>
+
+## Usage
+
+### Server Events
+
+Import from `@workspace/analytics/server` in `apps/api` routes, webhook handlers, or workers:
+
+```typescript
+import {
+  captureServerEvent,
+  identifyServerUser,
+  shutdownAnalytics,
+} from "@workspace/analytics/server";
+
+identifyServerUser("usr_123", {
+  email: "founder@example.com",
+  plan: "pro",
+});
+
+captureServerEvent({
+  distinctId: "usr_123",
+  event: "subscription_upgraded",
+  properties: { plan: "pro", amountCents: 4900 },
+});
+
+// Flush queued events on process exit
+process.on("SIGTERM", async () => {
+  await shutdownAnalytics();
+  process.exit(0);
+});
+```
+
+### Server Feature Flags
+
+Evaluate boolean or multivariate flags on the server. Calls fail open to `defaultValue` on network errors:
+
+```typescript
+import { getFeatureFlag, isFeatureEnabled } from "@workspace/analytics/server";
+
+const useNewPipeline = await isFeatureEnabled(
+  "v2-billing-pipeline",
+  "usr_123",
+  { defaultValue: false },
+);
+
+const variant = await getFeatureFlag("checkout-layout", "usr_123", {
+  defaultValue: "control",
+});
+```
+
+### Client Events & Flags
+
+Import from `@workspace/analytics/client` in `apps/web` client components:
+
+```typescript
+import {
+  captureClientEvent,
+  identifyClientUser,
+  initPostHogClient,
+  isClientFeatureEnabled,
+  resetClientAnalytics,
+} from "@workspace/analytics/client";
+
+initPostHogClient();
+identifyClientUser("usr_123", { role: "admin" });
+captureClientEvent("upgrade_cta_clicked", { location: "billing_banner" });
+
+if (isClientFeatureEnabled("ai-assistant-panel", false)) {
+  // Render assistant panel
+}
+
+// Clear identity on sign-out
+resetClientAnalytics();
+```
+
+## API Reference
+
+### Server Exports
+
+| Export                                                  | Description                                                                        |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `getPostHogServer(config?)`                             | Returns the shared `posthog-node` instance, or `null` if unconfigured.             |
+| `captureServerEvent(payload, client?)`                  | Captures a server event for `distinctId` and returns `true` if sent.               |
+| `identifyServerUser(distinctId, properties?, client?)`  | Associates user properties with `distinctId` on the server.                        |
+| `isFeatureEnabled(flagKey, distinctId, opts?, client?)` | Evaluates a boolean flag with fail-open fallback to `opts.defaultValue ?? false`.  |
+| `getFeatureFlag(flagKey, distinctId, opts?, client?)`   | Returns a boolean or multivariate flag value with fallback to `opts.defaultValue`. |
+| `shutdownAnalytics(client?)`                            | Flushes pending events and closes the `posthog-node` client.                       |
+
+### Client Exports
+
+| Export                                                  | Description                                                                 |
+| ------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `initPostHogClient(config?)`                            | Initializes `posthog-js` in the browser when a valid public key is present. |
+| `captureClientEvent(eventName, properties?, client?)`   | Captures a browser event if initialized.                                    |
+| `identifyClientUser(distinctId, properties?, client?)`  | Identifies the active browser user.                                         |
+| `isClientFeatureEnabled(flagKey, defaultVal?, client?)` | Checks a boolean feature flag in the browser.                               |
+| `getClientFeatureFlag(flagKey, client?)`                | Returns the active variant key or boolean for a browser feature flag.       |
+| `resetClientAnalytics(client?)`                         | Clears the current browser user identity on logout.                         |

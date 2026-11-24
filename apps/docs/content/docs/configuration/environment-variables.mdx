@@ -143,15 +143,19 @@ See the [Storage Package](../packages/storage) for complete setup guides and COR
 
 Stackbase uses the following `.env` files:
 
-| File                             | Description                                  |
-| -------------------------------- | -------------------------------------------- |
-| `apps/web/.env.local`            | Web Application Variables                    |
-| `apps/api/.env.local`            | API Server Variables                         |
-| `packages/db/.env.local`         | Database connection and Prisma config        |
-| `packages/auth/.env.local`       | Better Auth secret & OAuth credentials       |
-| `packages/email/.env.local`      | React Email templates and Resend integration |
-| `packages/rate-limit/.env.local` | Upstash Redis config                         |
-| `packages/storage/.env.local`    | S3, Cloudflare R2, or MinIO storage config   |
+| File                             | Description                                           |
+| -------------------------------- | ----------------------------------------------------- |
+| `apps/web/.env.local`            | Web Application Variables                             |
+| `apps/api/.env.local`            | API Server Variables                                  |
+| `packages/db/.env.local`         | Database connection and Prisma config                 |
+| `packages/auth/.env.local`       | Better Auth secret & OAuth credentials                |
+| `packages/email/.env.local`      | React Email templates and Resend integration          |
+| `packages/rate-limit/.env.local` | Upstash Redis config                                  |
+| `packages/queue/.env.local`      | Redis connection for BullMQ background queues         |
+| `packages/storage/.env.local`    | S3, Cloudflare R2, or MinIO storage config            |
+| `packages/payments/.env.local`   | Stripe secret, webhook, and publishable keys (opt-in) |
+| `packages/ai/.env.local`         | OpenAI and Anthropic keys and default models (opt-in) |
+| `packages/analytics/.env.local`  | PostHog server and client keys and hosts (opt-in)     |
 
 ## Adding New Variables
 

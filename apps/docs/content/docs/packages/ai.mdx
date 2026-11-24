@@ -1,0 +1,172 @@
+---
+title: AI
+description: Vercel AI SDK integration with OpenAI and Anthropic model routing, automatic fallbacks, and Zod-validated tools
+---
+
+# AI Package
+
+The `@workspace/ai` package integrates the **Vercel AI SDK** (`ai`) with first-class support for **OpenAI** (`@ai-sdk/openai`) and **Anthropic** (`@ai-sdk/anthropic`), automatic multi-provider fallback chains on rate limits or upstream outages, and Zod-validated tool definitions.
+
+## Overview
+
+- **Package:** `@workspace/ai`
+- **Location:** `packages/ai`
+- **Install via CLI:** `pnpm dlx stackbase@latest add ai`
+- **Engine:** Vercel AI SDK (`ai`, `@ai-sdk/openai`, `@ai-sdk/anthropic`)
+- **Default Models:** `gpt-6-luna` (OpenAI) and `claude-sonnet-5-5` (Anthropic)
+
+## Project Structure
+
+```txt
+packages/ai/
+├── src/
+│   ├── providers.ts             # Cached OpenAI & Anthropic provider factories and model resolution
+│   ├── fallback.ts              # withFallback, generateTextWithFallback, streamTextWithFallback
+│   ├── tools.ts                 # defineTool helper with runtime Zod input validation
+│   ├── keys.ts                  # Zod environment variable schema
+│   ├── types.ts                 # Provider, model spec, fallback, and tool types
+│   ├── index.ts                 # Package entry point
+│   └── __tests__/
+│       └── ai.test.ts           # Unit test suite
+├── .env.example                 # Environment variables template
+├── package.json                 # Dependencies and scripts
+├── turbo.json                   # Scoped Turborepo lint environment config
+└── tsconfig.json                # TypeScript configuration
+```
+
+## Environment Variables
+
+Configure your AI provider keys and default models in `packages/ai/.env.local` or your app `.env.local`:
+
+```bash
+# AI Providers (Vercel AI SDK)
+AI_DEFAULT_PROVIDER=openai
+OPENAI_API_KEY=your-openai-api-key
+OPENAI_MODEL=gpt-6-luna
+ANTHROPIC_API_KEY=your-anthropic-api-key
+ANTHROPIC_MODEL=claude-sonnet-5-5
+```
+
+<Callout type="info">
+  When both `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` are set,
+  `getDefaultModelSpecs()` automatically places `AI_DEFAULT_PROVIDER` first in
+  the chain and appends the secondary provider as an automatic fallback.
+</Callout>
+
+## Usage
+
+### Text Generation with Fallbacks
+
+`generateTextWithFallback` runs `generateText` against the primary model and automatically falls back to the next model in `models` if the provider returns a retryable error (`error.isRetryable`, HTTP `408`, `429`, or `5xx`):
+
+```typescript
+import { generateTextWithFallback } from "@workspace/ai";
+
+const { result, modelIndex, failedAttempts } = await generateTextWithFallback({
+  models: [
+    { provider: "openai", modelId: "gpt-6-luna" },
+    { provider: "anthropic", modelId: "claude-sonnet-5-5" },
+  ],
+  prompt: "Summarize the key architecture decisions in three bullet points.",
+});
+
+console.log(result.text);
+console.log(`Answered by model index ${modelIndex}`);
+```
+
+If you omit `models`, `generateTextWithFallback` uses `getDefaultModelSpecs()` based on your environment variables:
+
+```typescript
+const { result } = await generateTextWithFallback({
+  prompt: "Draft a release announcement for v2.4.0.",
+});
+```
+
+### Tool Calling with `defineTool`
+
+Use `defineTool` to define tools with runtime Zod schema validation that work directly with `generateTextWithFallback` and `streamTextWithFallback`:
+
+```typescript
+import { defineTool, generateTextWithFallback } from "@workspace/ai";
+import { z } from "zod";
+
+const lookupOrder = defineTool({
+  description: "Look up order status by order ID",
+  inputSchema: z.object({
+    orderId: z.string().min(1),
+  }),
+  execute: async ({ orderId }) => ({
+    orderId,
+    status: "shipped",
+    carrier: "DHL",
+  }),
+});
+
+const { result } = await generateTextWithFallback({
+  models: [
+    { provider: "openai", modelId: "gpt-6-luna" },
+    { provider: "anthropic", modelId: "claude-sonnet-5-5" },
+  ],
+  tools: { lookupOrder },
+  prompt: "Check the shipping status for order ORD-1042.",
+});
+```
+
+### Streaming Responses
+
+Use `streamTextWithFallback` for streaming chat endpoints in Express or Next.js Route Handlers:
+
+```typescript
+import { streamTextWithFallback } from "@workspace/ai";
+
+const { result } = await streamTextWithFallback({
+  prompt: "Explain how BullMQ exponential backoff works.",
+});
+
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+### Custom Operations with `withFallback`
+
+Wrap any custom AI SDK call (such as structured object generation) in `withFallback`:
+
+```typescript
+import { withFallback } from "@workspace/ai";
+import { generateText } from "ai";
+
+const { result } = await withFallback(
+  [
+    { provider: "openai", modelId: "gpt-6-luna" },
+    { provider: "anthropic", modelId: "claude-sonnet-5-5" },
+  ],
+  async (model) => {
+    return generateText({
+      model,
+      prompt: "Classify the sentiment of this support ticket.",
+    });
+  },
+  {
+    onFallback: (error, failedIdx, nextIdx) => {
+      console.warn(
+        `Model ${failedIdx} failed, retrying with model ${nextIdx}`,
+        error,
+      );
+    },
+  },
+);
+```
+
+## API Reference
+
+| Export                                              | Description                                                                                   |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `generateTextWithFallback(params)`                  | Wraps Vercel AI SDK `generateText` with automatic multi-provider fallback.                    |
+| `streamTextWithFallback(params)`                    | Wraps Vercel AI SDK `streamText` with multi-provider fallback.                                |
+| `withFallback(models, operation, options?)`         | Executes an arbitrary async callback across a fallback chain of `ModelOrSpec` entries.        |
+| `getLanguageModel(spec?)`                           | Resolves a cached OpenAI or Anthropic `LanguageModel` instance from a `ModelSpec`.            |
+| `getDefaultModelSpecs()`                            | Builds the default ordered fallback chain from configured environment variables.              |
+| `defineTool({ description, inputSchema, execute })` | Creates a Zod-validated tool definition compatible with AI SDK `tools` maps.                  |
+| `isRetryableProviderError(error)`                   | Returns `true` for retryable AI SDK errors (`isRetryable`, `408`, `429`, `>= 500`).           |
+| `keys()`                                            | Returns validated `AI_DEFAULT_PROVIDER`, `OPENAI_*`, and `ANTHROPIC_*` environment variables. |

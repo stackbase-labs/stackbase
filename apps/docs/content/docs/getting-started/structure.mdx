@@ -71,13 +71,17 @@ Packages are internal libraries shared across applications. They provide reusabl
 
 ```
 packages/
+├── ai/                     # Vercel AI SDK providers, fallbacks & tools (opt-in)
+├── analytics/              # PostHog client & server analytics and flags (opt-in)
 ├── auth/                   # Authentication logic & Better Auth config
 ├── contracts/              # Shared Zod validation contracts
 ├── db/                     # Prisma schema, client, and database migrations
 ├── email/                  # React Email templates and components
 ├── eslint-config/          # Shared ESLint configuration
 ├── logger/                 # Pino structured logger with env configuration
+├── payments/               # Stripe checkout, portal & webhook verification (opt-in)
 ├── prettier-config/        # Shared Prettier configuration
+├── queue/                  # BullMQ & Redis background job queues
 ├── rate-limit/             # API rate limiting utilities
 ├── storage/                # S3-compatible cloud file storage client
 ├── typescript-config/      # Shared TypeScript configs

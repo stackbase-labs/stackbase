@@ -9,14 +9,20 @@ import { getModulesStatus } from "../list.js";
 import { isExcludedByOptionalModules } from "../upgrade.js";
 import { isGitClean } from "../utils.js";
 import { adaptScope } from "../transformers/scope.js";
-import { extractEnvKeys, mergeEnvExample } from "../transformers/env.js";
+import {
+  detectWorkspaceEnvFileName,
+  extractEnvKeys,
+  initializeModuleEnv,
+  mergeEnvExample,
+} from "../transformers/env.js";
+import { checkEnv, parseEnvFileMap } from "../checks/env.js";
 import { mergeDockerComposeService } from "../transformers/dockerCompose.js";
 import {
   adaptPackageDependencies,
   DEFAULT_CATALOGS,
 } from "../transformers/catalog.js";
 import { linkPackageToApp } from "../transformers/appLink.js";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -173,6 +179,122 @@ PORT=4000
       expect(updated).toContain("REDIS_HOST=127.0.0.1");
       expect(updated).toContain("REDIS_PORT=6379");
       expect(updated).toContain("PORT=3000"); // preserved original
+    } finally {
+      await rm(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it("initializes packages/<module>/.env.local by default and passes checkEnv", async () => {
+    const tempDir = await mkdtemp(join(tmpdir(), "stackbase-test-mod-env-"));
+
+    try {
+      const dbDir = join(tempDir, "packages", "db");
+      const queueDir = join(tempDir, "packages", "queue");
+      await mkdir(dbDir, { recursive: true });
+      await mkdir(queueDir, { recursive: true });
+
+      await writeFile(
+        join(dbDir, ".env.example"),
+        'DATABASE_URL="postgresql://127.0.0.1:5432/app"\n',
+      );
+      await writeFile(
+        join(dbDir, ".env.local"),
+        'DATABASE_URL="postgresql://127.0.0.1:5432/app"\n',
+      );
+
+      await writeFile(
+        join(queueDir, ".env.example"),
+        "REDIS_HOST=127.0.0.1\nREDIS_PORT=6379\nREDIS_PASSWORD=\n",
+      );
+
+      const res = await initializeModuleEnv(queueDir, tempDir);
+      expect(res.created).toBe(true);
+      expect(res.envFileName).toBe(".env.local");
+
+      const envGroup = await checkEnv(tempDir);
+      expect(envGroup.checks.every((c) => c.status === "pass")).toBe(true);
+      const queueCheck = envGroup.checks.find(
+        (c) => c.id === "env-keys-packages/queue",
+      );
+      expect(queueCheck?.status).toBe("pass");
+      expect(queueCheck?.label).toBe("packages/queue/.env.local");
+    } finally {
+      await rm(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it("respects workspace .env convention when no .env.local files are used", async () => {
+    const tempDir = await mkdtemp(join(tmpdir(), "stackbase-test-mod-dotenv-"));
+
+    try {
+      const apiDir = join(tempDir, "apps", "api");
+      const queueDir = join(tempDir, "packages", "queue");
+      await mkdir(apiDir, { recursive: true });
+      await mkdir(queueDir, { recursive: true });
+
+      await writeFile(join(apiDir, ".env.example"), "PORT=4000\n");
+      await writeFile(join(apiDir, ".env"), "PORT=4000\n");
+      await writeFile(
+        join(queueDir, ".env.example"),
+        "REDIS_HOST=127.0.0.1\nREDIS_PORT=6379\n",
+      );
+
+      expect(await detectWorkspaceEnvFileName(tempDir)).toBe(".env");
+
+      const res = await initializeModuleEnv(queueDir, tempDir);
+      expect(res.created).toBe(true);
+      expect(res.envFileName).toBe(".env");
+
+      const envGroup = await checkEnv(tempDir);
+      expect(envGroup.checks.every((c) => c.status === "pass")).toBe(true);
+      const queueCheck = envGroup.checks.find(
+        (c) => c.id === "env-keys-packages/queue",
+      );
+      expect(queueCheck?.status).toBe("pass");
+      expect(queueCheck?.label).toBe("packages/queue/.env");
+    } finally {
+      await rm(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it("synchronizes BETTER_AUTH_SECRET with existing workspace secret or generates one", async () => {
+    const tempDir = await mkdtemp(join(tmpdir(), "stackbase-test-mod-auth-"));
+
+    try {
+      const apiDir = join(tempDir, "apps", "api");
+      const authDir = join(tempDir, "packages", "auth");
+      await mkdir(apiDir, { recursive: true });
+      await mkdir(authDir, { recursive: true });
+
+      const existingSecret = "existing-valid-better-auth-secret-over-32-chars";
+      await writeFile(
+        join(apiDir, ".env.example"),
+        "BETTER_AUTH_SECRET=your-betterauth-secret-key-min-32-chars\n",
+      );
+      await writeFile(
+        join(apiDir, ".env.local"),
+        `BETTER_AUTH_SECRET="${existingSecret}"\n`,
+      );
+
+      await writeFile(
+        join(authDir, ".env.example"),
+        "BETTER_AUTH_URL=http://localhost:4000\nBETTER_AUTH_SECRET=your-betterauth-secret-key-min-32-chars\n",
+      );
+
+      const res = await initializeModuleEnv(authDir, tempDir);
+      expect(res.created).toBe(true);
+      expect(res.envFileName).toBe(".env.local");
+
+      const authEnvMap = parseEnvFileMap(
+        await readFile(res.envFilePath, "utf8"),
+      );
+      expect(authEnvMap.get("BETTER_AUTH_SECRET")).toBe(existingSecret);
+
+      const envGroup = await checkEnv(tempDir);
+      expect(envGroup.checks.every((c) => c.status === "pass")).toBe(true);
+      expect(
+        envGroup.checks.find((c) => c.id === "env-auth-secret-sync"),
+      ).toBeUndefined();
     } finally {
       await rm(tempDir, { recursive: true, force: true });
     }

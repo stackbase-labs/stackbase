@@ -35,7 +35,7 @@ import {
   getTargetWorkspaceCatalogs,
 } from "./transformers/catalog.js";
 import { mergeDockerComposeService } from "./transformers/dockerCompose.js";
-import { mergeEnvExample } from "./transformers/env.js";
+import { initializeModuleEnv, mergeEnvExample } from "./transformers/env.js";
 import { adaptScope, detectWorkspaceScope } from "./transformers/scope.js";
 import { directoryExists, exec, isGitClean } from "./utils.js";
 
@@ -274,7 +274,9 @@ export const add = async (
           basename !== ".turbo" &&
           basename !== "dist" &&
           basename !== "build" &&
-          basename !== "tsconfig.tsbuildinfo"
+          basename !== "tsconfig.tsbuildinfo" &&
+          basename !== ".env" &&
+          basename !== ".env.local"
         );
       },
     });
@@ -311,7 +313,7 @@ export const add = async (
     }
   }
 
-  // 7. Merge environment variables into root .env.example
+  // 7. Merge environment variables into root .env.example and initialize module env file
   const moduleEnvExamplePath = join(targetPackageDir, ".env.example");
   if (await directoryExists(moduleEnvExamplePath)) {
     const moduleEnvContent = await readFile(moduleEnvExamplePath, "utf8");
@@ -322,6 +324,16 @@ export const add = async (
     );
     if (changed && addedKeys.length > 0) {
       log.success(`Updated .env.example (added ${addedKeys.join(", ")})`);
+    }
+
+    const { created, envFileName } = await initializeModuleEnv(
+      targetPackageDir,
+      projectRoot,
+    );
+    if (created) {
+      log.success(
+        `Created packages/${moduleDef.name}/${envFileName} from .env.example`,
+      );
     }
   }
 
@@ -531,7 +543,13 @@ const walkFiles = async (
         ) {
           await walkFiles(fullPath, root, results);
         }
-      } else {
+      } else if (
+        entry.name !== ".env" &&
+        entry.name !== ".env.local" &&
+        entry.name !== ".env.production" &&
+        entry.name !== ".env.development" &&
+        entry.name !== "tsconfig.tsbuildinfo"
+      ) {
         results.push(relPath);
       }
     }
